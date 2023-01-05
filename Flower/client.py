@@ -6,10 +6,10 @@ from utils.data_utils import load_data
 # Make TensorFlow log less verbose
 os.environ["TF_CPP_MIN_LOG_LEVEL"] = "3"
 datapath="data/data.csv"
-# Load utils and data
-model = get_seq_nn_model()
-model.compile("adam", "binary_crossentropy", metrics=["accuracy"])
+# Load model and data
 (x_train, y_train), (x_test, y_test) = load_data(datapath)
+model = get_seq_nn_model(input_dim=x_train.shape[1])
+model.compile("adam", "binary_crossentropy", metrics=["accuracy"])
 
 
 # Define Flower client

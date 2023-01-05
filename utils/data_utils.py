@@ -35,6 +35,8 @@ def load_data(data_path:str):
     :return: train test arrays
     """
     df = pd.read_csv(data_path)
+    df = df.rename(columns={'Unnamed: 0': 'Sample'})
+    df= df.set_index("Sample")
     df = clean_genexpr_data(df)
     X, y = create_X_y(df)
     X_train, X_test, y_train, y_test = train_test_split(X, y, test_size=0.2, random_state=69)

@@ -20,26 +20,27 @@ batch_size = 512
 
 #create train test data
 data_path ="../DataGenExpression/Alldata.csv"
+modelname = data_path.split("/")[-1].split(".")[0]
 X_train, X_test, y_train, y_test = load_data(data_path)
 
 #get utils
-model = get_seq_nn_model(num_nodes, dropout_rate, l1_v, l2_v)
+model = get_seq_nn_model(X_train.shape[1], num_nodes, dropout_rate, l1_v, l2_v)
 model.compile(optimizer=optimizer,
               loss=loss,
               metrics=metrics)
 
 # train utils
-os.makedirs("models",exist_ok=True)
+# os.makedirs("models",exist_ok=True)
 callbacks = [EarlyStopping(monitor='loss', patience=25),
-         ModelCheckpoint(filepath='/models/genexpr_model_fit.h5', monitor='loss', save_best_only=True)]
+         ModelCheckpoint(filepath=f'models/genexpr_model_{modelname}.h5', monitor='loss', save_best_only=True)]
 model.fit(X_train, y_train, epochs=epochs, batch_size=batch_size, callbacks=callbacks)
 
 #evaluate utils
 score = model.evaluate(X_test, y_test, verbose = 0)
 
-with open('readme.txt', 'w+') as f:
-    f.writelines(f"Test loss {score[0]}")
-    f.writelines(f"Text accuracy {score[1]}")
+with open('readme.txt', 'a+') as f:
+    f.writelines(f"Test loss {modelname} {score[0]}")
+    f.writelines(f"Text accuracy {modelname} {score[1]}")
 
 print('Test loss:', score[0])
 print('Test accuracy:', score[1])
