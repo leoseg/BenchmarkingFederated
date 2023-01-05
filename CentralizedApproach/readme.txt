@@ -1,0 +1,1 @@
+cTest loss Alldata 0.8253651857376099Text accuracy Alldata 0.9538653492927551
