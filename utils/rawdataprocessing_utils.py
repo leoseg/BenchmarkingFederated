@@ -37,4 +37,3 @@ def genexpr_anotation_txt_to_csv(filepath_txt:str,filepath_csv:str=None)-> pd.Da
     if filepath_csv:
         data.to_csv(filepath_csv)
     return data
-

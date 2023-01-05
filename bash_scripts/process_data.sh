@@ -10,4 +10,4 @@
 module load Anaconda3
 source activate venv
 pip3 install -r requirements.txt
-python .././process_data_script.py
+python ../scripts/process_data_script.py
