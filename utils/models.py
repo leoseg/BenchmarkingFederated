@@ -12,6 +12,7 @@ def get_seq_nn_model(input_dim:int,num_nodes: int = param_num_nodes, dropout_rat
                      l2_v: float = param_l2_v):
     """
     Creates utils with given parameters
+    :param input_dim: input dimension of data
     :param num_nodes: number of nodes in dense layers
     :param dropout_rate: dropout rate after denser layer
     :param l1_v: l1 kernel regularizer

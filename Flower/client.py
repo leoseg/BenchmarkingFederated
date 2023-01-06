@@ -1,13 +1,13 @@
 import os
 import flwr as fl
 from utils.models import get_seq_nn_model
-from utils.data_utils import load_data
+from utils.data_utils import load_gen_data_as_train_test_split
 
 # Make TensorFlow log less verbose
 os.environ["TF_CPP_MIN_LOG_LEVEL"] = "3"
-datapath="data/data.csv"
+datapath="app/data/Dataset.csv"
 # Load model and data
-(x_train, y_train), (x_test, y_test) = load_data(datapath)
+(x_train, y_train), (x_test, y_test) = load_gen_data_as_train_test_split(datapath)
 model = get_seq_nn_model(input_dim=x_train.shape[1])
 model.compile("adam", "binary_crossentropy", metrics=["accuracy"])
 

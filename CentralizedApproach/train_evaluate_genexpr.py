@@ -1,10 +1,6 @@
+from keras.callbacks import EarlyStopping, ModelCheckpoint
+from utils.data_utils import load_gen_data_as_train_test_split
 from utils.models import get_seq_nn_model
-import os
-from keras.callbacks import EarlyStopping,ModelCheckpoint
-import pandas as pd
-from utils.data_utils import create_X_y,clean_genexpr_data,load_data
-from sklearn.model_selection import train_test_split
-
 
 #params
 optimizer = "adam"
@@ -19,9 +15,9 @@ batch_size = 512
 
 
 #create train test data
-data_path ="../DataGenExpression/Alldata.csv"
+data_path ="../DataGenExpression/Dataset1.csv"
 modelname = data_path.split("/")[-1].split(".")[0]
-X_train, X_test, y_train, y_test = load_data(data_path)
+X_train, X_test, y_train, y_test = load_gen_data_as_train_test_split(data_path)
 
 #get utils
 model = get_seq_nn_model(X_train.shape[1], num_nodes, dropout_rate, l1_v, l2_v)

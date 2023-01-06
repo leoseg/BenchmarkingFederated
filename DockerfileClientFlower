@@ -1,0 +1,23 @@
+FROM python:3.9-buster
+
+ENV RUN_DIR="/app"
+
+
+WORKDIR $RUN_DIR
+
+COPY . $RUN_DIR
+#COPY $WORKER_SRC_PATH $RUN_DIR
+#COPY "data_loading.py" $RUN_DIR
+#COPY "../utils" $RUN_DIR
+
+#RUN python3 --version
+
+RUN pip3 install --upgrade "pip"
+RUN pip3 install tensorflow
+RUN pip3 install pandas
+RUN pip3 install scikit-learn
+RUN pip3 install flwr
+
+EXPOSE 8000
+
+CMD python3 $RUN_DIR/Flower/client.py

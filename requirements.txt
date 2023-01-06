@@ -55,3 +55,4 @@ Werkzeug==2.2.2
 wrapt==1.14.1
 
 flwr~=1.1.0
+pyreadr~=0.4.7
