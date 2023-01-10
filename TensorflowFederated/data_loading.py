@@ -3,7 +3,7 @@ import tensorflow as tf
 import tensorflow_federated as tff
 from utils.data_utils import load_gen_data
 
-GEN_DATAPATH = "app/data/Dataset.csv"
+GEN_DATAPATH = "/app/data/Dataset.csv"
 class GenDataBackend(tff.framework.DataBackend):
     def __int__(self):
         super().__init__()

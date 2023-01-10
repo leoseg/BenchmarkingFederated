@@ -29,11 +29,9 @@ COPY . $RUN_DIR
 
 #RUN python3 --version
 
-RUN pip3 install --upgrade "pip"
-RUN pip3 install tensorflow-federated
-RUN pip3 install pandas
-RUN pip3 install scikit
-
+COPY requirements.txt requirements.txt
+RUN pip3 install -r requirements.txt
+ENV PYTHONPATH "${PYTHONPATH}:${RUN_DIR}"
 EXPOSE 8000
 
 CMD python3 $RUN_DIR/TensorflowFederated/worker_service.py

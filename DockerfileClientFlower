@@ -10,14 +10,11 @@ COPY . $RUN_DIR
 #COPY "data_loading.py" $RUN_DIR
 #COPY "../utils" $RUN_DIR
 
-#RUN python3 --version
-
-RUN pip3 install --upgrade "pip"
-RUN pip3 install tensorflow
-RUN pip3 install pandas
-RUN pip3 install scikit-learn
-RUN pip3 install flwr
+COPY requirements.txt requirements.txt
+RUN pip3 install -r requirements.txt
+ENV PYTHONPATH "${PYTHONPATH}:${RUN_DIR}"
 
 EXPOSE 8000
+
 
 CMD python3 $RUN_DIR/Flower/client.py
