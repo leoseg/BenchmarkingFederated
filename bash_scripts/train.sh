@@ -12,4 +12,4 @@ module load cuDNN/8.1.0.77-CUDA-11.2.1
 module load Anaconda3
 source activate venv
 pip3 install -r requirements.txt
-python ../CentralizedApproach/train.py
+python ../CentralizedApproach/train_evaluate_genexpr.py

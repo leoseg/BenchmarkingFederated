@@ -3,3 +3,4 @@ tensorflow
 tensorflow-federated
 scikit-learn
 pandas
+wandb
