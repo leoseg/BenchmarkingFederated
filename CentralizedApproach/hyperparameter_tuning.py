@@ -66,4 +66,4 @@ def train():
         wandb.log({f"eval_{key}": value})
     wandb.finish()
 
-wandb.agent(sweep_id, function=train, count=2)
+wandb.agent(sweep_id, function=train, count=10)
