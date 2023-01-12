@@ -1,6 +1,6 @@
 from utils.data_utils import load_gen_data, create_X_y
 from utils.models import get_seq_nn_model
-from keras.metrics import Precision,Recall
+from keras.metrics import Precision,Recall,AUC
 from sklearn.model_selection import StratifiedKFold
 import wandb
 from tensorflow_addons.metrics import F1Score
@@ -12,17 +12,17 @@ configs = dict(
     epochs = 100,
     optimizer = 'adam',
     loss = "binary_crossentropy",
-    metrics = ["accuracy","AUC",Precision(),Recall()],
+    metrics = ["accuracy",AUC(curve="PR"),Precision(),Recall()],
     earlystopping_patience = 5,
     num_nodes = 1024,
     dropout_rate = 0.3,
     l1_v = 0.0,
     l2_v = 0.005,
-    n_splits =2
+    n_splits = 5
 
 )
 #create train test data
-data_path ="../DataGenExpression/Dataset1.csv"
+data_path ="../DataGenExpression/Alldata.csv"
 data_name = data_path.split("/")[2].split(".")[0]
 modelname = data_path.split("/")[-1].split(".")[0]
 df = load_gen_data(data_path)
@@ -62,7 +62,7 @@ for count,(train,test) in enumerate(kfold.split(X,Y)):
         else:
             ACCUMULATED_METRICS[key] = value
     wandb.finish()
-ACCUMULATED_METRICS = { key : value/configs["n_splits"] for (key, value) in ACCUMULATED_METRICS}
+ACCUMULATED_METRICS = { key : value/configs["n_splits"] for (key, value) in ACCUMULATED_METRICS.items()}
 wandb.init(project ="benchmark-central", config= configs, job_type="train", name="summary")
 for key,value in ACCUMULATED_METRICS:
     wandb.log(f"sum_{key} : {value}")

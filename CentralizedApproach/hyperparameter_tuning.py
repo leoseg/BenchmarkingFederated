@@ -11,7 +11,7 @@ configs = dict(
     epochs = 100,
     optimizer = 'adam',
     loss = "binary_crossentropy",
-    metrics = ["accuracy",AUC(),Precision(),Recall()],
+    metrics = ["accuracy",AUC(curve="PR"),Precision(),Recall()],
     earlystopping_patience = 5,
     num_nodes = 1024,
     dropout_rate = 0.3,
@@ -32,7 +32,7 @@ sweep_configuration = {
         "l2_v" : {"values" : [0.0,0.005]}
      }
 }
-data_path ="../DataGenExpression/Dataset1.csv"
+data_path ="../DataGenExpression/Alldata.csv"
 data_name = data_path.split("/")[2].split(".")[0]
 sweep_id = wandb.sweep(sweep=sweep_configuration, project=f'benchmark-central_sweep_{data_name}')
 #create train test data
