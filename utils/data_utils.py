@@ -42,13 +42,16 @@ def load_gen_data_as_train_test_split(data_path: str):
     return X_train, X_test, y_train, y_test
 
 
-def load_gen_data(data_path: str):
+def load_gen_data(data_path: str,nrows= None):
     """
     Load data from given path and preprocesses it
     :param data_path: path to data
     :return: datafrane
     """
-    df = pd.read_csv(data_path)
+    if nrows:
+        df = pd.read_csv(data_path,nrows= nrows)
+    else:
+        df = pd.read_csv(data_path)
     df = df.rename(columns={'Unnamed: 0': 'Sample'})
     df = df.set_index("Sample")
     df = clean_genexpr_data(df)

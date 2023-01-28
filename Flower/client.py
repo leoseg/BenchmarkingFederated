@@ -2,12 +2,13 @@ import os
 import flwr as fl
 from utils.models import get_seq_nn_model
 from utils.data_utils import load_gen_data_as_train_test_split
+import tensorflow as tf
 
 # Make TensorFlow log less verbose
 os.environ["TF_CPP_MIN_LOG_LEVEL"] = "3"
-datapath="data/Dataset.csv"
+datapath="../DataGenExpression/Dataset1.csv"
 # Load model and data
-x_train, y_train, x_test, y_test = load_gen_data_as_train_test_split(datapath)
+x_train, x_test, y_train, y_test = load_gen_data_as_train_test_split(datapath)
 model = get_seq_nn_model(input_dim=x_train.shape[1])
 model.compile("adam", "binary_crossentropy", metrics=["accuracy"])
 
@@ -19,7 +20,10 @@ class Client(fl.client.NumPyClient):
 
     def fit(self, parameters, config):
         model.set_weights(parameters)
-        model.fit(x_train, y_train, epochs=1, batch_size=32)
+        begin = tf.timestamp()
+        model.fit(x_train, y_train, epochs=40, batch_size=512)
+        end = tf.timestamp()
+        tf.print(end-begin)
         return model.get_weights(), len(x_train), {}
 
     def evaluate(self, parameters, config):

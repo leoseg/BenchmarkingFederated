@@ -1,20 +1,26 @@
 from typing import Any, Optional, List
 import tensorflow as tf
 import tensorflow_federated as tff
-from utils.data_utils import load_gen_data
+from utils.data_utils import load_gen_data_as_train_test_split
+from tff_config import EPOCHS,BATCH, N_ROWS
+GEN_DATAPATH = "../DataGenExpression/Dataset1.csv"
+SHUFFLE = 10000
 
-GEN_DATAPATH = "/app/data/Dataset.csv"
 class GenDataBackend(tff.framework.DataBackend):
-    def __int__(self):
-        super().__init__()
-        self.shuffle = 100
-        self.batch = 20
+
+
+    def __init__(self):
+        X_train, X_test, y_train, y_test = load_gen_data_as_train_test_split(data_path=GEN_DATAPATH)
+        self.client_dataset = tf.data.Dataset.from_tensor_slices((X_train, y_train))
+
+
+
+
+    def preprocess(self,dataset : tf.data.Dataset):
+        return dataset.shuffle(SHUFFLE, seed =1,reshuffle_each_iteration=True).batch(BATCH).repeat(EPOCHS)
 
     async def materialize(self, data, type_spec):
-        df = tf.convert_to_tensor(load_gen_data(GEN_DATAPATH))
-        client_dataset = tf.data.Dataset.from_tensor_slices((df[:, :-1], df[:, -1])).shuffle(self.shuffle).batch(
-            self.batch)
-        return client_dataset
+        return self.preprocess(self.client_dataset)
 
 
 

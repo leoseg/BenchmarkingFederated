@@ -1,18 +1,22 @@
 import collections
-
+from tff_config import *
 import grpc
 import tensorflow as tf
 import tensorflow_federated as tff
-
+from customized_tff_modules.fed_avg_with_time import build_weighted_fed_avg
 from data_loading import FederatedData
+from keras.metrics import AUC, Precision, Recall
 from utils.models import get_seq_nn_model
+import wandb
+RUN_NAME = "Test"
+element_spec = (
+    tf.TensorSpec(shape=(None, 12708), dtype=tf.float64, name=None),
+tf.TensorSpec(shape=(None,), dtype=tf.int64, name=None)
+)
 
-input_spec = collections.OrderedDict([
-    ('x', tf.TensorSpec(shape=(None, 12708), dtype=tf.int64, name=None)),
-    ('y', tf.TensorSpec(shape=(None,), dtype=tf.int64, name=None))
-])
 element_type = tff.types.StructWithPythonType(
-    input_spec, container_type=collections.OrderedDict)
+    element_spec,
+    container_type=collections.OrderedDict)
 dataset_type = tff.types.SequenceType(element_type)
 
 train_data_source = FederatedData(type_spec=dataset_type)
@@ -23,38 +27,60 @@ def model_fn():
     model = get_seq_nn_model(input_dim=12708)
     return tff.learning.from_keras_model(
         model,
-        input_spec=input_spec,
+        input_spec=element_spec,
         loss=tf.keras.losses.BinaryCrossentropy(),
-        metrics=[tf.keras.metrics.Accuracy()])
+        metrics=[tf.keras.metrics.BinaryAccuracy(),AUC(),Precision(),Recall()])
 
 
-trainer = tff.learning.algorithms.build_weighted_fed_avg(
+trainer = build_weighted_fed_avg(
     model_fn,
     client_optimizer_fn=lambda: tf.keras.optimizers.Adam(),
-    server_optimizer_fn=lambda: tf.keras.optimizers.Adam())
+    server_optimizer_fn=lambda: tf.keras.optimizers.SGD(learning_rate=1.0),
+    model_aggregator=tff.learning.robust_aggregator(zeroing=False, clipping=False, debug_measurements_fn=tff.learning.add_debug_measurements))
 
 
-def train_loop(num_rounds=10, num_clients=10):
+def train_loop(num_rounds=1, num_clients=1):
+    begin = tf.timestamp()
     state = trainer.initialize()
+    end = tf.timestamp()
+
+    tf.print("-------------------------------------------",output_stream="file://worker_service_logging.out")
+    with open('worker_service_logging.out', 'a+') as f:
+        f.writelines(
+            f"\nNew run with config num_rounds:{NUM_ROUNDS},num_clients:{num_clients},epochs:{EPOCHS},batch:{BATCH}"
+        )
+
+    round_data_uris = [f'uri://{i}' for i in range(num_clients)]
+    round_train_data = tff.framework.CreateDataDescriptor(
+        arg_uris=round_data_uris, arg_type=dataset_type)
+    tf.print(f"\nInitializationtime is {end - begin}",output_stream="file://worker_service_logging.out")
+
     for round in range(1, num_rounds + 1):
-        train_data = train_data_iterator.select(num_clients)
-        result = trainer.next(state, train_data)
+        begin = tf.timestamp()
+        result = trainer.next(state, round_train_data)
+        end = tf.timestamp()
+        round_time = end -begin
+        tf.print(f"Round  {round} time is {round_time}",output_stream="file://worker_service_logging.out")
         state = result.state
         train_metrics = result.metrics['client_work']['train']
-        with open('readme.txt', 'a+') as f:
-            f.writelines('round {:2d}, metrics={}'.format(round, train_metrics))
-        print('round {:2d}, metrics={}'.format(round, train_metrics))
+        with open('worker_service_logging.out', 'a+') as f:
+            f.writelines('Metrics={}'.format(train_metrics))
+    tf.print("\n-------------------------------------------", output_stream="file://worker_service_logging.out")
 
-
-ip_address_1 = '0.0.0.0'  # @param {type:"string"} TODO change to ip of node
-ip_address_2 = '0.0.0.0'  # @param {type:"string"} TODO change to ip of node
-port = 80
+ip_address= '0.0.0.0'  # @param {type:"string"} TODO change to ip of node
+port1 = 8040
+port2 = 8050
+port3 = 8060
 
 channels = [
-    grpc.insecure_channel(f'{ip_address_1}:{port}'),
-    grpc.insecure_channel(f'{ip_address_2}:{port}')
+    grpc.insecure_channel(f'{ip_address}:{port1}',options=[ ('grpc.max_send_message_length', 25586421),
+        ('grpc.max_receive_message_length',25586421), ("grpc.max_metadata_size",25586421)]),
+ grpc.insecure_channel(f'{ip_address}:{port2}',options=[ ('grpc.max_send_message_length', 25586421),
+          ('grpc.max_receive_message_length',25586421),("grpc.max_metadata_size",25586421)]),
+ grpc.insecure_channel(f'{ip_address}:{port3}',options=[ ('grpc.max_send_message_length', 25586421),
+          ('grpc.max_receive_message_length',25586421),("grpc.max_metadata_size",25586421)])
 ]
 
-tff.backends.native.set_remote_python_execution_context(channels)
+tff.backends.native.set_remote_python_execution_context([channels[1]])
 
-train_loop()
+train_loop(NUM_ROUNDS,NUM_CLIENTS)
