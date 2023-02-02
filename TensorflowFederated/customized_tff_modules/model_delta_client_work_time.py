@@ -47,6 +47,7 @@ from tensorflow_federated.python.learning.models import model_weights as model_w
 from tensorflow_federated.python.learning.optimizers import optimizer as optimizer_base
 from tensorflow_federated.python.learning.templates import client_works
 from tensorflow_federated.python.tensorflow_libs import tensor_utils
+from utils.config import tff_time_logging_directory
 
 logging.basicConfig(filename='/home/lseeger/PycharmProjects/BenchmarkingFederated/example.log', encoding='utf-8', level=logging.DEBUG)
 # TODO(b/213433744): Make this method private.
@@ -219,11 +220,11 @@ def build_model_delta_update_with_keras_optimizer(
 
 
 
-    tf.print("Num of examples", output_stream=f"file://worker_service_logging.out")
-    tf.print(num_examples, output_stream=f"file://worker_service_logging.out")
+    tf.print("Num of examples")
+    tf.print(num_examples)
     end = tf.timestamp()
-    tf.print("Time for client update with keras optimizer time ís", output_stream=f"file://worker_service_logging.out")
-    tf.print(end - begin, output_stream=f"file://worker_service_logging.out")
+    tf.print("Client training time", output_stream=f"file://{tff_time_logging_directory}")
+    tf.print(end - begin, output_stream=f"file://{tff_time_logging_directory}")
     return client_works.ClientResult(
         update=client_update, update_weight=client_weight), model_output
 

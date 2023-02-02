@@ -7,7 +7,7 @@ from sklearn.model_selection import StratifiedKFold
 import wandb
 import tensorflow as tf
 from wandb.keras import WandbCallback
-
+from utils.config import configs
 
 configs = dict(
     batch_size = 512,
@@ -35,7 +35,7 @@ kfold = StratifiedKFold(n_splits=configs["n_splits"],shuffle=True,random_state=0
 for count,(train,test) in enumerate(kfold.split(X,Y)):
     wandb.init(project=f"benchmark-central_{data_name}_with_tf_dataset", config=configs, job_type='train',name=f"k_fold_{count}")
 
-    client_dataset = tf.data.Dataset.from_tensor_slices((X.iloc[train], Y[train])).shuffle(10000)
+    client_dataset = tf.data.Dataset.from_tensor_slices((X.iloc[train], Y[train])).shuffle(configs["shuffle"])
     # Define WandbCallback for experiment tracking
     wandb_callback = WandbCallback(monitor='val_loss',
                                    log_weights=True,

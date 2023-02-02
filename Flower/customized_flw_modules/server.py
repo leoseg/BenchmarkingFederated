@@ -37,7 +37,9 @@ from flwr.server.client_manager import ClientManager
 from flwr.server.client_proxy import ClientProxy
 from flwr.server.history import History
 from flwr.server.strategy import FedAvg, Strategy
-
+import wandb
+from utils.time_logging import get_time_logs
+from utils.config import flw_time_logging_directory
 FitResultsAndFailures = Tuple[
     List[Tuple[ClientProxy, FitRes]],
     List[Union[Tuple[ClientProxy, FitRes], BaseException]],
@@ -56,12 +58,16 @@ class Server:
     """Flower server."""
 
     def __init__(
-        self, *, client_manager: ClientManager, strategy: Optional[Strategy] = None
+        self, system_metrics:bool, run_repeat:int,num_clients:int,data_path:str, client_manager: ClientManager, strategy: Optional[Strategy] = None
     ) -> None:
         self._client_manager: ClientManager = client_manager
         self.parameters: Parameters = Parameters(
             tensors=[], tensor_type="numpy.ndarray"
         )
+        self.system_metrics = system_metrics
+        self.run_repeat = run_repeat
+        self.num_clients = num_clients
+        self.data_path = data_path
         self.strategy: Strategy = strategy if strategy is not None else FedAvg()
         self.max_workers: Optional[int] = None
 
@@ -100,7 +106,12 @@ class Server:
         # Run federated learning for num_rounds
         log(INFO, "FL starting")
         start_time = timeit.default_timer()
-
+        data_name = self.data_path.split("/")[-1].split(".")[0]
+        if self.system_metrics:
+            metrics_type = "system"
+        else:
+            metrics_type ="model"
+        wandb.init(project=f"benchmark_rounds_{num_rounds}_{data_name}_{metrics_type}_metrics", group=f"flwr_{self.num_clients}", name=f"run_{self.run_repeat}")
         for current_round in range(1, num_rounds + 1):
             begin = tf.timestamp()
             # Train model and replace previous global model
@@ -110,7 +121,9 @@ class Server:
                 if parameters_prime:
                     self.parameters = parameters_prime
             end = tf.timestamp()
-            tf.print(end-begin)
+            if self.system_metrics:
+                wandb.log({"round_time", end - begin})
+                wandb.log(get_time_logs(flw_time_logging_directory, True))
             # Evaluate model using strategy implementation
             res_cen = self.strategy.evaluate(current_round, parameters=self.parameters)
             if res_cen is not None:
@@ -132,6 +145,8 @@ class Server:
             res_fed = self.evaluate_round(server_round=current_round, timeout=timeout)
             if res_fed:
                 loss_fed, evaluate_metrics_fed, _ = res_fed
+                if not self.system_metrics:
+                    wandb.log(res_fed)
                 if loss_fed:
                     history.add_loss_distributed(
                         server_round=current_round, loss=loss_fed

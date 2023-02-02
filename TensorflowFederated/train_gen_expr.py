@@ -5,10 +5,11 @@ import tensorflow as tf
 import tensorflow_federated as tff
 from customized_tff_modules.fed_avg_with_time import build_weighted_fed_avg
 from data_loading import FederatedData
-from keras.metrics import AUC, Precision, Recall
 from utils.models import get_seq_nn_model
 import wandb
-RUN_NAME = "Test"
+from utils.config import configs
+
+
 element_spec = (
     tf.TensorSpec(shape=(None, 12708), dtype=tf.float64, name=None),
 tf.TensorSpec(shape=(None,), dtype=tf.int64, name=None)
@@ -24,17 +25,17 @@ train_data_iterator = train_data_source.iterator()
 
 
 def model_fn():
-    model = get_seq_nn_model(input_dim=12708)
+    model = get_seq_nn_model(12708, configs["num_nodes"],configs["dropout_rate"], configs["l1_v"], configs["l2_v"])
     return tff.learning.from_keras_model(
         model,
         input_spec=element_spec,
-        loss=tf.keras.losses.BinaryCrossentropy(),
-        metrics=[tf.keras.metrics.BinaryAccuracy(),AUC(),Precision(),Recall()])
+        loss=configs["loss"],
+        metrics=[configs["metrics"]])
 
 
 trainer = build_weighted_fed_avg(
     model_fn,
-    client_optimizer_fn=lambda: tf.keras.optimizers.Adam(),
+    client_optimizer_fn=lambda: configs["optimizer"],
     server_optimizer_fn=lambda: tf.keras.optimizers.SGD(learning_rate=1.0),
     model_aggregator=tff.learning.robust_aggregator(zeroing=False, clipping=False, debug_measurements_fn=tff.learning.add_debug_measurements))
 
@@ -82,5 +83,7 @@ channels = [
 ]
 
 tff.backends.native.set_remote_python_execution_context([channels[1]])
+
+
 
 train_loop(NUM_ROUNDS,NUM_CLIENTS)
