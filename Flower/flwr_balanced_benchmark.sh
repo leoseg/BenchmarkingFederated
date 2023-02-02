@@ -8,7 +8,7 @@ python ../scripts/partion_data.py --num_clients $NUM_CLIENTS  --data_path $DATA_
 echo "Benchmark model metrics"
 for repeat in range{0..1}
 do
-  python server.py --data_path $DATA_PATH --run_repeat $repeat --num_clients $NUM_CLIENTS --num_rounds $NUM_ROUNDS --system_metrics false &
+  python server.py --data_path $DATA_PATH --random_state $repeat --num_clients $NUM_CLIENTS --num_rounds $NUM_ROUNDS --system_metrics false &
   sleep 3
   for ((i=1;i<=$NUM_CLIENTS;i++))
   do
@@ -16,7 +16,7 @@ do
   done
 done
 echo "Benchmark system metrics"
-for repeat in range{0..10}
+for repeat in range{0..100}
 do
   python server.py --data_path $DATA_PATH --run_repeat $repeat --num_clients 1 --num_rounds $NUM_ROUNDS --system_metrics true &
   sleep 3
