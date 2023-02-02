@@ -173,8 +173,6 @@ def build_model_delta_update_with_keras_optimizer(
 
   @tf.function
   def client_update(optimizer, initial_weights, data):
-
-
     model_weights = model_weights_lib.ModelWeights.from_model(model)
     tf.nest.map_structure(lambda a, b: a.assign(b), model_weights,
                           initial_weights)

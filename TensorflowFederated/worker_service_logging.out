@@ -8834,4 +8834,97 @@ Metrics=OrderedDict([('binary_accuracy', 0.99975), ('auc', 0.99998736), ('precis
 Time for client update with keras optimizer time ís
 11.392400026321411
 Round  4 time is 12.237836837768555
-Metrics=OrderedDict([('binary_accuracy', 0.99998), ('auc', 1.0), ('precision', 0.99995244), ('recall', 1.0), ('loss', 0.00094081427), ('num_examples', 100000), ('num_batches', 200)])
+Metrics=OrderedDict([('binary_accuracy', 0.99998), ('auc', 1.0), ('precision', 0.99995244), ('recall', 1.0), ('loss', 0.00094081427), ('num_examples', 100000), ('num_batches', 200)])-------------------------------------------
+
+New run with config num_rounds:4,num_clients:1,epochs:50,batch:512
+Initializationtime is 0.49880504608154297
+-------------------------------------------
+
+New run with config num_rounds:4,num_clients:1,epochs:50,batch:512
+Initializationtime is 0.4775509834289551
+-------------------------------------------
+
+New run with config num_rounds:4,num_clients:1,epochs:50,batch:512
+Initializationtime is 0.4975569248199463
+-------------------------------------------
+
+New run with config num_rounds:4,num_clients:1,epochs:50,batch:512
+Initializationtime is 0.4964418411254883
+-------------------------------------------
+
+New run with config num_rounds:4,num_clients:1,epochs:50,batch:512
+Initializationtime is 0.48064303398132324
+Round  1 time is 49.56681799888611
+Metrics=OrderedDict([('binary_accuracy', 0.97213), ('loss', 0.0832051), ('num_examples', 200000), ('num_batches', 400)])Round  2 time is 27.426514863967896
+Metrics=OrderedDict([('binary_accuracy', 0.999695), ('loss', 0.0018428846), ('num_examples', 200000), ('num_batches', 400)])Round  3 time is 27.935469150543213
+Metrics=OrderedDict([('binary_accuracy', 0.999975), ('loss', 0.0007406669), ('num_examples', 200000), ('num_batches', 400)])Round  4 time is 28.25783681869507
+Metrics=OrderedDict([('binary_accuracy', 0.99998), ('loss', 0.0006213639), ('num_examples', 200000), ('num_batches', 400)])
+-------------------------------------------
+-------------------------------------------
+
+New run with config num_rounds:4,num_clients:1,epochs:50,batch:512
+Initializationtime is 0.48078393936157227
+Round  1 time is 28.634080171585083
+Metrics=OrderedDict([('binary_accuracy', 0.955265), ('loss', 0.19164617), ('num_examples', 200000), ('num_batches', 400)])Round  2 time is 26.736404180526733
+Metrics=OrderedDict([('binary_accuracy', 0.99962), ('loss', 0.004080835), ('num_examples', 200000), ('num_batches', 400)])Round  3 time is 26.855284929275513
+Metrics=OrderedDict([('binary_accuracy', 0.99995), ('loss', 0.0009614935), ('num_examples', 200000), ('num_batches', 400)])Round  4 time is 27.114495038986206
+Metrics=OrderedDict([('binary_accuracy', 0.999985), ('loss', 0.0006674127), ('num_examples', 200000), ('num_batches', 400)])
+-------------------------------------------
+-------------------------------------------
+
+New run with config num_rounds:4,num_clients:1,epochs:50,batch:512
+Initializationtime is 0.5084998607635498
+-------------------------------------------
+
+New run with config num_rounds:4,num_clients:1,epochs:50,batch:512
+Initializationtime is 0.4939849376678467
+-------------------------------------------
+
+New run with config num_rounds:4,num_clients:1,epochs:50,batch:512
+Initializationtime is 0.4926309585571289
+Round  1 time is 23.393737077713013
+Metrics=OrderedDict([('binary_accuracy', 0.944285), ('loss', 0.216229), ('num_examples', 200000), ('num_batches', 400)])Round  2 time is 21.119552850723267
+Metrics=OrderedDict([('binary_accuracy', 0.999425), ('loss', 0.0032915412), ('num_examples', 200000), ('num_batches', 400)])Round  3 time is 27.858375072479248
+Metrics=OrderedDict([('binary_accuracy', 0.999975), ('loss', 0.0008193173), ('num_examples', 200000), ('num_batches', 400)])Round  4 time is 23.635318994522095
+Metrics=OrderedDict([('binary_accuracy', 0.99996), ('loss', 0.00061991374), ('num_examples', 200000), ('num_batches', 400)])
+-------------------------------------------
+-------------------------------------------
+
+New run with config num_rounds:4,num_clients:1,epochs:50,batch:512
+Initializationtime is 0.5099799633026123
+Round  1 time is 45.939069986343384
+Metrics=OrderedDict([('binary_accuracy', 0.964725), ('loss', 0.12992482), ('num_examples', 200000), ('num_batches', 400)])Round  2 time is 23.7618088722229
+Metrics=OrderedDict([('binary_accuracy', 0.999515), ('loss', 0.0030963186), ('num_examples', 200000), ('num_batches', 400)])Round  3 time is 22.681512117385864
+Metrics=OrderedDict([('binary_accuracy', 0.99998), ('loss', 0.00078970665), ('num_examples', 200000), ('num_batches', 400)])Round  4 time is 21.14625597000122
+Metrics=OrderedDict([('binary_accuracy', 0.99997), ('loss', 0.000658171), ('num_examples', 200000), ('num_batches', 400)])
+-------------------------------------------
+-------------------------------------------
+
+New run with config num_rounds:4,num_clients:1,epochs:50,batch:512
+Initializationtime is 0.5088710784912109
+Round  1 time is 50.02574801445007
+Metrics=OrderedDict([('binary_accuracy', 0.94231), ('loss', 0.26405466), ('num_examples', 200000), ('num_batches', 400)])Round  2 time is 26.317193031311035
+Metrics=OrderedDict([('binary_accuracy', 0.99947), ('loss', 0.0030988462), ('num_examples', 200000), ('num_batches', 400)])Round  3 time is 26.42460322380066
+Metrics=OrderedDict([('binary_accuracy', 0.999935), ('loss', 0.0010434964), ('num_examples', 200000), ('num_batches', 400)])Round  4 time is 26.23895812034607
+Metrics=OrderedDict([('binary_accuracy', 0.99997), ('loss', 0.00068760454), ('num_examples', 200000), ('num_batches', 400)])
+-------------------------------------------
+-------------------------------------------
+
+New run with config num_rounds:4,num_clients:1,epochs:50,batch:512
+Initializationtime is 0.5850741863250732
+Round  1 time is 42.82504320144653
+Metrics=OrderedDict([('binary_accuracy', 0.970995), ('loss', 0.090992674), ('num_examples', 200000), ('num_batches', 400)])Round  2 time is 18.486119985580444
+Metrics=OrderedDict([('binary_accuracy', 0.99954), ('loss', 0.0027886026), ('num_examples', 200000), ('num_batches', 400)])Round  3 time is 18.522966146469116
+Metrics=OrderedDict([('binary_accuracy', 0.999965), ('loss', 0.0008590059), ('num_examples', 200000), ('num_batches', 400)])Round  4 time is 18.33024311065674
+Metrics=OrderedDict([('binary_accuracy', 0.99999), ('loss', 0.0006130663), ('num_examples', 200000), ('num_batches', 400)])
+-------------------------------------------
+-------------------------------------------
+
+New run with config num_rounds:4,num_clients:1,epochs:50,batch:512
+Initializationtime is 0.846869945526123
+Round  1 time is 21.0776469707489
+Metrics=OrderedDict([('binary_accuracy', 0.968925), ('loss', 0.15060543), ('num_examples', 200000), ('num_batches', 400)])Round  2 time is 18.463162899017334
+Metrics=OrderedDict([('binary_accuracy', 0.99942), ('loss', 0.004812175), ('num_examples', 200000), ('num_batches', 400)])Round  3 time is 18.679859161376953
+Metrics=OrderedDict([('binary_accuracy', 0.99995), ('loss', 0.0008883424), ('num_examples', 200000), ('num_batches', 400)])Round  4 time is 18.92550301551819
+Metrics=OrderedDict([('binary_accuracy', 0.99998), ('loss', 0.0006507328), ('num_examples', 200000), ('num_batches', 400)])
+-------------------------------------------

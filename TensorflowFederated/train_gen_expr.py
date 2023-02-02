@@ -8,7 +8,7 @@ from data_loading import FederatedData
 from utils.models import get_seq_nn_model
 import wandb
 from utils.config import configs
-
+from keras.metrics import BinaryAccuracy
 
 element_spec = (
     tf.TensorSpec(shape=(None, 12708), dtype=tf.float64, name=None),
@@ -30,14 +30,16 @@ def model_fn():
         model,
         input_spec=element_spec,
         loss=configs["loss"],
-        metrics=[configs["metrics"]])
+        metrics=[BinaryAccuracy()])
 
 
 trainer = build_weighted_fed_avg(
     model_fn,
+    use_experimental_simulation_loop=True,
     client_optimizer_fn=lambda: configs["optimizer"],
     server_optimizer_fn=lambda: tf.keras.optimizers.SGD(learning_rate=1.0),
-    model_aggregator=tff.learning.robust_aggregator(zeroing=False, clipping=False, debug_measurements_fn=tff.learning.add_debug_measurements))
+    model_aggregator=tff.learning.robust_aggregator(zeroing=False, clipping=False, debug_measurements_fn=tff.learning.add_debug_measurements),
+)
 
 
 def train_loop(num_rounds=1, num_clients=1):
@@ -55,7 +57,7 @@ def train_loop(num_rounds=1, num_clients=1):
     round_train_data = tff.framework.CreateDataDescriptor(
         arg_uris=round_data_uris, arg_type=dataset_type)
     tf.print(f"\nInitializationtime is {end - begin}",output_stream="file://worker_service_logging.out")
-
+    logdir="testlog"
     for round in range(1, num_rounds + 1):
         begin = tf.timestamp()
         result = trainer.next(state, round_train_data)
@@ -83,7 +85,6 @@ channels = [
 ]
 
 tff.backends.native.set_remote_python_execution_context([channels[1]])
-
 
 
 train_loop(NUM_ROUNDS,NUM_CLIENTS)

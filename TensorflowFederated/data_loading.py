@@ -5,11 +5,12 @@ from utils.data_utils import load_gen_data_as_train_test_dataset_balanced, prepr
 
 class GenDataBackend(tff.framework.DataBackend):
 
-    def __init__(self, rows_to_keep, kfold_num, data_path,local_epochs):
+    def __init__(self, rows_to_keep, kfold_num, data_path,local_epochs,random_state):
         self.train_dataset, self.test_dataset = load_gen_data_as_train_test_dataset_balanced(
             data_path=data_path,
             rows_to_keep=rows_to_keep,
-            kfold_num=kfold_num
+            kfold_num=kfold_num,
+            random_state=random_state
         )
         self.local_epochs = local_epochs
 

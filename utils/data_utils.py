@@ -3,7 +3,7 @@ from sklearn.model_selection import train_test_split, StratifiedKFold
 from sklearn.preprocessing import StandardScaler
 from config import configs
 import tensorflow as tf
-kfold = StratifiedKFold(n_splits=configs["n_splits"],shuffle=True,random_state=0)
+
 
 
 def clean_genexpr_data(df: pd.DataFrame) -> pd.DataFrame:
@@ -60,20 +60,21 @@ def load_gen_data(data_path: str,rows_to_keep= None):
     df = clean_genexpr_data(df)
     return df
 
-def load_gen_data_as_train_test_dataset_balanced(data_path:str, rows_to_keep=None, kfold_num:int=0):
+def load_gen_data_as_train_test_dataset_balanced(data_path:str, rows_to_keep=None, kfold_num:int=0,random_state=0):
     """
     Loads gen data from given path and splits is into train and test dataset
     :param data_path: path to gen data file
     :param rows_to_keep: if given only keep this rows of data file
-    :param kfold_num: used too choose which fold to use for test and train
+    :param kfold_num: used to choose which fold to use for test and train
     :return:
     """
+    kfold = StratifiedKFold(n_splits=configs["n_splits"], shuffle=True, random_state=random_state)
     df = load_gen_data(data_path,rows_to_keep)
     X, Y = create_X_y(df)
     for count, (train, test) in enumerate(kfold.split(X, Y)):
         if count == kfold_num:
             train_dataset = tf.data.Dataset.from_tensor_slices((X.iloc[train], Y[train]))
-            test_dataset = tf.data.Dataset.from_tensor_slices(X.iloc[test],Y[test])
+            test_dataset = tf.data.Dataset.from_tensor_slices((X.iloc[test],Y[test]))
             return train_dataset,test_dataset
 
 def preprocess(dataset : tf.data.Dataset,epochs :int = configs["epochs"]):
@@ -81,7 +82,7 @@ def preprocess(dataset : tf.data.Dataset,epochs :int = configs["epochs"]):
 
 
 def create_class_balanced_partitions(data_path:str, num_partitions:int):
-    partitioner = StratifiedKFold(n_splits=num_partitions,shuffle=True,random_state=0)
+    partitioner = StratifiedKFold(n_splits=num_partitions,shuffle=True)
     partition_rows = []
     df = load_gen_data(data_path)
     X,y = create_X_y(df)
