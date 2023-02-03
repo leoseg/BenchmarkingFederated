@@ -22,14 +22,17 @@ parser.add_argument(
 parser.add_argument(
     "--l1_v",type=float,help="l1 kernel regularizer",default=configs["l1_v"]
 )
+parser.add_argument(
+    "--data_path", type=str, help="path of data to load",default=configs["data_path"]
+)
 # print help if no argument is specified
 args = parser.parse_args()
 
 #create train test data
-data_path =configs["data_path"]
+data_path = args.data_path
 data_name = data_path.split("/")[2].split(".")[0]
 modelname = data_path.split("/")[-1].split(".")[0]
-df = load_gen_data(configs["data_path"])
+df = load_gen_data(data_path)
 X, Y= create_X_y(df)
 kfold = StratifiedKFold(n_splits=configs["n_splits"],shuffle=True,random_state=0)
 

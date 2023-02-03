@@ -4,6 +4,7 @@ export PYTHONPATH="${PYTHONPATH}:../."
 DATA_PATH=$1
 NUM_CLIENTS=$2
 NUM_ROUNDS=$3
+WANDB_API_KEY=$4
 REPEATS=$5
 DATA_NAME=$(basename "$DATA_PATH")
 echo "Starting flwr experiment with num clients ${NUM_CLIENTS} num rounds ${NUM_ROUNDS} and data ${DATA_NAME} and ${REPEATS} repeats"
