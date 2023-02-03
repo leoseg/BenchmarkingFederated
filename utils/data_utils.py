@@ -3,7 +3,7 @@ from sklearn.model_selection import train_test_split, StratifiedKFold
 from sklearn.preprocessing import StandardScaler
 from config import configs
 import tensorflow as tf
-
+import numpy
 
 
 def clean_genexpr_data(df: pd.DataFrame) -> pd.DataFrame:
@@ -51,7 +51,7 @@ def load_gen_data(data_path: str,rows_to_keep= None):
     :param data_path: path to data
     :return: datafrane
     """
-    if rows_to_keep:
+    if rows_to_keep is not None:
         df = pd.read_csv(data_path, skiprows=lambda x: x not in rows_to_keep)
     else:
         df = pd.read_csv(data_path)
@@ -87,5 +87,7 @@ def create_class_balanced_partitions(data_path:str, num_partitions:int):
     df = load_gen_data(data_path)
     X,y = create_X_y(df)
     for _,rows in partitioner.split(X,y):
+        rows = list(numpy.asarray(rows) + 1)
+        rows.append(0)
         partition_rows.append(rows)
     return partition_rows

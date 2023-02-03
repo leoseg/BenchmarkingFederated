@@ -11,6 +11,8 @@ import wandb
 from utils.config import configs
 from utils.config import tff_time_logging_directory
 import argparse
+from keras.metrics import AUC,BinaryAccuracy,Recall,Precision
+import os
 parser = argparse.ArgumentParser(
         prog="train_gen_expr.py",
         formatter_class=argparse.RawDescriptionHelpFormatter,
@@ -22,7 +24,7 @@ parser.add_argument(
     "--num_clients",type=int,help="number of clients"
 )
 parser.add_argument(
-    "--datapath", type=str, help="path of data to load"
+    "--data_path", type=str, help="path of data to load"
 )
 parser.add_argument(
     "--run_repeat",type=int,help="number of run with same config"
@@ -32,12 +34,13 @@ parser.add_argument(
 )
 # print help if no argument is specified
 args = parser.parse_args()
-
+os.environ["TF_CPP_MIN_LOG_LEVEL"] = "3"
 element_spec = (
     tf.TensorSpec(shape=(None, 12708), dtype=tf.float64, name=None),
 tf.TensorSpec(shape=(None,), dtype=tf.int64, name=None)
 )
-
+print("Command line args are:\n")
+print(args)
 element_type = tff.types.StructWithPythonType(
     element_spec,
     container_type=collections.OrderedDict)
@@ -53,7 +56,7 @@ def model_fn():
         model,
         input_spec=element_spec,
         loss=configs["loss"],
-        metrics=[configs["metrics"]])
+        metrics=[BinaryAccuracy(),AUC(),Precision(),Recall()])
 
 
 trainer = build_weighted_fed_avg(
@@ -63,11 +66,12 @@ trainer = build_weighted_fed_avg(
     model_aggregator=tff.learning.robust_aggregator(zeroing=False, clipping=False, debug_measurements_fn=tff.learning.add_debug_measurements))
 evaluation_process = tff.learning.algorithms.build_fed_eval(model_fn=model_fn)
 data_name = args.data_path.split("/")[-1].split(".")[0]
-if args.system_metrics:
+if args.system_metrics == True:
     metrics_type = "system"
 else:
     metrics_type = "model"
 
+print("Training initialized")
 wandb.init(project=f"benchmark_rounds_{args.num_rounds}_{data_name}_{metrics_type}_metrics", group=f"tff_{args.num_clients}", name=f"run_{args.run_repeat}")
 
 def train_loop(num_rounds=1, num_clients=1):
@@ -80,18 +84,21 @@ def train_loop(num_rounds=1, num_clients=1):
     eval_data = tff.framework.CreateDataDescriptor(
         arg_uris=eval_data_uris, arg_type=dataset_type)
     for round in range(1, num_rounds + 1):
+        print(f"Begin round {round}")
         begin = tf.timestamp()
         result = trainer.next(state, round_train_data)
         end = tf.timestamp()
-        state = result.state
-        model_weights = trainer.get_model_weights(state)
-        evaluation_state = evaluation_process.set_model_weights(evaluation_state, model_weights)
-        evaluation_output = evaluation_process.next(evaluation_state, eval_data)
+
         if not args.system_metrics:
-            wandb.log(evaluation_output.metrics["client_work"]["current_round_metrics"])
+            state = result.state
+            model_weights = trainer.get_model_weights(state)
+            evaluation_state = evaluation_process.set_model_weights(evaluation_state, model_weights)
+            evaluation_output = evaluation_process.next(evaluation_state, eval_data)
+            wandb.log(evaluation_output.metrics["client_work"]["eval"]["current_round_metrics"])
 
         if args.system_metrics:
-            wandb.log({"round_time",end-begin})
+            round_time = end-begin
+            wandb.log({"round_time":tf.get_static_value(round_time)})
             wandb.log(get_time_logs(tff_time_logging_directory,True))
 
 

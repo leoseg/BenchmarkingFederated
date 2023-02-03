@@ -122,7 +122,7 @@ class Server:
                     self.parameters = parameters_prime
             end = tf.timestamp()
             if self.system_metrics:
-                wandb.log({"round_time", end - begin})
+                wandb.log({"round_time":tf.get_static_value(end - begin)})
                 wandb.log(get_time_logs(flw_time_logging_directory, True))
             # Evaluate model using strategy implementation
             res_cen = self.strategy.evaluate(current_round, parameters=self.parameters)

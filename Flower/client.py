@@ -18,7 +18,7 @@ parser.add_argument(
 )
 
 parser.add_argument(
-    "--datapath", type=str, help="path of data to load",default="../DataGenExpression/Dataset1.csv"
+    "--data_path", type=str, help="path of data to load",default="../DataGenExpression/Dataset1.csv"
 )
 parser.add_argument(
     "--run_repeat",type=int,help="number of run with same config",default=1
@@ -35,7 +35,7 @@ with open("partitions_list","rb") as file:
     partitions_list = pickle.load(file)
 # Make TensorFlow log less verbose
 os.environ["TF_CPP_MIN_LOG_LEVEL"] = "3"
-datapath = args.datapath
+datapath = args.data_path
 if args.client_index:
     rows_to_keep = partitions_list[args.client_index]
 else:
@@ -60,12 +60,12 @@ class Client(fl.client.NumPyClient):
         if args.system_metrics:
             tf.print("Client training time",output_stream=f"file://{flw_time_logging_directory}")
             tf.print(end-begin,output_stream=f"file://{flw_time_logging_directory}")
-        return model.get_weights(), len(list[train_ds]), {}
+        return model.get_weights(), len(list(train_ds)), {}
 
     def evaluate(self, parameters, config):
         model.set_weights(parameters)
         loss, accuracy = model.evaluate(test_ds)
-        return loss, len(list[test_ds]), {"accuracy": accuracy}
+        return loss, len(list(test_ds)), {"accuracy": accuracy}
 
 
 

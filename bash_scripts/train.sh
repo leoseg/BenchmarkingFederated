@@ -7,9 +7,7 @@
 #SBATCH --mail-type=end          # send email when job ends
 #SBATCH --mail-type=fail         # send email if job fails
 #SBATCH --mail-user=leoseeger16@gmail.com
-module load CUDAcore/11.2.1
-module load cuDNN/8.1.0.77-CUDA-11.2.1
-module load Anaconda3
+#module load Anaconda3
 source activate venv
 pip3 install -r requirements.txt
-python ../CentralizedApproach/train_evaluate_genexpr.py
+python ../CentralizedApproach/benchmark_central.py

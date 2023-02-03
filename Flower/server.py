@@ -15,7 +15,7 @@ parser.add_argument(
     "--num_clients",type=int,help="number of clients"
 )
 parser.add_argument(
-    "--datapath", type=str, help="path of data to load"
+    "--data_path", type=str, help="path of data to load"
 )
 parser.add_argument(
     "--run_repeat",type=int,help="number of run with same config"
@@ -34,12 +34,12 @@ def fit_config(server_round: int):
     return config
 
 strat = fl.server.strategy.FedAvg(min_fit_clients =1,min_available_clients=1
-                                  ,min_evaluate_clients=1,on_fit_config= fit_config)
+                                  ,min_evaluate_clients=1,on_fit_config_fn= fit_config)
 # Start Flower server
 start_server(
     server_address="0.0.0.0:8080",
     server=Server(
-        data_path=args.datapath,
+        data_path=args.data_path,
         num_clients=args.num_clients,
         client_manager=SimpleClientManager(),
         strategy=strat,

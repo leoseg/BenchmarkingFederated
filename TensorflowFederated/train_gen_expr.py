@@ -48,7 +48,7 @@ def train_loop(num_rounds=1, num_clients=1):
     end = tf.timestamp()
 
     tf.print("-------------------------------------------",output_stream="file://worker_service_logging.out")
-    with open('worker_service_logging.out', 'a+') as f:
+    with open('timelogs/worker_service_logging.out', 'a+') as f:
         f.writelines(
             f"\nNew run with config num_rounds:{NUM_ROUNDS},num_clients:{num_clients},epochs:{EPOCHS},batch:{BATCH}"
         )
@@ -66,7 +66,7 @@ def train_loop(num_rounds=1, num_clients=1):
         tf.print(f"Round  {round} time is {round_time}",output_stream="file://worker_service_logging.out")
         state = result.state
         train_metrics = result.metrics['client_work']['train']
-        with open('worker_service_logging.out', 'a+') as f:
+        with open('timelogs/worker_service_logging.out', 'a+') as f:
             f.writelines('Metrics={}'.format(train_metrics))
     tf.print("\n-------------------------------------------", output_stream="file://worker_service_logging.out")
 

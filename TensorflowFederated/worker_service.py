@@ -5,7 +5,8 @@ from data_loading import GenDataBackend
 from absl import flags
 from utils.config import configs
 import pickle
-# import cygrpc
+import os
+os.environ["TF_CPP_MIN_LOG_LEVEL"] = "3"
 FLAGS = flags.FLAGS
 _GRPC_OPTIONS = [
     ('grpc.max_receive_message_length', 25586421),
@@ -24,14 +25,13 @@ def main(argv) -> None:
     port = FLAGS.port
     num_rounds = FLAGS.num_rounds
     epochs = int(configs["epochs"]/num_rounds)
-    rows_to_keep = FLAGS.rows_to_keep
     data_path  = FLAGS.data_path
     run_repeat = FLAGS.run_repeat
     random_state = FLAGS.random_state
     client_index = FLAGS.client_index
-    with open("partitions_list", "rb") as file:
-        partitions_list = pickle.load(file)
     if client_index:
+        with open("partitions_list", "rb") as file:
+            partitions_list = pickle.load(file)
         rows_to_keep = partitions_list[client_index]
     else:
         rows_to_keep = None
@@ -52,6 +52,7 @@ def main(argv) -> None:
         max_fanout=100,
         leaf_executor_fn=ex_fn)
 
+    print(f"Worker created with port {port}")
     tff.simulation.run_server(executor_factory, _THREADS, port, None,
                               _GRPC_OPTIONS)
 
