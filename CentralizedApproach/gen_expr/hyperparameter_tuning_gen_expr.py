@@ -1,25 +1,10 @@
 from utils.data_utils import load_gen_data_as_train_test_split
 from utils.models import get_seq_nn_model
-from keras.metrics import Precision,Recall, AUC
-from tensorflow_addons.metrics import F1Score
+from utils.config import configs
 import wandb
 from wandb.keras import WandbCallback
 
 
-configs = dict(
-    batch_size = 512,
-    epochs = 100,
-    optimizer = 'adam',
-    loss = "binary_crossentropy",
-    metrics = ["accuracy",AUC(curve="PR"),Precision(),Recall()],
-    earlystopping_patience = 5,
-    num_nodes = 1024,
-    dropout_rate = 0.3,
-    l1_v = 0.0,
-    l2_v = 0.005,
-    n_splits =5
-
-)
 sweep_configuration = {
     'method': 'random',
     'name': 'sweep',
@@ -32,9 +17,9 @@ sweep_configuration = {
         "l2_v" : {"values" : [0.0,0.005]}
      }
 }
-data_path ="../DataGenExpression/Alldata.csv"
+data_path = "../DataGenExpression/Alldata.csv"
 data_name = data_path.split("/")[2].split(".")[0]
-sweep_id = wandb.sweep(sweep=sweep_configuration, project=f'benchmark-central_sweep_{data_name}')
+sweep_id = wandb.sweep(sweep=sweep_configuration, project=f'benchmark-central_sweep_{data_name}_AUC(ROC)')
 #create train test data
 
 modelname = data_path.split("/")[-1].split(".")[0]
@@ -49,7 +34,9 @@ def train():
     wandb_callback = WandbCallback(monitor='val_loss',
                                    log_weights=True,
                                    log_evaluation=True,
-                                   validation_steps=5)
+                                   validation_steps=5 ,
+                                   save_model=False,
+                                   save_weights_only=True)
 
     model = get_seq_nn_model(X_train.shape[1], configs["num_nodes"],configs["dropout_rate"], configs["l1_v"], configs["l2_v"])
     model.compile(optimizer=configs["optimizer"],

@@ -9,7 +9,7 @@ configs = dict(
     epochs = 100,
     optimizer = Adam(),
     loss = BinaryCrossentropy(),
-    metrics = [BinaryAccuracy(),AUC(),Precision(),Recall()],
+    metrics = [BinaryAccuracy(),AUC(name="auc"),Precision(name="precision"),Recall(name="recall")],
     earlystopping_patience = 5,
     num_nodes = 1024,
     dropout_rate = 0.3,

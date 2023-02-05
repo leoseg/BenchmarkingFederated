@@ -38,7 +38,7 @@ from flwr.server.client_proxy import ClientProxy
 from flwr.server.history import History
 from flwr.server.strategy import FedAvg, Strategy
 import wandb
-from utils.time_logging import get_time_logs
+from utils.system_utils import get_time_logs
 from utils.config import flw_time_logging_directory
 FitResultsAndFailures = Tuple[
     List[Tuple[ClientProxy, FitRes]],
@@ -145,8 +145,9 @@ class Server:
             res_fed = self.evaluate_round(server_round=current_round, timeout=timeout)
             if res_fed:
                 loss_fed, evaluate_metrics_fed, _ = res_fed
+                evaluate_metrics_fed["loss"] = loss_fed
                 if not self.system_metrics:
-                    wandb.log(res_fed)
+                    wandb.log(evaluate_metrics_fed)
                 if loss_fed:
                     history.add_loss_distributed(
                         server_round=current_round, loss=loss_fed

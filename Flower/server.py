@@ -2,29 +2,31 @@ import flwr as fl
 from flwr.server import SimpleClientManager
 from flwr.server import start_server
 import argparse
-from utils.config import configs
+from Flower.flwr_utils import evaluate_metrics_aggregation_fn
+from config import configs
 from Flower.customized_flw_modules.server import Server
 parser = argparse.ArgumentParser(
         prog="server.py",
         formatter_class=argparse.RawDescriptionHelpFormatter,
     )
 parser.add_argument(
-    "--num_rounds",type=int,help="number of fl rounds"
+    "--num_rounds",type=int,help="number of fl rounds", default=1
 )
 parser.add_argument(
-    "--num_clients",type=int,help="number of clients"
+    "--num_clients",type=int,help="number of clients", default=1
 )
 parser.add_argument(
-    "--data_path", type=str, help="path of data to load"
+    "--data_path", type=str, help="path of data to load",default="../DataGenExpression/Dataset1.csv"
 )
 parser.add_argument(
-    "--run_repeat",type=int,help="number of run with same config"
+    "--run_repeat",type=int,help="number of run with same config",default=1
 )
 parser.add_argument(
-    "--system_metrics",type=bool,help="flag for system metrics"
+    "--system_metrics",type=bool,help="flag for system metrics",default=False
 )
 # print help if no argument is specified
 args = parser.parse_args()
+
 
 def fit_config(server_round: int):
     """Return training configuration dict for each round."""
@@ -32,12 +34,17 @@ def fit_config(server_round: int):
         "local_epochs": int(configs["epochs"]/args.num_rounds)
     }
     return config
-
-strat = fl.server.strategy.FedAvg(min_fit_clients =1,min_available_clients=1
-                                  ,min_evaluate_clients=1,on_fit_config_fn= fit_config)
+if args.system_metrics:
+    num_clients = 1
+else:
+    num_clients = args.num_clients
+strat = fl.server.strategy.FedAvg(min_fit_clients =num_clients,min_available_clients=num_clients
+                                  ,min_evaluate_clients=num_clients,on_fit_config_fn= fit_config,evaluate_metrics_aggregation_fn=evaluate_metrics_aggregation_fn)
 # Start Flower server
+print("Starting flowerserver with args:\n")
+print(args)
 start_server(
-    server_address="0.0.0.0:8080",
+    server_address="0.0.0.0:8020",
     server=Server(
         data_path=args.data_path,
         num_clients=args.num_clients,
@@ -46,6 +53,5 @@ start_server(
         run_repeat=args.run_repeat,
         system_metrics=args.system_metrics
     ),
-    config=fl.server.ServerConfig(num_rounds=args.num_rounds),
-    strategy= strat
+    config=fl.server.ServerConfig(num_rounds=args.num_rounds)
 )

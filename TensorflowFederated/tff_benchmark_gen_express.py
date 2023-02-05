@@ -1,11 +1,11 @@
 import collections
-from tff_config import *
+from TensorflowFederated.testing_prototyping.tff_config import *
 import grpc
 import tensorflow as tf
 import tensorflow_federated as tff
 from customized_tff_modules.fed_avg_with_time import build_weighted_fed_avg
 from data_loading import FederatedData
-from utils.time_logging import get_time_logs
+from utils.system_utils import get_time_logs
 from utils.models import get_seq_nn_model
 import wandb
 from utils.config import configs
@@ -68,8 +68,10 @@ evaluation_process = tff.learning.algorithms.build_fed_eval(model_fn=model_fn)
 data_name = args.data_path.split("/")[-1].split(".")[0]
 if args.system_metrics == True:
     metrics_type = "system"
+    num_clients = 1
 else:
     metrics_type = "model"
+    num_clients = args.num_clients
 
 print("Training initialized")
 wandb.init(project=f"benchmark_rounds_{args.num_rounds}_{data_name}_{metrics_type}_metrics", group=f"tff_{args.num_clients}", name=f"run_{args.run_repeat}")
@@ -108,10 +110,10 @@ ip_address= '0.0.0.0'
 ports = []
 port_num = 8000
 channels =[]
-for i in range(1,args.num_clients+1):
+for i in range(1,num_clients+1):
     channels.append(grpc.insecure_channel(f'{ip_address}:{port_num+i}',options=[ ('grpc.max_send_message_length', 25586421),
         ('grpc.max_receive_message_length',25586421), ("grpc.max_metadata_size",25586421)]),)
 
 
 tff.backends.native.set_remote_python_execution_context(channels)
-train_loop(args.num_rounds,args.num_clients)
+train_loop(args.num_rounds,num_clients)

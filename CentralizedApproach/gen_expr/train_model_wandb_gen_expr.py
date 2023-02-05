@@ -24,7 +24,7 @@ configs = dict(
 
 )
 #create train test data
-data_path ="../DataGenExpression/Dataset1.csv"
+data_path = "../../DataGenExpression/Dataset1.csv"
 data_name = data_path.split("/")[2].split(".")[0]
 modelname = data_path.split("/")[-1].split(".")[0]
 df = load_gen_data(data_path)

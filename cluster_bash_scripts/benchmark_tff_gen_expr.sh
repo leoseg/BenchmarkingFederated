@@ -7,9 +7,11 @@
 #SBATCH --mail-type=end          # send email when job ends
 #SBATCH --mail-type=fail         # send email if job fails
 #SBATCH --mail-user=leoseeger16@gmail.com
-#module load Anaconda3
+module load Python/3.10.4-GCCcore-11.3.0
+python3 -m venv venv
 export PYTHONPATH="${PYTHONPATH}:../."
 source activate venv
+pip3 install --upgrade pip
 pip3 install -r ../requirements.txt
 WANDB_API_KEY=$WANDB_API_KEY
 cd ..

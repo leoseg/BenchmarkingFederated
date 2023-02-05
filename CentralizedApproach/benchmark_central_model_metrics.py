@@ -8,7 +8,7 @@ from utils.config import configs
 import argparse
 
 parser = argparse.ArgumentParser(
-        prog="benchmark_central.py",
+        prog="benchmark_central_model_metrics.py",
         formatter_class=argparse.RawDescriptionHelpFormatter,
     )
 
@@ -40,7 +40,7 @@ num_nodes = args.num_nodes
 dropout_rate = args.dropout_rate
 l1_v = args.l1_v
 for count,(train,test) in enumerate(kfold.split(X,Y)):
-    wandb.init(project=f"benchmark-central_{data_name}_with_tf_dataset_and_time", config=configs, job_type='train',group=f"nodes_{num_nodes}_dropout_{dropout_rate}_l1_{l1_v}",name=f"k_fold_{count}")
+    wandb.init(project=f"benchmark-central_{data_name}_model_metrics", config=configs, job_type='train',group=f"nodes_{num_nodes}_dropout_{dropout_rate}_l1_{l1_v}",name=f"k_fold_{count}")
 
     client_dataset = preprocess(tf.data.Dataset.from_tensor_slices((X.iloc[train], Y[train])))
 
@@ -51,10 +51,7 @@ for count,(train,test) in enumerate(kfold.split(X,Y)):
                   loss=configs["loss"],
                   metrics=configs["metrics"])
 
-    begin = tf.timestamp()
     model.fit(client_dataset)
-    end = tf.timestamp()
-    wandb.log({"training_time":end-begin})
     #evaluate utils
     score = model.evaluate(X.iloc[test], Y[test], verbose = 0,return_dict=True)
     for key,value in score.items():

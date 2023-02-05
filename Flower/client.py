@@ -27,7 +27,7 @@ parser.add_argument(
     "--system_metrics",type=bool,help="flag for system metrics",default=True
 )
 parser.add_argument(
-    "--random_state",type=int,help="flag for setting the random state for train test", default=0
+    "--random_state",type=int,help="flag for setting the random state for train test", default=1
 )
 # print help if no argument is specified
 args = parser.parse_args()
@@ -41,7 +41,7 @@ if args.client_index:
 else:
     rows_to_keep = None
 # Load model and data
-train_ds,test_ds = load_gen_data_as_train_test_dataset_balanced(data_path=datapath,rows_to_keep=rows_to_keep,kfold_num=args.run_repeat,random_state=args.random_state)
+train_ds,test_ds = load_gen_data_as_train_test_dataset_balanced(data_path=datapath,rows_to_keep=rows_to_keep,kfold_num=args.random_state,random_state=args.run_repeat)
 model = get_seq_nn_model(12708, configs["num_nodes"],configs["dropout_rate"], configs["l1_v"], configs["l2_v"])
 model.compile(configs["optimizer"], configs["loss"], metrics=configs["metrics"])
 
@@ -64,10 +64,13 @@ class Client(fl.client.NumPyClient):
 
     def evaluate(self, parameters, config):
         model.set_weights(parameters)
-        loss, accuracy = model.evaluate(test_ds)
-        return loss, len(list(test_ds)), {"accuracy": accuracy}
+        metrics = model.evaluate(test_ds.batch(32),return_dict=True)
+        loss = metrics.pop("loss")
+        return loss, len(list(test_ds)), metrics
 
 
 
 # Start Flower client
-fl.client.start_numpy_client(server_address="127.0.0.1:8080", client=Client())
+print("Starting flowerclient with args:\n")
+print(args)
+fl.client.start_numpy_client(server_address="127.0.0.1:8020", client=Client())
