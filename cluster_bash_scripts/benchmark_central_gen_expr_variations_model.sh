@@ -14,7 +14,7 @@
 #pip3 install --upgrade pip
 #pip3 install -r ../requirements.txt
 WANDB_API_KEY=$WANDB_API_KEY
-python ../CentralizedApproach/benchmark_central.py --num_nodes 512 --dropout_rate 0.3 --l1_v 0.005 --data_path "../DataGenExpression/Alldata.csv"
+python ../CentralizedApproach/benchmark_central.py --num_nodes 512 --dropout_rate 0.3 --l1_v 0.0 --data_path "../DataGenExpression/Alldata.csv"
 python ../CentralizedApproach/benchmark_central.py --num_nodes 1024 --dropout_rate 0.3 --l1_v 0.0 --data_path "../DataGenExpression/Alldata.csv"
-python ../CentralizedApproach/benchmark_central.py --num_nodes 512 --dropout_rate 0.5 --l1_v 0.005 --data_path "../DataGenExpression/Alldata.csv"
+python ../CentralizedApproach/benchmark_central.py --num_nodes 256 --dropout_rate 0.5 --l1_v 0.005 --data_path "../DataGenExpression/Alldata.csv"
 
