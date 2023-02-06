@@ -8,9 +8,9 @@
 #SBATCH --mail-type=fail         # send email if job fails
 #SBATCH --mail-user=leoseeger16@gmail.com
 module load Python/3.10.4-GCCcore-11.3.0
-python3 -m venv venv
 export PYTHONPATH="${PYTHONPATH}:../."
 cd ..
+python3 -m venv venv
 python3.10 -m venv venv
 source venv/bin/activate
 pip3 install --upgrade pip
