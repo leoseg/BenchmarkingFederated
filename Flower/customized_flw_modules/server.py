@@ -238,7 +238,7 @@ class Server:
             len(client_instructions),
             self._client_manager.num_available(),
         )
-        log("Client instructions gotten")
+        log(INFO,"Client instructions gotten")
         # Collect `fit` results from all clients participating in this round
         results, failures = fit_clients(
             client_instructions=client_instructions,
