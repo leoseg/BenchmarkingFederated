@@ -14,11 +14,11 @@ NUM_REPEATS=$2
 echo $WANDB_API_KEY
 cd ..
 python3.10 -m venv venv
-#source venv/bin/activate
+source venv/bin/activate
 python3 -c 'import sys; print(sys.version_info[:])'
-#pip3 install --upgrade pip
-#pip install -e utils
-#pip3 install -r requirements.txt
+pip3 install --upgrade pip
+pip install -e utils
+pip3 install -r requirements.txt
 cd Flower || exit
 #for client_num in {3..10}
 #do
