@@ -15,15 +15,14 @@ echo "Benchmark model metrics"
 for (( repeat = 0; repeat < $REPEATS; repeat++ ))
 do
   echo "Start repeat ${repeat}"
-  echo "Start server for repeat ${repeat}"
-  python server.py --data_path $DATA_PATH --run_repeat $repeat --num_clients $NUM_CLIENTS --num_rounds $NUM_ROUNDS &
-  sleep 3
   for ((i=1;i<=$NUM_CLIENTS;i++))
   do
     echo "Start client ${i}"
     client_index=$(($i -1))
     python client.py --client_index $client_index --data_path $DATA_PATH --run_repeat $repeat &
   done
+  echo "Start server for repeat ${repeat}"
+  python server.py --data_path $DATA_PATH --run_repeat $repeat --num_clients $NUM_CLIENTS --num_rounds $NUM_ROUNDS &
   wait
   echo "Repeat ${repeat} complete"
   echo "<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<"
