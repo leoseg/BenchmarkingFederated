@@ -19,7 +19,7 @@ python3 -c 'import sys; print(sys.version_info[:])'
 pip3 install --upgrade pip
 pip install -e utils
 pip3 install -r requirements.txt
-cd Flower || exit
+cd Flower || exit=
 for client_num in {3..10}
 do
   for rounds in {1,2,5,10}
