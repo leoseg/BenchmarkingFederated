@@ -1,5 +1,5 @@
 #!/bin/bash
-#SBATCH --nodes=1
+#SBATCH --nodes=11
 #SBATCH --job-name=training_unsupervised
 #SBATCH --partition=clara
 #SBATCH --time=1-00:00:00
@@ -9,10 +9,13 @@
 #SBATCH --mail-user=leoseeger16@gmail.com
 module load Python/3.10.4-GCCcore-11.3.0
 export PYTHONPATH="${PYTHONPATH}:../."
-WANDB_API_KEY=$WANDB_API_KEY
+WANDB_API_KEY=$1
+NUM_REPEATS=$2
+echo $WANDB_API_KEY
 cd ..
 python3 -m venv venv
 source venv/bin/activate
+python3 -c 'import sys; print(sys.version_info[:])'
 pip3 install --upgrade pip
 pip install -e utils
 pip3 install -r requirements.txt
