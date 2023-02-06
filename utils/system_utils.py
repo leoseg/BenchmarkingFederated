@@ -27,8 +27,8 @@ def read_system_logs(log_path:str,project_name,group_name,run_name,memory_type):
             for count,line in enumerate(lines):
                 if count == 0:
                     continue
-                wandb.log({f"memory_{memory_type}": float(line.split()[2])})
-                wandb.log({f"cpu_{memory_type}":float(line.split()[1])})
+                wandb.log({f"memory_{memory_type}": float(line.split()[2])},step=count-1)
+                wandb.log({f"cpu_{memory_type}":float(line.split()[1])},step=count-1)
             wandb.log({"total_duration": float(lines[-1].split()[0])})
 
 
