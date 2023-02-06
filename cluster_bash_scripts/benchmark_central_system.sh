@@ -18,6 +18,7 @@ pip install -e utils
 pip3 install -r requirements.txt
 DATA_PATH="../DataGenExpression/Alldata.csv"
 WANDB_API_KEY=$1
+REPEATS=$2
 DATA_NAME=$(basename "$DATA_PATH" .csv)
 cd CentralizedApproach || exit
 for (( repeat = 0; repeat < $REPEATS; repeat++ ))
