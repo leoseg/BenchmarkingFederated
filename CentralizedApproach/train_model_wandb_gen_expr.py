@@ -34,7 +34,8 @@ data_name = data_path.split("/")[2].split(".")[0]
 modelname = data_path.split("/")[-1].split(".")[0]
 df = load_gen_data(data_path)
 X, Y= create_X_y(df)
-kfold = StratifiedKFold(n_splits=configs["n_splits"],shuffle=True,random_state=0)
+random_state = 63
+kfold = StratifiedKFold(n_splits=configs["n_splits"],shuffle=True,random_state=random_state)
 
 num_nodes = args.num_nodes
 dropout_rate = args.dropout_rate
@@ -42,8 +43,11 @@ l1_v = args.l1_v
 
 
 for count,(train,test) in enumerate(kfold.split(X,Y)):
-    wandb.init(project=f"choose-best-config-central_{data_name}_gen_expr", config=configs,group=f"val_split_0_1_nodes_{num_nodes}_dropout_{dropout_rate}_l1_{l1_v}",job_type='train',name=f"k_fold_{count}")
-
+    value_counts =Y[train].value_counts()
+    print(value_counts)
+    wandb.init(project=f"choose-best-config-central_{data_name}_gen_expr", config=configs,group=f"random_state_{random_state}_{num_nodes}_dropout_{dropout_rate}_l1_{l1_v}",job_type='train',name=f"k_fold_{count}")
+    wandb.log({"label_0": value_counts[0]})
+    wandb.log({"label_1": value_counts[1]})
     client_dataset = tf.data.Dataset.from_tensor_slices((X.iloc[train], Y[train]))
     # Define WandbCallback for experiment tracking
     wandb_callback = WandbCallback(monitor='val_loss',
@@ -63,8 +67,9 @@ for count,(train,test) in enumerate(kfold.split(X,Y)):
                   loss=configs["loss"],
                   metrics=configs["metrics"])
 
+
     #model.fit(train_ds,validation_freq=10,validation_data=(valid_ds),callbacks=[wandb_callback])
-    model.fit(X.iloc[train], Y[train], epochs=configs["epochs"], batch_size=configs["batch_size"], validation_freq = 10, validation_split=0.1,callbacks=[wandb_callback])
+    model.fit(X.iloc[train], Y[train], epochs=configs["epochs"], validation_split=0.1,validation_freq=10,batch_size=configs["batch_size"],callbacks=[wandb_callback])
 
     #evaluate utils
     score = model.evaluate(X.iloc[test], Y[test], verbose = 0,return_dict=True)

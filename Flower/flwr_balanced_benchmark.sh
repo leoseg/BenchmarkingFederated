@@ -1,13 +1,14 @@
 #!/bin/bash
 set -e
 export PYTHONPATH="${PYTHONPATH}:../."
-export TF_CPP_MIN_LOG_LEVEL=3
+#export TF_CPP_MIN_LOG_LEVEL=3
 DATA_PATH=$1
 NUM_CLIENTS=$2
 NUM_ROUNDS=$3
 WANDB_API_KEY=$4
 REPEATS=$5
 DATA_NAME=$(basename "$DATA_PATH" .csv)
+echo $WANDB_API_KEY
 echo "Starting flwr experiment with num clients ${NUM_CLIENTS} num rounds ${NUM_ROUNDS} and data ${DATA_NAME} and ${REPEATS} repeats"
 python ../scripts/partition_data.py --num_clients $NUM_CLIENTS  --data_path $DATA_PATH
 echo "Benchmark model metrics"
