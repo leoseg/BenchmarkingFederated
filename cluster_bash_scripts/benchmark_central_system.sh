@@ -15,7 +15,7 @@ python3.10 -m venv venv
 source venv/bin/activate
 pip3 install --upgrade pip
 pip install -e utils
-pip3 install -r ../requirements.txt
+pip3 install -r requirements.txt
 DATA_PATH="../DataGenExpression/Alldata.csv"
 WANDB_API_KEY=$WANDB_API_KEY
 DATA_NAME=$(basename "$DATA_PATH" .csv)
