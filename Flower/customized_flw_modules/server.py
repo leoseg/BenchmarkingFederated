@@ -86,6 +86,7 @@ class Server:
     # pylint: disable=too-many-locals
     def fit(self, num_rounds: int, timeout: Optional[float]) -> History:
         """Run federated averaging for a number of rounds."""
+        self.client_manager().wait_for(self.num_clients,600000)
         history = History()
 
         # Initialize parameters
