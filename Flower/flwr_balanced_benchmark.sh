@@ -9,7 +9,6 @@ WANDB_API_KEY=$4
 REPEATS=$5
 DATA_NAME=$(basename "$DATA_PATH" .csv)
 echo "Starting flwr experiment with num clients ${NUM_CLIENTS} num rounds ${NUM_ROUNDS} and data ${DATA_NAME} and ${REPEATS} repeats"
-source activate ../venvBM
 python ../scripts/partition_data.py --num_clients $NUM_CLIENTS  --data_path $DATA_PATH
 echo "Benchmark model metrics"
 for (( repeat = 0; repeat < $REPEATS; repeat++ ))

@@ -58,7 +58,6 @@ matplotlib==3.6.3
 mdurl==0.1.2
 more-itertools==9.0.0
 mpmath==1.2.1
--e git+https://github.com/leoseg/BenchmarkingFederated@0260844645fffb9ebff2f66ce931289e7b86562f#egg=myproject&subdirectory=utils
 mypy-extensions==0.4.3
 networkx==2.8.3
 ninja==1.11.1
