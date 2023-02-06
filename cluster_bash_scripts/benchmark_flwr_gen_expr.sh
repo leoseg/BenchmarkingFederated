@@ -4,7 +4,6 @@
 #SBATCH --partition=clara
 #SBATCH --time=1-00:00:00
 #SBATCH --gres=gpu:v100:4
-#SBATCH --mem-per-gpu=32G
 #SBATCH --ntasks=11
 #SBATCH --mem=50G
 #SBATCH --mail-type=begin        # send email when job begins
