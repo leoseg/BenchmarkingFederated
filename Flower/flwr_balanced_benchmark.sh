@@ -1,14 +1,13 @@
 #!/bin/bash
 set -e
 export PYTHONPATH="${PYTHONPATH}:../."
-#export TF_CPP_MIN_LOG_LEVEL=3
+export TF_CPP_MIN_LOG_LEVEL=3
 DATA_PATH=$1
 NUM_CLIENTS=$2
 NUM_ROUNDS=$3
 WANDB_API_KEY=$4
 REPEATS=$5
 DATA_NAME=$(basename "$DATA_PATH" .csv)
-echo $WANDB_API_KEY
 echo "Starting flwr experiment with num clients ${NUM_CLIENTS} num rounds ${NUM_ROUNDS} and data ${DATA_NAME} and ${REPEATS} repeats"
 python ../scripts/partition_data.py --num_clients $NUM_CLIENTS  --data_path $DATA_PATH
 echo "Benchmark model metrics"
@@ -47,4 +46,6 @@ do
   run_name="run_${repeat}"
   python ../scripts/mem_data_to_wandb.py --logs_path $client_time_logs --project_name $project_name --run_name $run_name --group_name "flwr_${NUM_CLIENTS}"  --memory_type "client"
   python ../scripts/mem_data_to_wandb.py --logs_path $server_time_logs --project_name $project_name  --run_name $run_name --group_name "flwr_${NUM_CLIENTS}"  --memory_type "server"
+  echo "Repeat ${repeat} complete"
+  echo "<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<"
 done

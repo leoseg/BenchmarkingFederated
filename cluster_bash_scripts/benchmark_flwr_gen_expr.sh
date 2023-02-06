@@ -19,12 +19,11 @@ python3 -c 'import sys; print(sys.version_info[:])'
 pip3 install --upgrade pip
 pip install -e utils
 pip3 install -r requirements.txt
-cd Flower || exit
-#for client_num in {3..10}
-#do
-#  for rounds in {1,2,5,10}
-#  do
-#    bash flwr_balanced_benchmark.sh "../DataGenExpression/Alldata.csv" $client_num $rounds $WANDB_API_KEY $NUM_REPEATS
-#  done
-#done
-bash flwr_balanced_benchmark.sh "../DataGenExpression/Dataset1.csv" 3 2 $WANDB_API_KEY $NUM_REPEATS
+cd Flower || exit=
+for client_num in {3..10}
+do
+  for rounds in {1,2,5,10}
+  do
+    bash flwr_balanced_benchmark.sh "../DataGenExpression/Alldata.csv" $client_num $rounds $WANDB_API_KEY $NUM_REPEATS
+  done
+done
