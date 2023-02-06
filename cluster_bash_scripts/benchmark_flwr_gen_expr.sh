@@ -3,12 +3,16 @@
 #SBATCH --job-name=training_unsupervised
 #SBATCH --partition=clara
 #SBATCH --time=1-00:00:00
+#SBATCH --gres=gpu:v100:4
+#SBATCH --mem-per-gpu=32G
 #SBATCH --ntasks=11
 #SBATCH --mem=50G
 #SBATCH --mail-type=begin        # send email when job begins
 #SBATCH --mail-type=end          # send email when job ends
 #SBATCH --mail-type=fail         # send email if job fails
 #SBATCH --mail-user=leoseeger16@gmail.com
+module load CUDAcore/11.2.1
+module load cuDNN/8.1.0.77-CUDA-11.2.1
 module load Python/3.10.4-GCCcore-11.3.0
 export PYTHONPATH="${PYTHONPATH}:../."
 WANDB_API_KEY=$1
