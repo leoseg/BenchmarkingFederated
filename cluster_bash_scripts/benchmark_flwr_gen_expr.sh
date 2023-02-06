@@ -12,7 +12,7 @@ module load Python/3.10.4-GCCcore-11.3.0
 export PYTHONPATH="${PYTHONPATH}:../."
 WANDB_API_KEY=$WANDB_API_KEY
 cd ..
-python3 -m venv venv
+python3.10 -m venv venv
 source venv/bin/activate
 python3 -c 'import sys; print(sys.version_info[:])'
 pip3 install --upgrade pip
