@@ -1,5 +1,5 @@
 #!/bin/bash
-#SBATCH --nodes=11
+#SBATCH --nodes=1
 #SBATCH --job-name=training_unsupervised
 #SBATCH --partition=clara
 #SBATCH --time=1-00:00:00

@@ -53,7 +53,7 @@ for count,(train,test) in enumerate(kfold.split(X,Y)):
     wandb_callback = WandbCallback(monitor='val_loss',
                                    log_weights=True,
                                    log_evaluation=True,
-                                   validation_steps=5,
+                                   validation_steps=10,
                                    save_model=False,
                                    save_weights_only=True)
     # dataset_size = len(list(client_dataset))
