@@ -221,6 +221,7 @@ class Server:
         """Perform a single round of federated averaging."""
 
         # Get clients and their respective instructions from strategy
+        log(INFO,"Getting client instructions")
         client_instructions = self.strategy.configure_fit(
             server_round=server_round,
             parameters=self.parameters,
@@ -237,7 +238,7 @@ class Server:
             len(client_instructions),
             self._client_manager.num_available(),
         )
-
+        log("Client instructions gotten")
         # Collect `fit` results from all clients participating in this round
         results, failures = fit_clients(
             client_instructions=client_instructions,
@@ -341,6 +342,7 @@ def fit_clients(
     timeout: Optional[float],
 ) -> FitResultsAndFailures:
     """Refine parameters concurrently on all selected clients."""
+    log(INFO,"Start fit clients")
     with concurrent.futures.ThreadPoolExecutor(max_workers=max_workers) as executor:
         submitted_fs = {
             executor.submit(fit_client, client_proxy, ins, timeout)
