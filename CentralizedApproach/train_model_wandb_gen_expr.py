@@ -42,7 +42,7 @@ l1_v = args.l1_v
 
 
 for count,(train,test) in enumerate(kfold.split(X,Y)):
-    wandb.init(project=f"choose-best-config-central_{data_name}_gen_expr", config=configs,group=f"nodes_{num_nodes}_dropout_{dropout_rate}_l1_{l1_v}",job_type='train',name=f"k_fold_{count}")
+    wandb.init(project=f"choose-best-config-central_{data_name}_gen_expr", config=configs,group=f"val_split_0_1_nodes_{num_nodes}_dropout_{dropout_rate}_l1_{l1_v}",job_type='train',name=f"k_fold_{count}")
 
     client_dataset = tf.data.Dataset.from_tensor_slices((X.iloc[train], Y[train])).shuffle(configs["shuffle"])
     # Define WandbCallback for experiment tracking
@@ -52,19 +52,19 @@ for count,(train,test) in enumerate(kfold.split(X,Y)):
                                    validation_steps=5,
                                    save_model=False,
                                    save_weights_only=True)
-    dataset_size = len(list(client_dataset))
-    train_ds_size = int(0.8 * dataset_size)
-    valid_ds_size = int(0.2 * dataset_size)
-
-    train_ds = client_dataset.take(train_ds_size).shuffle(10000,reshuffle_each_iteration=True).batch(configs["batch_size"]).repeat(configs["epochs"])
-    valid_ds= client_dataset.skip(train_ds_size)
+    # dataset_size = len(list(client_dataset))
+    # train_ds_size = int(0.8 * dataset_size)
+    # valid_ds_size = int(0.2 * dataset_size)
+    #
+    # train_ds = client_dataset.take(train_ds_size).shuffle(10000,reshuffle_each_iteration=True).batch(configs["batch_size"]).repeat(configs["epochs"])
+    # valid_ds= client_dataset.skip(train_ds_size)
     model = get_seq_nn_model(X.iloc[train].shape[1], num_nodes,dropout_rate ,l1_v, configs["l2_v"])
     model.compile(optimizer=configs["optimizer"],
                   loss=configs["loss"],
                   metrics=configs["metrics"])
 
     #model.fit(train_ds,validation_freq=10,validation_data=(valid_ds),callbacks=[wandb_callback])
-    model.fit(X.iloc[train], Y[train], epochs=configs["epochs"], batch_size=configs["batch_size"], validation_freq = 10, validation_split=0.2,callbacks=[wandb_callback])
+    model.fit(X.iloc[train], Y[train], epochs=configs["epochs"], batch_size=configs["batch_size"], validation_freq = 10, validation_split=0.1,callbacks=[wandb_callback])
 
     #evaluate utils
     score = model.evaluate(X.iloc[test], Y[test], verbose = 0,return_dict=True)
