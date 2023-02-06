@@ -20,10 +20,11 @@ pip3 install --upgrade pip
 pip install -e utils
 pip3 install -r requirements.txt
 cd TensorflowFederated || exit
-for client_num in {3..10}
-do
-  for rounds in {1,2,5,10}
-  do
-    bash tff_balanced_benchmark.sh "../DataGenExpression/Alldata.csv" $client_num $rounds $WANDB_API_KEY 100
-  done
-done
+#for client_num in {3..10}
+#do
+#  for rounds in {1,2,5,10}
+#  do
+#    bash tff_balanced_benchmark.sh "../DataGenExpression/Alldata.csv" $client_num $rounds $WANDB_API_KEY 100
+#  done
+#done
+bash tff_balanced_benchmark.sh "../DataGenExpression/Dataset1.csv" 3 2 $WANDB_API_KEY $NUM_REPEATS

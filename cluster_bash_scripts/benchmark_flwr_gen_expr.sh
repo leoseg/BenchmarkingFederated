@@ -27,4 +27,3 @@ do
     bash flwr_balanced_benchmark.sh "../DataGenExpression/Alldata.csv" $client_num $rounds $WANDB_API_KEY $NUM_REPEATS
   done
 done
-bash flwr_balanced_benchmark.sh "../DataGenExpression/Dataset1.csv" 3 2 $WANDB_API_KEY $NUM_REPEATS
