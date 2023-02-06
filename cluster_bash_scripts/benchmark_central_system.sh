@@ -3,6 +3,7 @@
 #SBATCH --job-name=training_unsupervised
 #SBATCH --partition=clara
 #SBATCH --time=1-00:00:00
+#SBATCH --mem-per-gpu=32G
 #SBATCH --mail-type=begin        # send email when job begins
 #SBATCH --mail-type=end          # send email when job ends
 #SBATCH --mail-type=fail         # send email if job fails
