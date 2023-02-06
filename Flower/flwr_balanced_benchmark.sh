@@ -13,6 +13,9 @@ python ../scripts/partition_data.py --num_clients $NUM_CLIENTS  --data_path $DAT
 echo "Benchmark model metrics"
 for (( repeat = 0; repeat < $REPEATS; repeat++ ))
 do
+  echo "Start server for repeat ${repeat}"
+  python server.py --data_path $DATA_PATH --run_repeat $repeat --num_clients $NUM_CLIENTS --num_rounds $NUM_ROUNDS
+  sleep  $(($NUM_CLIENTS * 2))
   echo "Start repeat ${repeat}"
   for ((i=1;i<=$NUM_CLIENTS;i++))
   do
@@ -20,9 +23,6 @@ do
     client_index=$(($i -1))
     python client.py --client_index $client_index --data_path $DATA_PATH --run_repeat $repeat &
   done
-  echo "Start server for repeat ${repeat}"
-  sleep  $(($repeat* 1))
-  python server.py --data_path $DATA_PATH --run_repeat $repeat --num_clients $NUM_CLIENTS --num_rounds $NUM_ROUNDS
   echo "Repeat ${repeat} complete"
   echo "<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<"
 done
