@@ -13,7 +13,7 @@ python ../scripts/partition_data.py --num_clients $NUM_CLIENTS --data_path $DATA
 echo "Benchmark model metrics"
 for (( repeat = 0; repeat < $REPEATS; repeat++ ))
 do
-  echo "Start repeat ${repeat}"
+  echo "Start repeat model metrics ${repeat} num clients ${NUM_CLIENTS} num rounds ${NUM_ROUNDS} and data ${DATA_NAME}"
   for ((i=1;i<=$NUM_CLIENTS;i++))
   do
     port=$((8000 + $i))
@@ -25,14 +25,15 @@ do
   echo "Start training for repeat ${repeat}"
   python tff_benchmark_gen_express.py --num_clients $NUM_CLIENTS --num_rounds $NUM_ROUNDS --data_path $DATA_PATH --run_repeat $repeat
   pkill worker_service
-  echo "Repeat ${repeat} complete"
+  echo "Repeat model metrics ${repeat} num clients ${NUM_CLIENTS} num rounds ${NUM_ROUNDS} and data ${DATA_NAME} complete"
   echo "<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<"
 done
 echo "---------------------------------------------------------------------------------------------------------"
 echo "Benchmark system metrics"
 for (( repeat = 0; repeat < $REPEATS; repeat++ ))
 do
-  echo "Start repeat ${repeat}"
+  echo "Start repeat system metrics ${repeat} num clients ${NUM_CLIENTS} num rounds ${NUM_ROUNDS} and data ${DATA_NAME}"
+  rm timelogs/tff_logs_time.txt
   echo "Creating single worker service"
   python worker_service.py --port 8001 --num_rounds $NUM_ROUNDS --client_index 0 --data_path $DATA_PATH --random_state $repeat &
   worker_id=$!
@@ -48,6 +49,6 @@ do
   run_name="run_${repeat}"
   python ../scripts/mem_data_to_wandb.py --logs_path $worker_time_logs --project_name $project_name --run_name $run_name --group_name "tff_${NUM_CLIENTS}"  --memory_type "client"
   python ../scripts/mem_data_to_wandb.py --logs_path $train_time_logs --project_name $project_name  --run_name $run_name --group_name "tff_${NUM_CLIENTS}"  --memory_type "server"
-  echo "Repeat ${repeat} complete"
+  echo "Repeat system metrics ${repeat} num clients ${NUM_CLIENTS} num rounds ${NUM_ROUNDS} and data ${DATA_NAME} complete"
   echo "<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<"
 done

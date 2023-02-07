@@ -13,7 +13,7 @@ python ../scripts/partition_data.py --num_clients $NUM_CLIENTS  --data_path $DAT
 echo "Benchmark model metrics"
 for (( repeat = 0; repeat < $REPEATS; repeat++ ))
 do
-  echo "Start server for repeat ${repeat}"
+  echo "Start server for repeat model metrics ${repeat} num clients ${NUM_CLIENTS} num rounds ${NUM_ROUNDS} and data ${DATA_NAME}"
   python server.py --data_path $DATA_PATH --run_repeat $repeat --num_clients $NUM_CLIENTS --num_rounds $NUM_ROUNDS &
   sleep  $(($NUM_CLIENTS * 2))
   echo "Start repeat ${repeat}"
@@ -24,14 +24,15 @@ do
     python client.py --client_index $client_index --data_path $DATA_PATH --run_repeat $repeat &
   done
   wait
-  echo "Repeat ${repeat} complete"
+  echo "Repeat model metrics ${repeat} num clients ${NUM_CLIENTS} num rounds ${NUM_ROUNDS} and data ${DATA_NAME} complete"
   echo "<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<"
 done
 echo "---------------------------------------------------------------------------------------------------------"
 echo "Benchmark system metrics"
 for (( repeat = 0; repeat < $REPEATS; repeat++ ))
 do
-  echo "Start repeat ${repeat}"
+  echo "Start repeat system metrics ${repeat} num clients ${NUM_CLIENTS} num rounds ${NUM_ROUNDS} and data ${DATA_NAME}"
+  rm timelogs/flw_logs_time.txt
   echo "Creating server"
   python server.py --data_path $DATA_PATH --run_repeat $repeat --num_clients $NUM_CLIENTS --num_rounds $NUM_ROUNDS --system_metrics true &
   server_id=$!
@@ -48,6 +49,6 @@ do
   run_name="run_${repeat}"
   python ../scripts/mem_data_to_wandb.py --logs_path $client_time_logs --project_name $project_name --run_name $run_name --group_name "flwr_${NUM_CLIENTS}"  --memory_type "client"
   python ../scripts/mem_data_to_wandb.py --logs_path $server_time_logs --project_name $project_name  --run_name $run_name --group_name "flwr_${NUM_CLIENTS}"  --memory_type "server"
-  echo "Repeat ${repeat} complete"
+  echo "Repeat model metrics ${repeat} num clients ${NUM_CLIENTS} num rounds ${NUM_ROUNDS} and data ${DATA_NAME} complete"
   echo "<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<"
 done
