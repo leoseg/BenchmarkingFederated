@@ -22,7 +22,10 @@ parser.add_argument(
     "--data_path", type=str, help="path of data to load",default=configs["data_path"]
 )
 parser.add_argument(
-    "--run_repeat",type=int, help="num of repeat"
+    "--run_repeat",type=int, help="num of repeat",default=configs["num_nodes"]
+)
+parser.add_argument(
+    "--num_nodes",type=int,help="num of nodes",default=configs["num_nodes"]
 )
 # print help if no argument is specified
 args = parser.parse_args()
