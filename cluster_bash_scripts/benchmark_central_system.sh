@@ -24,7 +24,7 @@ cd CentralizedApproach || exit
 for (( repeat = 0; repeat < $REPEATS; repeat++ ))
 do
   python benchmark_central_system_metrics.py --run_repeat $repeat --data_path $DATA_PATH &
-  psrecord $! --log "CentralizedApproach/timelogs/central_model_repeat_${repeat}.txt" --intervall 0.5
+  psrecord $! --log "CentralizedApproach/timelogs/central_model_repeat_${repeat}.txt" --interval 0.5
   project_name="benchmark-central_${DATA_NAME}_system_metrics"
-  python ../scripts/mem_data_to_wandb.py --logs_path "CentralizedApproach/timelogs/central_model_repeat_${repeat}.txt" --project_name $project_name --run_name $run_name --group_name "central"  --memory_type "central"
+  python ../scripts/mem_data_to_wandb.py --logs_path "CentralizedApproach/timelogs/central_model_repeat_${repeat}.txt" --project_name $project_name --run_name "run_${repeat}" --group_name "central"  --memory_type "central"
 done
