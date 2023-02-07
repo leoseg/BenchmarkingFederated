@@ -59,8 +59,4 @@ for count,(train,test) in enumerate(kfold.split(X,Y)):
     model.fit(client_dataset)
     end = tf.timestamp()
     wandb.log({"training_time": tf.get_static_value(end - begin)})
-    #evaluate utils
-    score = model.evaluate(X.iloc[test], Y[test], verbose = 0,return_dict=True)
-    for key,value in score.items():
-        wandb.log({f"eval_{key}": value})
-    wandb.finish()
+    #
