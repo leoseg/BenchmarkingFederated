@@ -15,7 +15,7 @@ WANDB_API_KEY=$1
 NUM_REPEATS=$2
 echo $WANDB_API_KEY
 cd ..
-python3 -m venv venvtff
+python3.10 -m venv venvtff
 source venvtff/bin/activate
 python3 -c 'import sys; print(sys.version_info[:])'
 pip3 install --upgrade pip
