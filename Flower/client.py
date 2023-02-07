@@ -36,7 +36,7 @@ with open("partitions_list","rb") as file:
 # Make TensorFlow log less verbose
 os.environ["TF_CPP_MIN_LOG_LEVEL"] = "3"
 datapath = args.data_path
-if args.client_index:
+if args.client_index or args.client_index == 0:
     rows_to_keep = partitions_list[args.client_index]
 else:
     rows_to_keep = None

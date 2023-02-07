@@ -179,7 +179,6 @@ def build_model_delta_update_with_keras_optimizer(
     begin = tf.timestamp()
     def reduce_fn(num_examples_sum, batch):
       """Trains a `tff.learning.Model` on a batch of data."""
-      #begin_train = tf.timestamp()
       with tf.GradientTape() as tape:
         output = model.forward_pass(batch, training=True)
 
@@ -195,8 +194,6 @@ def build_model_delta_update_with_keras_optimizer(
       else:
         num_examples_sum += tf.cast(output.num_examples, tf.int64)
 
-      # end_train = tf.timestamp()
-      # train_time =  train_time + end_train - begin_train
       return num_examples_sum
 
     def initial_state_for_reduce_fn():

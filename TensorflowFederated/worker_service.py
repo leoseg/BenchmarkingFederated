@@ -29,7 +29,7 @@ def main(argv) -> None:
     run_repeat = FLAGS.run_repeat
     random_state = FLAGS.random_state
     client_index = FLAGS.client_index
-    if client_index:
+    if client_index or client_index == 0:
         with open("partitions_list", "rb") as file:
             partitions_list = pickle.load(file)
         rows_to_keep = partitions_list[client_index]

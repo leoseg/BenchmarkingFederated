@@ -1,0 +1,34 @@
+Client training time
+7.9152610301971436
+Client training time
+7.9803810119628906
+Client training time
+7.74409294128418
+Client training time
+7.893129825592041
+Client training time
+74.507730007171631
+Client training time
+74.5695288181305
+Client training time
+129.57579803466797
+Client training time
+77.321716070175171
+Client training time
+77.356783866882324
+Client training time
+132.48177599906921
+Client training time
+83.2334520816803
+Client training time
+83.526457071304321
+Client training time
+147.78943300247192
+Client training time
+77.438453912734985
+Client training time
+77.680854082107544
+Client training time
+134.95676207542419
+Client training time
+76.29921293258667

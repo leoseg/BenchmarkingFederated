@@ -17,6 +17,6 @@ WANDB_API_KEY=$WANDB_API_KEY
 cd ..
 # shellcheck disable=SC2164
 cd CentralizedApproach
-python train_model_wandb_gen_expr.py --num_nodes 512 --dropout_rate 0.3 --l1_v 0.0 --data_path "../DataGenExpression/Alldata.csv"
-python train_model_wandb_gen_expr.py --num_nodes 1024 --dropout_rate 0.3 --l1_v 0.0 --data_path "../DataGenExpression/Alldata.csv"
-python train_model_wandb_gen_expr.py --num_nodes 256 --dropout_rate 0.5 --l1_v 0.005 --data_path "../DataGenExpression/Alldata.csv"
+python train_model_wandb_gen_expr.py --num_nodes 512 --dropout_rate 0.3 --l1_v 0.0
+python train_model_wandb_gen_expr.py --num_nodes 1024 --dropout_rate 0.3 --l1_v 0.0
+python train_model_wandb_gen_expr.py --num_nodes 256 --dropout_rate 0.5 --l1_v 0.005

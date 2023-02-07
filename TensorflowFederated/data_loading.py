@@ -12,6 +12,7 @@ class GenDataBackend(tff.framework.DataBackend):
             kfold_num=kfold_num,
             random_state=random_state
         )
+        print("Loading data backend dataset of client has num of examples",self.train_dataset.cardinality())
         self.local_epochs = local_epochs
 
     # def preprocess(self,dataset : tf.data.Dataset):
@@ -19,7 +20,7 @@ class GenDataBackend(tff.framework.DataBackend):
 
     async def materialize(self, data, type_spec):
         if data.uri[0] == "e":
-            return preprocess(self.test_dataset,epochs=self.local_epochs)
+            return preprocess(self.test_dataset,epochs=1)
         else:
             return preprocess(self.train_dataset,epochs=self.local_epochs)
 
