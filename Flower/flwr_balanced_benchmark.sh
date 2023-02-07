@@ -38,7 +38,7 @@ do
   server_id=$!
   #sleep 3
   echo "Start client"
-  python client.py --client_index 0 --data_path $DATA_PATH --run_repeat $repeat --system_metrics true &
+  python client.py --client_index 1 --data_path $DATA_PATH --run_repeat $repeat --system_metrics true &
   client_id=$!
   client_time_logs="timelogs/flwr_client_${DATA_NAME}_${NUM_CLIENTS}_${NUM_ROUNDS}_repeat_${repeat}.txt"
   server_time_logs="timelogs/flwr_server_${DATA_NAME}_${NUM_CLIENTS}_${NUM_ROUNDS}_repeat_${repeat}.txt"
