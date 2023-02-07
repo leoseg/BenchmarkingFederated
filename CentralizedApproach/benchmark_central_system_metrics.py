@@ -21,6 +21,9 @@ parser.add_argument(
 parser.add_argument(
     "--data_path", type=str, help="path of data to load",default=configs["data_path"]
 )
+parser.add_argument(
+    "--run_repeat",type=int, help="num of repeat"
+)
 # print help if no argument is specified
 args = parser.parse_args()
 
