@@ -22,8 +22,11 @@ DATA_NAME=$(basename "$DATA_PATH" .csv)
 cd CentralizedApproach || exit
 for (( repeat = 0; repeat < $REPEATS; repeat++ ))
 do
-  python benchmark_central_system_metrics.py --run_repeat $repeat --data_path $DATA_PATH &
+  num_nodes=1024
+  dropout=0.3
+  l1=0.0
+  python benchmark_central_system_metrics.py --run_repeat $repeat --data_path $DATA_PATH --num_nodes $num_nodes --l1_v $l1 --dropout_rate $dropout&
   psrecord $! --log "timelogs/central_model_repeat_${repeat}.txt" --interval 0.5
   project_name="benchmark-central_${DATA_NAME}_system_metrics"
-  python ../scripts/mem_data_to_wandb.py --logs_path "timelogs/central_model_repeat_${repeat}.txt" --project_name $project_name --run_name "run_${repeat}" --group_name "central"  --memory_type "central"
+  python ../scripts/mem_data_to_wandb.py --logs_path "timelogs/central_model_repeat_${repeat}.txt" --project_name $project_name --run_name "run_${repeat}" --group_name f"nodes_${num_nodes}_dropout_${dropout}_l1_${l1}"  --memory_type "central"
 done

@@ -21,7 +21,7 @@ def get_time_logs(filepath:str,erase=False):
 
 def read_system_logs(log_path:str,project_name,group_name,run_name,memory_type):
         wandb.init(project=project_name,
-                   group=group_name, name=run_name)
+                   group=group_name, name=run_name,job_type="train")
         with open(log_path) as file:
             lines = file.readlines()
             for count,line in enumerate(lines):
