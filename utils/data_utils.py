@@ -12,7 +12,10 @@ def clean_genexpr_data(df: pd.DataFrame) -> pd.DataFrame:
     :param df: dataframe to clean
     :return: cleaned pandas dataframe
     """
-    df = df.drop(columns=['Dataset', 'GSE', 'Disease', 'Tissue', 'FAB', 'Filename', 'FAB_all'])
+    columns_to_drop = ['Dataset', 'GSE', 'Disease', 'Tissue', 'FAB', 'Filename']
+    if "FAB_all" in df.columns:
+        columns_to_drop.append("FAB_all")
+    df = df.drop(columns=columns_to_drop)
     df.Condition = df.Condition.map(dict(CASE=1, CONTROL=0))
     df = df.astype('int64')
     df = df.dropna()
