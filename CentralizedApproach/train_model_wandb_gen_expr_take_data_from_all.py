@@ -46,12 +46,12 @@ l1_v = args.l1_v
 
 
 for count,((train,test),(train2,test2),(train3,test3)) in enumerate(zip(kfold.split(Xs[0],Ys[0]),kfold.split(Xs[1],Ys[1]),kfold.split(Xs[2],Ys[2]))):
-    X_train = pandas.concat([Xs[0].iloc[train]],Xs[1].iloc[train2],Xs[2].iloc[train3],ignore_index=True)
-    Y_train = pandas.concat([Ys[0][train],Ys[1][train2],Ys[2][train2]],ignore_index=True)
-    X_test= pandas.concat([Xs[0].iloc[test]], Xs[1].iloc[test2], Xs[2].iloc[test3],ignore_index=True)
+    X_train = pandas.concat([Xs[0].iloc[train],Xs[1].iloc[train2],Xs[2].iloc[train3]],ignore_index=True)
+    Y_train = pandas.concat([Ys[0][train],Ys[1][train2],Ys[2][train3]],ignore_index=True)
+    X_test= pandas.concat([Xs[0].iloc[test], Xs[1].iloc[test2], Xs[2].iloc[test3]],ignore_index=True)
     Y_test = pandas.concat([Ys[0][test], Ys[1][test2], Ys[2][test3]],ignore_index=True)
 
-    wandb.init(project=f"choose-best-config-central_all_data_even_split_gen_expr", config=configs,group=f"crossfold_random_state_{random_state}_{num_nodes}_dropout_{dropout_rate}_l1_{l1_v}",job_type='train',name=f"k_fold_{count}")
+    wandb.init(project=f"choose-best-config-central_Alldata_gen_expr",config=configs,group=f"even_split_crossfold_random_state_{random_state}_{num_nodes}_dropout_{dropout_rate}_l1_{l1_v}",job_type='train',name=f"k_fold_{count}")
 
     wandb_callback = WandbCallback(monitor='val_loss',
                                    log_weights=True,
