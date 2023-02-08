@@ -30,7 +30,7 @@ args = parser.parse_args()
 #create train test data
 for epochs in [100,200]:
     if epochs == 100:
-        data_pathes = ["../DataGenExpression/Dataset3.csv","../DataGenExpression/Alldata.csv"]
+        data_pathes = ["../DataGenExpression/Alldata.csv"]
     elif epochs == 200:
         data_pathes = ["../DataGenExpression/Dataset1.csv","../DataGenExpression/Dataset2.csv","../DataGenExpression/Dataset3.csv","../DataGenExpression/Alldata.csv"]
     for data_path in data_pathes:
@@ -70,8 +70,9 @@ for epochs in [100,200]:
         wandb.finish()
 
         for count,(train,test) in enumerate(kfold.split(X,Y)):
-            value_counts =Y[train].value_counts()
-            print(value_counts)
+            group_name = f"crossfold_random_state_{random_state}_{num_nodes}_dropout_{dropout_rate}_l1_{l1_v}"
+            if epochs == 200:
+                group_name = "200_epochs_" + group_name
             wandb.init(project=f"choose-best-config-central_{data_name}_gen_expr", config=configs,group=f"crossfold_random_state_{random_state}_{num_nodes}_dropout_{dropout_rate}_l1_{l1_v}",job_type='train',name=f"k_fold_{count}")
             # client_dataset = tf.data.Dataset.from_tensor_slices((X.iloc[train], Y[train]))
             # Define WandbCallback for experiment tracking
