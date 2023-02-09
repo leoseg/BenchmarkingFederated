@@ -18,6 +18,5 @@ pip install -e utils
 pip3 install -r requirements.txt
 WANDB_API_KEY=$1
 cd CentralizedApproach || exit
-python train_model_wandb_gen_expr.py --num_nodes 512 --dropout_rate 0.3 --l1_v 0.0
 python train_model_wandb_gen_expr.py --num_nodes 1024 --dropout_rate 0.3 --l1_v 0.0
 python train_model_wandb_gen_expr.py --num_nodes 256 --dropout_rate 0.5 --l1_v 0.005
