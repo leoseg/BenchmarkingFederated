@@ -1,10 +1,10 @@
 from sklearn.model_selection import StratifiedKFold
 from TensorflowFederated.data_loading import GenDataBackend
-from data_utils import load_gen_data,create_X_y
-import numpy
+from data_utils import create_unbalanced_splits
+
 data_path ="../DataGenExpression/Dataset1.csv"
 
-df = load_gen_data(data_path)
+create_unbalanced_splits(data_path,"Condition")
 # X,y = create_X_y(df)
 # print(len(y))
 # for i in range(3,11):

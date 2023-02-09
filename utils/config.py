@@ -1,11 +1,8 @@
-import os
 from keras.metrics import AUC,Precision,Recall,BinaryAccuracy
 from keras.optimizers import Adam
 from keras.losses import BinaryCrossentropy
-jobid = os.environ["SLURM_ARRAY_TASK_ID"]
-tff_time_logging_directory = f"timelogs/tff_logs_time_{jobid}.txt"
-flw_time_logging_directory = f"timelogs/flw_logs_time_{jobid}.txt"
-path_to_partitionlist = f"partitions_list_{jobid}"
+tff_time_logging_directory = "timelogs/tff_logs_time.txt"
+flw_time_logging_directory = "timelogs/flw_logs_time.txt"
 DATA_PATH = ""
 configs = dict(
     batch_size = 512,
