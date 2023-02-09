@@ -1,3 +1,5 @@
+import pickle
+
 import pandas as pd
 from sklearn.model_selection import train_test_split, StratifiedKFold
 from sklearn.preprocessing import StandardScaler
@@ -111,18 +113,23 @@ def create_unbalanced_splits(data_path:str,label_name:str,unweight_step:int):
     class_percentages = df[label_name].value_counts(normalize=True)
     num_classes = len(class_percentages)
     partition_size = int(len(df)/num_classes)
+    partitions_dict = {}
     for partition_split in range(num_classes):
+
         dfs = []
-        for count,(class_label,class_value) in enumerate(class_percentages):
+        for count,(class_label,class_value) in enumerate(zip(class_percentages.index,class_percentages)):
+            partition_value = 0.0
             if count == partition_split:
                 partition_value  = class_value +0.05 * unweight_step if class_value < 100.0 else 100.0
                 dfs.append(df[df[label_name] == class_label].sample(floor(partition_value*partition_size)))
             else:
                 partition_value  = class_value - 0.05/(num_classes-1) * unweight_step if class_value > 0.0 else 0.0
-                dfs.append(df[df[label_name] == class_label].sample(partition_value*partition_size))
+                dfs.append(df[df[label_name] == class_label].sample(floor(partition_value*partition_size)))
+            partitions_dict[f"client_{partition_split}_class_{class_label}"] = floor(partition_value*partition_size)
         partition_dataframe = pd.concat(dfs,ignore_index=True)
-        partition_dataframe.to_csv(f"partition_{partition_split}_repeat_{job_id}.csv")
-
+        partition_dataframe.to_csv(f"partition_{partition_split}.csv")
+    with open("partitions_dict","wb") as file:
+        pickle.dump(partitions_dict,file)
 
 
 

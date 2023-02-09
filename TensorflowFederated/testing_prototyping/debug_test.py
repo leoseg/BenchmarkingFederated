@@ -4,7 +4,7 @@ from data_utils import create_unbalanced_splits
 
 data_path ="../DataGenExpression/Dataset1.csv"
 
-create_unbalanced_splits(data_path,"Condition")
+create_unbalanced_splits(data_path,"Condition",unweight_step=2)
 # X,y = create_X_y(df)
 # print(len(y))
 # for i in range(3,11):

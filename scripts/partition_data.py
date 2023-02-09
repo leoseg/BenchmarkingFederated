@@ -20,6 +20,9 @@ def main():
     parser.add_argument(
         "--unweighted_step", type=int, help="flag that show that data is that much unweighted", default=-1
     )
+    parser.add_argument(
+        "--label_name",type=str,help="for partitioning data",default="Condition"
+    )
     args = parser.parse_args()
     if args.unweighted_step < 0:
         partitions = create_class_balanced_partitions(data_path=args.data_path, num_partitions=args.num_clients)

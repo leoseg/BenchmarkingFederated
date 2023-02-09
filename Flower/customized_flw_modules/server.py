@@ -16,6 +16,7 @@
 
 
 import concurrent.futures
+import pickle
 import timeit
 from logging import DEBUG, INFO
 from typing import Dict, List, Optional, Tuple, Union
@@ -58,12 +59,13 @@ class Server:
     """Flower server."""
 
     def __init__(
-        self, system_metrics:bool, run_repeat:int,num_clients:int,data_path:str, client_manager: ClientManager, strategy: Optional[Strategy] = None
+        self, unweighted:bool,system_metrics:bool, run_repeat:int,num_clients:int,data_path:str, client_manager: ClientManager, strategy: Optional[Strategy] = None
     ) -> None:
         self._client_manager: ClientManager = client_manager
         self.parameters: Parameters = Parameters(
             tensors=[], tensor_type="numpy.ndarray"
         )
+        self.unweighted = unweighted
         self.system_metrics = system_metrics
         self.run_repeat = run_repeat
         self.num_clients = num_clients
@@ -111,7 +113,18 @@ class Server:
             metrics_type = "system"
         else:
             metrics_type ="model"
-        wandb.init(project=f"benchmark_rounds_{num_rounds}_{data_name}_{metrics_type}_metrics", group=f"flwr_{self.num_clients}", name=f"run_{self.run_repeat}")
+
+        project_name = f"benchmark_rounds_{num_rounds}_{data_name}_{metrics_type}_metrics"
+        if self.unweighted >= 0.0:
+            project_name = "unweighted" + project_name
+            group = f"flwr_{self.unweighted}"
+        else:
+            group = f"flwr_{self.num_clients}"
+        wandb.init(project=project_name, group=group, name=f"run_{self.run_repeat}")
+        if self.unweighted >= 0.0:
+            with open("partitions_dict", "rb") as file:
+                partitions_dict = pickle.load(file)
+                wandb.log(partitions_dict)
         for current_round in range(1, num_rounds + 1):
             begin = tf.timestamp()
             # Train model and replace previous global model

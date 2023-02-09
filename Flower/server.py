@@ -24,10 +24,11 @@ parser.add_argument(
 parser.add_argument(
     "--system_metrics",type=bool,help="flag for system metrics",default=False
 )
+parser.add_argument(
+    "--unweighted_percentage",type=float,help="flag that show that data is that much unweighted",default=-1.0
+)
 # print help if no argument is specified
 args = parser.parse_args()
-
-
 def fit_config(server_round: int):
     """Return training configuration dict for each round."""
     config = {
@@ -52,7 +53,8 @@ start_server(
         client_manager=SimpleClientManager(),
         strategy=strat,
         run_repeat=args.run_repeat,
-        system_metrics=args.system_metrics
+        system_metrics=args.system_metrics,
+        unweighted=args.unweighted_percentage
     ),
     config=fl.server.ServerConfig(num_rounds=args.num_rounds)
 )
