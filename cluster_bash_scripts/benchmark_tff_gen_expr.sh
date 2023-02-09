@@ -4,7 +4,7 @@
 #SBATCH --partition=clara
 #SBATCH --time=2-00:00:00
 #SBATCH --tasks-per-node=36
-#SBATCH --cpus-per-tasks=11
+#SBATCH --cpus-per-task=11
 #SBATCH --mem=50G
 #SBATCH --mail-type=begin        # send email when job begins
 #SBATCH --mail-type=end          # send email when job ends
