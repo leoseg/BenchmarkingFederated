@@ -30,10 +30,7 @@ args = parser.parse_args()
 #create train test data
 for epochs in [200]:
     configs["epochs"] = epochs
-    if epochs == 100:
-        data_pathes = ["../DataGenExpression/Alldata.csv"]
-    elif epochs == 200:
-        data_pathes = ["../DataGenExpression/Dataset1.csv","../DataGenExpression/Dataset2.csv","../DataGenExpression/Dataset3.csv","../DataGenExpression/Alldata.csv"]
+    data_pathes = ["../DataGenExpression/Dataset2.csv","../DataGenExpression/Dataset3.csv","../DataGenExpression/Alldata.csv"]
     for data_path in data_pathes:
         data_name = data_path.split("/")[2].split(".")[0]
         modelname = data_path.split("/")[-1].split(".")[0]
