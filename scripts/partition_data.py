@@ -21,12 +21,12 @@ def main():
         "--unweighted_step", type=int, help="flag that show that data is that much unweighted", default=-1
     )
     args = parser.parse_args()
-    if args.unweighted_percentage < 0:
+    if args.unweighted_step < 0:
         partitions = create_class_balanced_partitions(data_path=args.data_path, num_partitions=args.num_clients)
         with open("partitions_list","wb") as file:
             pickle.dump(partitions,file)
     else:
-        create_unbalanced_splits(data_path=args.data_path,label_name=args.label_name,unweight_step=args.unweighted_step,job_id=jobid)
+        create_unbalanced_splits(data_path=args.data_path,label_name=args.label_name,unweight_step=args.unweighted_step)
 
 if __name__ == '__main__':
     main()
