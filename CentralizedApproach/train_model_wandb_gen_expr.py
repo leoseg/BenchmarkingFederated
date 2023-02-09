@@ -28,7 +28,8 @@ parser.add_argument(
 args = parser.parse_args()
 
 #create train test data
-for epochs in [100,200]:
+for epochs in [200]:
+    configs["epochs"] = epochs
     if epochs == 100:
         data_pathes = ["../DataGenExpression/Alldata.csv"]
     elif epochs == 200:

@@ -2,7 +2,7 @@
 #SBATCH --nodes=1
 #SBATCH --job-name=training_unsupervised
 #SBATCH --partition=clara
-#SBATCH --time=1-00:00:00
+#SBATCH --time=3-00:00:00
 #SBATCH --ntasks=11
 #SBATCH --mem=50G
 #SBATCH --mail-type=begin        # send email when job begins
