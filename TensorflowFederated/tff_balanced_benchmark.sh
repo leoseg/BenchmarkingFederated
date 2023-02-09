@@ -1,4 +1,4 @@
-#!/bin/bash
+#!/bin/sh
 set -e
 export PYTHONPATH="${PYTHONPATH}:../."
 export TF_CPP_MIN_LOG_LEVEL=3
