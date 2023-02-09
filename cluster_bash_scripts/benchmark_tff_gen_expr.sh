@@ -5,6 +5,7 @@
 #SBATCH --cpus-per-task=11
 #SBATCH --mem=150G
 #SBATCH --array=0-9
+#SBATCH --nodes=4
 module load Python/3.10.4-GCCcore-11.3.0
 export PYTHONPATH="${PYTHONPATH}:../."
 WANDB_API_KEY=$1
@@ -26,4 +27,4 @@ do
     srun "../DataGenExpression/Alldata.csv" $client_num $rounds $WANDB_API_KEY
   done
 done
-wait
+
