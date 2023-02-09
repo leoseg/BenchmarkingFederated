@@ -1,9 +1,9 @@
 #!/bin/bash
-#SBATCH --nodes=12
+#SBATCH --nodes=6
 #SBATCH --job-name=training_unsupervised
 #SBATCH --partition=clara
 #SBATCH --time=2-00:00:00
-#SBATCH --tasks-per-node=11
+#SBATCH --tasks-per-node=22
 #SBATCH --mem=50G
 #SBATCH --mail-type=begin        # send email when job begins
 #SBATCH --mail-type=end          # send email when job ends
@@ -27,6 +27,6 @@ do
   for client_num in {3,5,10}
   do
     echo "Starten srun with ${client_num} clients and ${rounds} rounds"
-    srun tff_balanced_benchmark.sh -N 1 -c 11 "../DataGenExpression/Alldata.csv" $client_num $rounds $WANDB_API_KEY $NUM_REPEATS &
+    srun tff_balanced_benchmark.sh -c 11 "../DataGenExpression/Alldata.csv" $client_num $rounds $WANDB_API_KEY $NUM_REPEATS &
   done
 done
