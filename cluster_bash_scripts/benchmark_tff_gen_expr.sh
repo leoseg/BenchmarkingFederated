@@ -3,7 +3,7 @@
 #SBATCH --partition=clara
 #SBATCH --time=2-00:00:00
 #SBATCH --cpus-per-task=11
-#SBATCH --mem-per-cpu=7G
+#SBATCH --mem-per-cpu=4g
 #SBATCH --ntasks=12
 #SBATCH --mail-type=begin        # send email when job begins
 #SBATCH --mail-type=end          # send email when job ends
@@ -28,7 +28,7 @@ do
   for client_num in {3,5,10}
   do
     echo "Starten srun with ${client_num} clients and ${rounds} rounds"
-    srun --cpus-per-task=$SLURM_CPUS_PER_TASK --ntasks=1 tff_balanced_benchmark.sh "../DataGenExpression/Alldata.csv" $client_num $rounds $WANDB_API_KEY $NUM_REPEATS &
+    bash tff_balanced_benchmark.sh "../DataGenExpression/Alldata.csv" $client_num $rounds $WANDB_API_KEY $NUM_REPEATS &
   done
 done
 wait
