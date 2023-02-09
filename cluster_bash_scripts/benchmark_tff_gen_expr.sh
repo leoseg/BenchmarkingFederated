@@ -22,6 +22,7 @@ pip3 install --upgrade pip
 pip install -e utils
 pip3 install -r requirements.txt
 cd TensorflowFederated || exit
+chmod 777 benchmark_tff_gen_expr.sh
 for rounds in {1,2,5,10}
 do
   for client_num in {3,5,10}
