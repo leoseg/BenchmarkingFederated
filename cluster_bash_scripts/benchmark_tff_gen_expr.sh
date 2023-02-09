@@ -28,7 +28,7 @@ do
   for client_num in {3,5,10}
   do
     echo "Starten srun with ${client_num} clients and ${rounds} rounds"
-    srun tff_balanced_benchmark.sh -c 11 "../DataGenExpression/Alldata.csv" $client_num $rounds $WANDB_API_KEY $NUM_REPEATS &
+    srun -c 11 tff_balanced_benchmark.sh "../DataGenExpression/Alldata.csv" $client_num $rounds $WANDB_API_KEY $NUM_REPEATS &
   done
 done
 wait
