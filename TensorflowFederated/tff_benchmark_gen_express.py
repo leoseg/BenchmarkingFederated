@@ -1,4 +1,6 @@
 import collections
+import concurrent.futures
+
 from TensorflowFederated.testing_prototyping.tff_config import *
 import grpc
 import tensorflow as tf
@@ -110,10 +112,11 @@ ip_address= '0.0.0.0'
 ports = []
 port_num = 8000
 channels =[]
+executor = concurrent.futures.ThreadPoolExecutor()
 for i in range(1,num_clients+1):
     channels.append(grpc.insecure_channel(f'{ip_address}:{port_num+i}',options=[ ('grpc.max_send_message_length', 25586421),
         ('grpc.max_receive_message_length',25586421), ("grpc.max_metadata_size",25586421)]),)
 
 
-tff.backends.native.set_remote_python_execution_context(channels)
+tff.backends.native.set_remote_python_execution_context(channels,thread_pool_executor=executor)
 train_loop(args.num_rounds,num_clients)
