@@ -1,8 +1,13 @@
 #!/bin/bash
+#SBATCH -J tensorflowff
+#SBATCH --time=2-00:00:00
+#SBATCH --ntasks=1
+#SBATCH --cpus-per-task=11
+#SBATCH --mem=150G
+#SBATCH --array=0-9
 module load Python/3.10.4-GCCcore-11.3.0
 export PYTHONPATH="${PYTHONPATH}:../."
 WANDB_API_KEY=$1
-NUM_REPEATS=$2
 echo $WANDB_API_KEY
 chmod 777 benchmark_tff_gen_expr.sh
 cd ..
@@ -17,8 +22,8 @@ for rounds in {1,2,5,10}
 do
   for client_num in {3,5,10}
   do
-    echo "Starten srun with ${client_num} clients and ${rounds} rounds"
-    sbatch -o "tff_log_${client_num}_${rounds}.out" tff_balanced_benchmark.sh "../DataGenExpression/Alldata.csv" $client_num $rounds $WANDB_API_KEY $NUM_REPEATS &
+    echo "Starten run with ${client_num} clients and ${rounds} rounds"
+    srun "../DataGenExpression/Alldata.csv" $client_num $rounds $WANDB_API_KEY
   done
 done
 wait

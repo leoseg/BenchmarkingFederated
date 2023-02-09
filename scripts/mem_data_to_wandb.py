@@ -1,6 +1,5 @@
 import argparse
-from utils.system_utils import draw_group_plot_of_df,read_system_logs
-import wandb
+from utils.system_utils import read_system_logs
 parser = argparse.ArgumentParser(
         prog="mem_data_to_wandb.py",
         formatter_class=argparse.RawDescriptionHelpFormatter,

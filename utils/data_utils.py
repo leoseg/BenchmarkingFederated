@@ -4,6 +4,8 @@ from sklearn.preprocessing import StandardScaler
 from config import configs
 import tensorflow as tf
 import numpy
+from math import floor
+
 
 
 def clean_genexpr_data(df: pd.DataFrame) -> pd.DataFrame:
@@ -63,7 +65,7 @@ def load_gen_data(data_path: str,rows_to_keep= None):
     df = clean_genexpr_data(df)
     return df
 
-def load_gen_data_as_train_test_dataset_balanced(data_path:str, rows_to_keep=None, kfold_num:int=0,random_state=0):
+def load_gen_data_as_train_test_dataset(data_path:str, rows_to_keep=None, kfold_num:int=0, random_state=0):
     """
     Loads gen data from given path and splits is into train and test dataset
     :param data_path: path to gen data file
@@ -94,3 +96,35 @@ def create_class_balanced_partitions(data_path:str, num_partitions:int):
         rows.append(0)
         partition_rows.append(rows)
     return partition_rows
+
+
+def create_unbalanced_splits(data_path:str,label_name:str,unweight_step:int,job_id:int):
+    """
+    Splits dataframe loaded with datapath into number of dataframes equal to number of partitions
+    where each dataframe has one class weighted more than the others
+    :param data_path: data path to original dataframe
+    :param label_name: label of column to split dataframe by
+    :param unweight_step: for each unweight step the choosen class has 5 percent more and the rest 5 percent less samples
+    :return:
+    """
+    df = load_gen_data(data_path)
+    class_percentages = df[label_name].value_counts(normalize=True)
+    num_classes = len(class_percentages)
+    partition_size = int(len(df)/num_classes)
+    for partition_split in range(num_classes):
+        dfs = []
+        for count,(class_label,class_value) in enumerate(class_percentages):
+            if count == partition_split:
+                partition_value  = class_value +0.05 * unweight_step if class_value < 100.0 else 100.0
+                dfs.append(df[df[label_name] == class_label].sample(floor(partition_value*partition_size)))
+            else:
+                partition_value  = class_value - 0.05/(num_classes-1) * unweight_step if class_value > 0.0 else 0.0
+                dfs.append(df[df[label_name] == class_label].sample(partition_value*partition_size))
+        partition_dataframe = pd.concat(dfs,ignore_index=True)
+        partition_dataframe.to_csv(f"partition_{partition_split}_repeat_{job_id}.csv")
+
+
+
+
+
+

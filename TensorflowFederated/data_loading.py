@@ -1,12 +1,12 @@
 from typing import Any, Optional, List
 import tensorflow_federated as tff
-from utils.data_utils import load_gen_data_as_train_test_dataset_balanced, preprocess
+from utils.data_utils import load_gen_data_as_train_test_dataset, preprocess
 
 
 class GenDataBackend(tff.framework.DataBackend):
 
     def __init__(self, rows_to_keep, kfold_num, data_path,local_epochs,random_state):
-        self.train_dataset, self.test_dataset = load_gen_data_as_train_test_dataset_balanced(
+        self.train_dataset, self.test_dataset = load_gen_data_as_train_test_dataset(
             data_path=data_path,
             rows_to_keep=rows_to_keep,
             kfold_num=kfold_num,

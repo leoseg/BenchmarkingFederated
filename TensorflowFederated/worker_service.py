@@ -3,7 +3,7 @@ import tensorflow as tf
 import tensorflow_federated as tff
 from data_loading import GenDataBackend
 from absl import flags
-from utils.config import configs
+from utils.config import configs, path_to_partitionlist
 import pickle
 import os
 os.environ["TF_CPP_MIN_LOG_LEVEL"] = "3"
@@ -20,6 +20,7 @@ flags.DEFINE_integer("client_index",None,"index for client to load data partitio
 flags.DEFINE_string("data_path","../DataGenExpression/Dataset1.csv","Defines path to data")
 flags.DEFINE_integer("run_repeat",1,"number of run with same config")
 flags.DEFINE_integer("random_state",0,"random state for train test split")
+flags.DEFINE_bool("unweighted",False,"if to use unweighted partitions")
 
 def main(argv) -> None:
     port = FLAGS.port
@@ -29,8 +30,9 @@ def main(argv) -> None:
     run_repeat = FLAGS.run_repeat
     random_state = FLAGS.random_state
     client_index = FLAGS.client_index
-    if client_index or client_index == 0:
-        with open("partitions_list", "rb") as file:
+    unweighted = FLAGS.unweighted
+    if (client_index or client_index == 0) and not unweighted:
+        with open(path_to_partitionlist, "rb") as file:
             partitions_list = pickle.load(file)
         rows_to_keep = partitions_list[client_index]
     else:
