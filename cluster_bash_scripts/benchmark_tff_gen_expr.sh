@@ -1,9 +1,9 @@
 #!/bin/bash
-#SBATCH --nodes=4
+#SBATCH --nodes=6
 #SBATCH --job-name=training_unsupervised
 #SBATCH --partition=clara
 #SBATCH --time=2-00:00:00
-#SBATCH --tasks-per-node=36
+#SBATCH --tasks-per-node=3
 #SBATCH --cpus-per-task=11
 #SBATCH --mem=50G
 #SBATCH --mail-type=begin        # send email when job begins
