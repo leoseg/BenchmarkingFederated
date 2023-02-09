@@ -1,13 +1,3 @@
-#!/bin/bash
-#SBATCH --job-name=tff_benchmark
-#SBATCH --partition=clara
-#SBATCH --time=2-00:00:00
-#SBATCH --cpus-per-task=11
-#SBATCH --mem-per-cpu=4g
-#SBATCH --mail-type=begin        # send email when job begins
-#SBATCH --mail-type=end          # send email when job ends
-#SBATCH --mail-type=fail         # send email if job fails
-#SBATCH --mail-user=leoseeger16@gmail.com
 set -e
 export PYTHONPATH="${PYTHONPATH}:../."
 export TF_CPP_MIN_LOG_LEVEL=3
