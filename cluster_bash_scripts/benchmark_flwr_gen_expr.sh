@@ -13,6 +13,7 @@ module load Python/3.10.4-GCCcore-11.3.0
 export PYTHONPATH="${PYTHONPATH}:../."
 WANDB_API_KEY=$1
 NUM_REPEATS=$2
+
 echo $WANDB_API_KEY
 cd ..
 python3.10 -m venv venvFlwr

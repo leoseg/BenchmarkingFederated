@@ -23,7 +23,7 @@ for rounds in {1,2,5,10}
 do
   for client_num in {3,5,10}
   do
-    echo "Starten run with ${client_num} clients and ${rounds} rounds"
+    echo "Start run with ${client_num} clients and ${rounds} rounds"
     srun "../DataGenExpression/Alldata.csv" $client_num $rounds $WANDB_API_KEY
   done
 done
