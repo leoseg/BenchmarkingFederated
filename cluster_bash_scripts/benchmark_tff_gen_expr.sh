@@ -1,11 +1,10 @@
 #!/bin/bash
-#SBATCH --nodes=6
-#SBATCH --job-name=training_unsupervised
+#SBATCH --job-name=tff_benchmark
 #SBATCH --partition=clara
 #SBATCH --time=2-00:00:00
-#SBATCH --tasks-per-node=3
 #SBATCH --cpus-per-task=11
-#SBATCH --mem=50G
+#SBATCH --mem-per-cpu=7G
+#SBATCH --ntasks=12
 #SBATCH --mail-type=begin        # send email when job begins
 #SBATCH --mail-type=end          # send email when job ends
 #SBATCH --mail-type=fail         # send email if job fails
@@ -28,7 +27,7 @@ do
   for client_num in {3,5,10}
   do
     echo "Starten srun with ${client_num} clients and ${rounds} rounds"
-    srun -c 11 tff_balanced_benchmark.sh "../DataGenExpression/Alldata.csv" $client_num $rounds $WANDB_API_KEY $NUM_REPEATS &
+    srun --cpus-per-task=$SLURM_CPUS_PER_TASK --ntasks=1 tff_balanced_benchmark.sh "../DataGenExpression/Alldata.csv" $client_num $rounds $WANDB_API_KEY $NUM_REPEATS &
   done
 done
 wait
