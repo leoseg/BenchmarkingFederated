@@ -1,0 +1,16 @@
+Client training time
+15.84613299369812
+Client training time
+15.79792594909668
+Client training time
+15.879613876342773
+Client training time
+15.929273128509521
+Client training time
+16.804208040237427
+Client training time
+16.982167959213257
+Client training time
+16.898428916931152
+Client training time
+16.932475805282593

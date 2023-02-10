@@ -83,7 +83,7 @@ else:
 project_name = f"benchmark_rounds_{args.num_rounds}_{data_name}_{metrics_type}_metrics"
 if unweighted >= 0.0:
     project_name = "unweighted" + project_name
-    group = f"tff_{args.unweighted}"
+    group = f"tff_{args.unweighted_percentage}"
 else:
     group = f"tff_{args.num_clients}"
 print("Training initialized")
