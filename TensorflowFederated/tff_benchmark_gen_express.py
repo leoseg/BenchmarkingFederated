@@ -1,5 +1,6 @@
 import collections
 import concurrent.futures
+import pickle
 
 from TensorflowFederated.testing_prototyping.tff_config import *
 import grpc
@@ -34,8 +35,12 @@ parser.add_argument(
 parser.add_argument(
     "--system_metrics",type=bool,help="flag for system metrics"
 )
+parser.add_argument(
+    "--unweighted_percentage",type=float,help="flag that show that data is that much unweighted",default=-1.0
+)
 # print help if no argument is specified
 args = parser.parse_args()
+unweighted = args.unweighted_percentage
 os.environ["TF_CPP_MIN_LOG_LEVEL"] = "3"
 element_spec = (
     tf.TensorSpec(shape=(None, 12708), dtype=tf.float64, name=None),
@@ -75,9 +80,18 @@ else:
     metrics_type = "model"
     num_clients = args.num_clients
 
+project_name = f"benchmark_rounds_{args.num_rounds}_{data_name}_{metrics_type}_metrics"
+if unweighted >= 0.0:
+    project_name = "unweighted" + project_name
+    group = f"tff_{args.unweighted}"
+else:
+    group = f"tff_{args.num_clients}"
 print("Training initialized")
-wandb.init(project=f"benchmark_rounds_{args.num_rounds}_{data_name}_{metrics_type}_metrics", group=f"tff_{args.num_clients}", name=f"run_{args.run_repeat}")
-
+wandb.init(project=f"benchmark_rounds_{args.num_rounds}_{data_name}_{metrics_type}_metrics", group=group, name=f"run_{args.run_repeat}")
+if unweighted >= 0.0:
+    with open("partitions_dict", "rb") as file:
+        partitions_dict = pickle.load(file)
+        wandb.log(partitions_dict)
 def train_loop(num_rounds=1, num_clients=1):
     evaluation_state = evaluation_process.initialize()
     state = trainer.initialize()
