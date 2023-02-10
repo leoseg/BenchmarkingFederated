@@ -87,7 +87,7 @@ if unweighted >= 0.0:
 else:
     group = f"tff_{args.num_clients}"
 print("Training initialized")
-wandb.init(project=f"benchmark_rounds_{args.num_rounds}_{data_name}_{metrics_type}_metrics", group=group, name=f"run_{args.run_repeat}")
+wandb.init(project=project_name, group=group, name=f"run_{args.run_repeat}")
 if unweighted >= 0.0:
     with open("partitions_dict", "rb") as file:
         partitions_dict = pickle.load(file)
