@@ -2,7 +2,7 @@ from sklearn.model_selection import StratifiedKFold
 from TensorflowFederated.data_loading import GenDataBackend
 from data_utils import create_unbalanced_splits
 
-data_path ="../DataGenExpression/Dataset1.csv"
+data_path ="../DataGenExpression/Alldata.csv"
 
 create_unbalanced_splits(data_path,"Condition",unweight_step=2)
 # X,y = create_X_y(df)

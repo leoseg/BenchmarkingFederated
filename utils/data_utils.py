@@ -112,19 +112,22 @@ def create_unbalanced_splits(data_path:str,label_name:str,unweight_step:int):
     df = load_gen_data(data_path)
     class_percentages = df[label_name].value_counts(normalize=True)
     num_classes = len(class_percentages)
-    partition_size = int(len(df)/num_classes)
+    partition_size = floor(min([ class_size * len(df) for class_size in class_percentages]))
     partitions_dict = {}
     for partition_split in range(num_classes):
-
         dfs = []
         for count,(class_label,class_value) in enumerate(zip(class_percentages.index,class_percentages)):
             partition_value = 0.0
             if count == partition_split:
                 partition_value  = class_value +0.05 * unweight_step if class_value < 100.0 else 100.0
-                dfs.append(df[df[label_name] == class_label].sample(floor(partition_value*partition_size)))
+                sampled_df = df[df[label_name] == class_label].sample(floor(partition_value*partition_size))
+                dfs.append(sampled_df)
+                df = df.drop(sampled_df.index)
             else:
                 partition_value  = class_value - 0.05/(num_classes-1) * unweight_step if class_value > 0.0 else 0.0
-                dfs.append(df[df[label_name] == class_label].sample(floor(partition_value*partition_size)))
+                sampled_df = df[df[label_name] == class_label].sample(floor(partition_value*partition_size))
+                dfs.append(sampled_df)
+                df = df.drop(sampled_df.index)
             partitions_dict[f"client_{partition_split}_class_{class_label}"] = floor(partition_value*partition_size)
         partition_dataframe = pd.concat(dfs,ignore_index=True)
         partition_dataframe.to_csv(f"partition_{partition_split}.csv")
