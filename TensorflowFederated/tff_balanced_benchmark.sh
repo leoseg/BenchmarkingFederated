@@ -10,25 +10,25 @@ REPEATS=$5
 DATA_NAME=$(basename "$DATA_PATH" .csv)
 echo "Starting tff experiment with num clients ${NUM_CLIENTS} num rounds ${NUM_ROUNDS} and data ${DATA_NAME} and ${REPEATS} repeats"
 python ../scripts/partition_data.py --num_clients $NUM_CLIENTS --data_path $DATA_PATH
-echo "Benchmark model metrics"
-for (( repeat = 0; repeat < $REPEATS; repeat++ ))
-do
-  echo "Start repeat model metrics ${repeat} num clients ${NUM_CLIENTS} num rounds ${NUM_ROUNDS} and data ${DATA_NAME}"
-  for ((i=1;i<=$NUM_CLIENTS;i++))
-  do
-    port=$((8000 + $i))
-    echo "Creating worker ${i} with port ${port}"
-    client_index=$(($i -1))
-    python worker_service.py --port $port --num_rounds $NUM_ROUNDS --client_index $client_index --data_path $DATA_PATH --random_state $repeat &
-  done
-  sleep 6
-  echo "Start training for repeat ${repeat}"
-  python tff_benchmark_gen_express.py --num_clients $NUM_CLIENTS --num_rounds $NUM_ROUNDS --data_path $DATA_PATH --run_repeat $repeat
-  pkill worker_service
-  echo "Repeat model metrics ${repeat} num clients ${NUM_CLIENTS} num rounds ${NUM_ROUNDS} and data ${DATA_NAME} complete"
-  echo "<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<"
-done
-echo "---------------------------------------------------------------------------------------------------------"
+#echo "Benchmark model metrics"
+#for (( repeat = 0; repeat < $REPEATS; repeat++ ))
+#do
+#  echo "Start repeat model metrics ${repeat} num clients ${NUM_CLIENTS} num rounds ${NUM_ROUNDS} and data ${DATA_NAME}"
+#  for ((i=1;i<=$NUM_CLIENTS;i++))
+#  do
+#    port=$((8000 + $i))
+#    echo "Creating worker ${i} with port ${port}"
+#    client_index=$(($i -1))
+#    python worker_service.py --port $port --num_rounds $NUM_ROUNDS --client_index $client_index --data_path $DATA_PATH --random_state $repeat &
+#  done
+#  sleep 6
+#  echo "Start training for repeat ${repeat}"
+#  python tff_benchmark_gen_express.py --num_clients $NUM_CLIENTS --num_rounds $NUM_ROUNDS --data_path $DATA_PATH --run_repeat $repeat
+#  pkill worker_service
+#  echo "Repeat model metrics ${repeat} num clients ${NUM_CLIENTS} num rounds ${NUM_ROUNDS} and data ${DATA_NAME} complete"
+#  echo "<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<"
+#done
+#echo "---------------------------------------------------------------------------------------------------------"
 echo "Benchmark system metrics"
 for (( repeat = 0; repeat < $REPEATS; repeat++ ))
 do

@@ -3,6 +3,8 @@ import tensorflow as tf
 import tensorflow_federated as tff
 from data_loading import GenDataBackend
 from absl import flags
+
+from data_utils import load_gen_data_as_train_test_dataset
 from utils.config import configs
 import pickle
 import os
@@ -37,16 +39,19 @@ def main(argv) -> None:
         rows_to_keep = partitions_list[client_index]
     else:
         rows_to_keep = None
-
+    train_dataset, test_dataset = load_gen_data_as_train_test_dataset(
+        data_path=data_path,
+        rows_to_keep=rows_to_keep,
+        kfold_num=run_repeat,
+        random_state=random_state
+    )
     def ex_fn(device: tf.config.LogicalDevice) -> tff.framework.DataExecutor:
         return tff.framework.DataExecutor(
             tff.framework.EagerTFExecutor(device),
             data_backend=GenDataBackend(
                 local_epochs=epochs,
-                rows_to_keep=rows_to_keep,
-                data_path=data_path,
-                kfold_num=run_repeat,
-                random_state=random_state))
+                train_dataset=train_dataset,
+                test_dataset=test_dataset))
 
 
     executor_factory = tff.framework.local_executor_factory(
