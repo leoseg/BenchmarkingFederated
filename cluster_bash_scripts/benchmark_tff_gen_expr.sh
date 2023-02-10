@@ -22,7 +22,7 @@ for rounds in {1,2,5,10}
 do
   for client_num in {3,5,10}
   do
-    bash flwr_balanced_benchmark.sh "../DataGenExpression/Alldata.csv" $client_num $rounds $WANDB_API_KEY $NUM_REPEATS
+    bash tff_balanced_benchmark.sh "../DataGenExpression/Alldata.csv" $client_num $rounds $WANDB_API_KEY $NUM_REPEATS
   done
 done
 
