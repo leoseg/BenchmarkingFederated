@@ -18,10 +18,11 @@ pip install -e utils
 pip3 install -r requirements.txt
 cd TensorflowFederated || exit
 rounds=10
-for client_num in {3,5,10}
+for rounds in {1,2,5,10}
 do
-  echo "Start run with ${client_num} clients and ${rounds} rounds"
-  bash tff_balanced_benchmark.sh "../DataGenExpression/Alldata.csv" $client_num $rounds $WANDB_API_KEY $NUM_REPEATS
+  for client_num in {3,5,10}
+  do
+    bash flwr_balanced_benchmark.sh "../DataGenExpression/Alldata.csv" $client_num $rounds $WANDB_API_KEY $NUM_REPEATS
+  done
 done
-bash tff_balanced_benchmark.sh "../DataGenExpression/Alldata.csv" 10 5 $WANDB_API_KEY $NUM_REPEATS
 
