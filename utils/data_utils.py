@@ -28,7 +28,7 @@ def clean_genexpr_data(df: pd.DataFrame) -> pd.DataFrame:
     return df
 
 
-def create_X_y(df: pd.DataFrame) -> (pd.DataFrame, pd.DataFrame):
+def create_X_y(df: pd.DataFrame,scaling=True) -> (pd.DataFrame, pd.DataFrame):
     """
     Gets X and y from dataframe and scales X
     :param df: dataframe with data
@@ -36,8 +36,9 @@ def create_X_y(df: pd.DataFrame) -> (pd.DataFrame, pd.DataFrame):
     """
     X = df.drop(['Condition'], axis=1)
     y = df['Condition']
-    scaler = StandardScaler()
-    X = scaler.fit_transform(X)
+    if scaling:
+        scaler = StandardScaler()
+        X = scaler.fit_transform(X)
     X = pd.DataFrame(X)
     return X, y
 
@@ -49,8 +50,11 @@ def load_gen_data_as_train_test_split(data_path: str,rows_to_keep=None):
     :return: train test arrays
     """
     df = load_gen_data(data_path,rows_to_keep)
-    X, y = create_X_y(df)
+    X, y = create_X_y(df,False)
     X_train, X_test, y_train, y_test = train_test_split(X, y, test_size=0.2, random_state=69)
+    scaler = StandardScaler()
+    X_train = scaler.fit_transform(X_train)
+    X_test = scaler.transform(X_test)
     return X_train, X_test, y_train, y_test
 
 
@@ -79,11 +83,14 @@ def load_gen_data_as_train_test_dataset(data_path:str, rows_to_keep=None, kfold_
     """
     kfold = StratifiedKFold(n_splits=configs["n_splits"], shuffle=True, random_state=random_state)
     df = load_gen_data(data_path,rows_to_keep)
-    X, Y = create_X_y(df)
+    X, Y = create_X_y(df,False)
     for count, (train, test) in enumerate(kfold.split(X, Y)):
         if count == kfold_num:
-            train_dataset = tf.data.Dataset.from_tensor_slices((X.iloc[train], Y[train]))
-            test_dataset = tf.data.Dataset.from_tensor_slices((X.iloc[test],Y[test]))
+            scaler = StandardScaler()
+            X_train = scaler.fit_transform(X.iloc[train])
+            X_test = scaler.transform(X.iloc[test])
+            train_dataset = tf.data.Dataset.from_tensor_slices((X_train, Y[train]))
+            test_dataset = tf.data.Dataset.from_tensor_slices((X_test,Y[test]))
             return train_dataset,test_dataset
 
 def preprocess(dataset : tf.data.Dataset,epochs :int = configs["epochs"]):
@@ -94,7 +101,7 @@ def create_class_balanced_partitions(data_path:str, num_partitions:int):
     partitioner = StratifiedKFold(n_splits=num_partitions,shuffle=True)
     partition_rows = []
     df = load_gen_data(data_path)
-    X,y = create_X_y(df)
+    X,y = create_X_y(df,False)
     for _,rows in partitioner.split(X,y):
         rows = list(numpy.asarray(rows) + 1)
         rows.append(0)
@@ -117,6 +124,7 @@ def create_unbalanced_splits(data_path:str,label_name:str,unweight_step:int):
     partition_size = floor(min([ class_size * len(df) for class_size in class_percentages]))
     partitions_dict = defaultdict(list)
     clients = []
+    start_percentage = 100/ num_classes
     for partition_split in range(num_classes):
         dfs = []
         clients.append(partition_split)
@@ -124,12 +132,12 @@ def create_unbalanced_splits(data_path:str,label_name:str,unweight_step:int):
 
             partition_value = 0.0
             if count == partition_split:
-                partition_value  = class_value +0.05 * unweight_step if (class_value +0.05 * unweight_step)< 1.0 else 1.0
+                partition_value  = start_percentage +0.05 * unweight_step if (start_percentage +0.05 * unweight_step)< 1.0 else 1.0
                 sampled_df = df[df[label_name] == class_label].sample(floor(partition_value*partition_size))
                 dfs.append(sampled_df)
                 df = df.drop(sampled_df.index)
             else:
-                partition_value  = class_value - 0.05/(num_classes-1) * unweight_step if  (class_value - 0.05/(num_classes-1) * unweight_step )> 0.0 else 0.0
+                partition_value  = start_percentage- 0.05/(num_classes-1) * unweight_step if  (start_percentage - 0.05/(num_classes-1) * unweight_step )> 0.0 else 0.0
                 sampled_df = df[df[label_name] == class_label].sample(floor(partition_value*partition_size))
                 dfs.append(sampled_df)
                 df = df.drop(sampled_df.index)
