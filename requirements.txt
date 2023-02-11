@@ -6,3 +6,4 @@ pandas
 psrecord
 wandb
 seaborn
+plotly

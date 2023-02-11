@@ -1,6 +1,8 @@
 import pickle
+from collections import defaultdict
 
 import pandas as pd
+from matplotlib import pyplot as plt
 from sklearn.model_selection import train_test_split, StratifiedKFold
 from sklearn.preprocessing import StandardScaler
 from config import configs
@@ -107,32 +109,37 @@ def create_unbalanced_splits(data_path:str,label_name:str,unweight_step:int):
     :param data_path: data path to original dataframe
     :param label_name: label of column to split dataframe by
     :param unweight_step: for each unweight step the choosen class has 5 percent more and the rest 5 percent less samples
-    :return:
+    :return: dataframe with class number of examples per client
     """
     df = load_gen_data(data_path)
     class_percentages = df[label_name].value_counts(normalize=True)
     num_classes = len(class_percentages)
     partition_size = floor(min([ class_size * len(df) for class_size in class_percentages]))
-    partitions_dict = {}
+    partitions_dict = defaultdict(list)
+    clients = []
     for partition_split in range(num_classes):
         dfs = []
+        clients.append(partition_split)
         for count,(class_label,class_value) in enumerate(zip(class_percentages.index,class_percentages)):
+
             partition_value = 0.0
             if count == partition_split:
-                partition_value  = class_value +0.05 * unweight_step if class_value < 100.0 else 100.0
+                partition_value  = class_value +0.05 * unweight_step if (class_value +0.05 * unweight_step)< 1.0 else 1.0
                 sampled_df = df[df[label_name] == class_label].sample(floor(partition_value*partition_size))
                 dfs.append(sampled_df)
                 df = df.drop(sampled_df.index)
             else:
-                partition_value  = class_value - 0.05/(num_classes-1) * unweight_step if class_value > 0.0 else 0.0
+                partition_value  = class_value - 0.05/(num_classes-1) * unweight_step if  (class_value - 0.05/(num_classes-1) * unweight_step )> 0.0 else 0.0
                 sampled_df = df[df[label_name] == class_label].sample(floor(partition_value*partition_size))
                 dfs.append(sampled_df)
                 df = df.drop(sampled_df.index)
-            partitions_dict[f"client_{partition_split}_class_{class_label}"] = floor(partition_value*partition_size)
+            partitions_dict["class "+str(class_label)].append(floor(partition_value*partition_size))
+
         partition_dataframe = pd.concat(dfs,ignore_index=True)
         partition_dataframe.to_csv(f"partition_{partition_split}.csv")
-    with open("partitions_dict","wb") as file:
-        pickle.dump(partitions_dict,file)
+
+    return pd.DataFrame(partitions_dict,index=clients)
+
 
 
 
