@@ -20,7 +20,7 @@ cd TensorflowFederated || exit
 rounds=10
 for rounds in {1,3,10}
 do
-  for unweight_step in {12,13}
+  for unweight_step in {11,12,13}
   do
     bash tff_unbalanced_benchmark.sh "../DataGenExpression/Alldata.csv" 2 $rounds $WANDB_API_KEY $NUM_REPEATS $unweight_step
   done
