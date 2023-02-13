@@ -124,7 +124,8 @@ def create_unbalanced_splits(data_path:str,label_name:str,unweight_step:int):
     partition_size = floor(min([ class_size * len(df) for class_size in class_percentages]))
     partitions_dict = defaultdict(list)
     clients = []
-    start_percentage = 100/ num_classes
+    partitions_dfs = []
+    start_percentage = 1.0/ num_classes
     for partition_split in range(num_classes):
         dfs = []
         clients.append(partition_split)
@@ -144,9 +145,10 @@ def create_unbalanced_splits(data_path:str,label_name:str,unweight_step:int):
             partitions_dict["class "+str(class_label)].append(floor(partition_value*partition_size))
 
         partition_dataframe = pd.concat(dfs,ignore_index=True)
-        partition_dataframe.to_csv(f"partition_{partition_split}.csv")
+        partitions_dfs.append(partition_dataframe)
+        #partition_dataframe.to_csv(f"partition_{partition_split}.csv")
 
-    return pd.DataFrame(partitions_dict,index=clients)
+    return pd.DataFrame(partitions_dict,index=clients),partitions_dfs
 
 
 

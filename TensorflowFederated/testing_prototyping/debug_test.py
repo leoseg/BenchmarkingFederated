@@ -3,7 +3,7 @@ from sklearn.model_selection import StratifiedKFold
 from TensorflowFederated.data_loading import GenDataBackend
 from data_utils import create_unbalanced_splits
 import pandas as pd
-data_path ="../DataGenExpression/Dataset1.csv"
+data_path ="../DataGenExpression/Alldata.csv"
 # df = pd.read_csv("class_num.csv")
 # fig = df.plot(kind="bar", stacked=True)
 # plt.xlabel = "Clients"
@@ -11,7 +11,7 @@ data_path ="../DataGenExpression/Dataset1.csv"
 # plt.title = "Examples per class and per client"
 # plt.show()
 # plt.savefig("test.png")
-create_unbalanced_splits(data_path,"Condition",unweight_step=6)
+create_unbalanced_splits(data_path,"Condition",unweight_step=0)
 # X,y = create_X_y(df)
 # print(len(y))
 # for i in range(3,11):
