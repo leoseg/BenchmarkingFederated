@@ -1,9 +1,9 @@
 from typing import Any, Optional, List
 import tensorflow_federated as tff
-from utils.data_utils import load_gen_data_as_train_test_dataset, preprocess
+from utils.data_utils import df_train_test_dataset, preprocess
 
 
-class GenDataBackend(tff.framework.DataBackend):
+class DataBackend(tff.framework.DataBackend):
 
     def __init__(self,train_dataset,test_dataset,local_epochs):
         self.train_dataset= train_dataset

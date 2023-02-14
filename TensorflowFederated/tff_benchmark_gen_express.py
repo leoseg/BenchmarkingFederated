@@ -9,13 +9,14 @@ import tensorflow_federated as tff
 from customized_tff_modules.fed_avg_with_time import build_weighted_fed_avg
 from data_loading import FederatedData
 from utils.system_utils import get_time_logs
-from utils.models import get_seq_nn_model
+from utils.models import get_model
 import wandb
 from utils.config import configs
 from utils.config import tff_time_logging_directory
 import argparse
 from keras.metrics import AUC,BinaryAccuracy,Recall,Precision
 import os
+import pandas as pd
 parser = argparse.ArgumentParser(
         prog="train_gen_expr.py",
         formatter_class=argparse.RawDescriptionHelpFormatter,
@@ -27,7 +28,7 @@ parser.add_argument(
     "--num_clients",type=int,help="number of clients"
 )
 parser.add_argument(
-    "--data_path", type=str, help="path of data to load"
+    "--data_path", type=str, help="path of data to load",default=configs["data_path"]
 )
 parser.add_argument(
     "--run_repeat",type=int,help="number of run with same config"
@@ -58,7 +59,8 @@ train_data_iterator = train_data_source.iterator()
 
 
 def model_fn():
-    model = get_seq_nn_model(12708, configs["num_nodes"],configs["dropout_rate"], configs["l1_v"], configs["l2_v"])
+
+    model = get_model(input_dim=12708, num_nodes= configs["num_nodes"], dropout_rate=configs["dropout_rate"], l1_v= configs["l1_v"], l2_v=configs["l2_v"])
     return tff.learning.from_keras_model(
         model,
         input_spec=element_spec,
@@ -80,18 +82,20 @@ else:
     metrics_type = "model"
     num_clients = args.num_clients
 
+
 project_name = f"benchmark_rounds_{args.num_rounds}_{data_name}_{metrics_type}_metrics"
+if configs["usecase"] == 2:
+            project_name = "usecase2_" + project_name
 if unweighted >= 0.0:
     project_name = "unweighted" + project_name
     group = f"tff_{args.unweighted_percentage}"
+
 else:
     group = f"tff_{args.num_clients}"
 print("Training initialized")
 wandb.init(project=project_name, group=group, name=f"run_{args.run_repeat}")
 if unweighted >= 0.0:
-    with open("partitions_dict", "rb") as file:
-        partitions_dict = pickle.load(file)
-        wandb.log(partitions_dict)
+    wandb.log({"class_num_table":pd.read_csv("partitions_dict.csv")})
 def train_loop(num_rounds=1, num_clients=1):
     evaluation_state = evaluation_process.initialize()
     state = trainer.initialize()

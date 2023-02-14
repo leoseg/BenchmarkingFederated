@@ -16,6 +16,7 @@
 
 
 import concurrent.futures
+import os
 import pickle
 import timeit
 from logging import DEBUG, INFO
@@ -41,6 +42,8 @@ from flwr.server.strategy import FedAvg, Strategy
 import wandb
 from utils.system_utils import get_time_logs
 from utils.config import flw_time_logging_directory
+from utils.config import configs
+import pandas as pd
 FitResultsAndFailures = Tuple[
     List[Tuple[ClientProxy, FitRes]],
     List[Union[Tuple[ClientProxy, FitRes], BaseException]],
@@ -115,6 +118,8 @@ class Server:
             metrics_type ="model"
 
         project_name = f"benchmark_rounds_{num_rounds}_{data_name}_{metrics_type}_metrics"
+        if configs["usecase"] == 2:
+            project_name = "usecase2_" + project_name
         if self.unweighted >= 0.0:
             project_name = "unweighted" + project_name
             group = f"flwr_{self.unweighted}"
@@ -122,9 +127,7 @@ class Server:
             group = f"flwr_{self.num_clients}"
         wandb.init(project=project_name, group=group, name=f"run_{self.run_repeat}")
         if self.unweighted >= 0.0:
-            with open("partitions_dict", "rb") as file:
-                partitions_dict = pickle.load(file)
-                wandb.log(partitions_dict)
+            wandb.log({"class_num_table":pd.read_csv("partitions_dict.csv")})
         for current_round in range(1, num_rounds + 1):
             begin = tf.timestamp()
             # Train model and replace previous global model

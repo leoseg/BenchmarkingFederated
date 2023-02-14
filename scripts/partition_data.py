@@ -2,8 +2,8 @@ import pickle
 from functools import reduce
 
 import matplotlib.pyplot as plt
-import pandas as pd
-from utils.data_utils import create_class_balanced_partitions,create_unbalanced_splits
+from utils.config import configs
+from utils.data_utils import create_class_balanced_partitions,create_unbalanced_splits,load_data,preprocess_data
 import argparse
 import os
 os.environ["TF_CPP_MIN_LOG_LEVEL"] = "3"
@@ -16,10 +16,7 @@ def main():
         formatter_class=argparse.RawDescriptionHelpFormatter,
     )
     parser.add_argument(
-        "--data_path", type=str, help="path of data to load"
-    )
-    parser.add_argument(
-        '--data_pathes', nargs='+', default=[],help="path multiple datapathes"
+        "--data_path", type=str, help="path of data to load",default=configs["data_path"]
     )
     parser.add_argument(
         "--num_clients", type=int, help="number of clients"
@@ -31,29 +28,23 @@ def main():
         "--label_name",type=str,help="for partitioning data",default="Condition"
     )
     args = parser.parse_args()
+
+    df = load_data(data_path=args.data_path)
+    df = preprocess_data(df)
     if args.unweighted_step < 0:
-        partitions = create_class_balanced_partitions(data_path=args.data_path, num_partitions=args.num_clients)
+        partitions = create_class_balanced_partitions(df, num_partitions=args.num_clients)
         with open("partitions_list","wb") as file:
             pickle.dump(partitions,file)
     else:
-        if args.data_path:
-            datapathes = [args.data_path]
-        else:
-            datapathes = args.data_pathes
-        class_num_dfs = []
-        list_partition_dfs = []
-        for datapath in datapathes:
-            class_num_df,partition_dfs = create_unbalanced_splits(data_path=datapath,label_name=args.label_name,unweight_step=args.unweighted_step)
-            class_num_dfs.append(class_num_df)
-            list_partition_dfs.append(partition_dfs)
-        partition_dfs = reduce(lambda  x,y: [ pd.concat([xi,yi]) for xi,yi in zip(x,y)],list_partition_dfs)
-        class_num_df = reduce(lambda x, y: x.add(y, fill_value=0), class_num_dfs)
+        class_num_df,partitions = create_unbalanced_splits(df,label_name=args.label_name,unweight_step=args.unweighted_step)
         class_num_df.plot(kind="bar", stacked=True, xlabel="Clients", ylabel="Num examples")
+        class_num_df.to_csv("partitions_dict.csv")
         plt.title = "Examples per class and per client"
         percentage = args.unweighted_step * 0.05 *100
         plt.savefig(f"../plots/class_imbalance_{percentage}_clients_{args.num_clients}.png")
-        for count,df in  enumerate(partition_dfs):
-            df.to_csv(f"partition_{count}.csv")
+        with open("partitions_list","wb") as file:
+            pickle.dump(partitions,file)
+
 
 
 

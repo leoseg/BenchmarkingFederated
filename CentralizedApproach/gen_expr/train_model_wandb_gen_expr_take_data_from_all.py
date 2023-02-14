@@ -1,4 +1,4 @@
-from utils.data_utils import load_gen_data, create_X_y, load_gen_data_as_train_test_split
+from utils.data_utils import load_data, create_X_y_from_gen_df, preprocess_data
 from utils.models import get_seq_nn_model
 from sklearn.model_selection import StratifiedKFold
 import wandb
@@ -8,7 +8,7 @@ import argparse
 import pandas
 
 parser = argparse.ArgumentParser(
-        prog="benchmark_central_model_metrics.py",
+        prog="train_model_wandb_gen_expr_take_data_from_all.py",
         formatter_class=argparse.RawDescriptionHelpFormatter,
     )
 
@@ -33,8 +33,9 @@ data_pathes = ["../DataGenExpression/Dataset1.csv","../DataGenExpression/Dataset
 Xs= []
 Ys=[]
 for data_path in data_pathes:
-    df = load_gen_data(data_path)
-    X, Y = create_X_y(df)
+    df = load_data(data_path)
+    df = preprocess_data(df)
+    X, Y = create_X_y_from_gen_df(df,label=configs["label"])
     Xs.append(X)
     Ys.append(Y)
 random_state = 69

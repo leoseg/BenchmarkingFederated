@@ -1,7 +1,20 @@
+import keras
 from keras.layers import Dense, Dropout
 from keras.models import Sequential
 from keras.regularizers import l1_l2
+from config import configs
 
+
+def get_model(**kwargs)->keras.Model:
+    """
+    Uses preprocess function depending on the configs
+    :param df: df to preprocess
+    :return: preprocessed df
+    """
+    if configs["usecase"] == 1:
+        return get_seq_nn_model(input_dim=kwargs["input_dim"],num_nodes=kwargs["num_nodes"],dropout_rate=kwargs["dropout_rate"],l1_v=kwargs["l1_v"],l2_v=kwargs["l2_v"])
+    elif configs["usecase"] == 2:
+        return None
 
 
 param_num_nodes = 1024

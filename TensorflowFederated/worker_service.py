@@ -1,10 +1,10 @@
 from absl import app
 import tensorflow as tf
 import tensorflow_federated as tff
-from data_loading import GenDataBackend
+from data_loading import DataBackend
 from absl import flags
 
-from data_utils import load_gen_data_as_train_test_dataset
+from data_utils import df_train_test_dataset,load_data,preprocess_data
 from utils.config import configs
 import pickle
 import os
@@ -19,10 +19,10 @@ _THREADS = 1
 flags.DEFINE_integer("port", 8050, "Sets port of workerservice")
 flags.DEFINE_integer("num_rounds",1,"Defines number of rounds")
 flags.DEFINE_integer("client_index",None,"index for client to load data partition")
-flags.DEFINE_string("data_path","../DataGenExpression/Dataset1.csv","Defines path to data")
+flags.DEFINE_string("data_path",configs["data_path"],"Defines path to data")
 flags.DEFINE_integer("run_repeat",1,"number of run with same config")
 flags.DEFINE_integer("random_state",0,"random state for train test split")
-flags.DEFINE_bool("unweighted",False,"indicates if data should be loaded in unweighted splits")
+
 
 def main(argv) -> None:
     port = FLAGS.port
@@ -32,23 +32,25 @@ def main(argv) -> None:
     run_repeat = FLAGS.run_repeat
     random_state = FLAGS.random_state
     client_index = FLAGS.client_index
-    unweighted = FLAGS.unweighted
-    if (client_index or client_index == 0) and not unweighted:
+    if (client_index or client_index == 0):
         with open("partitions_list", "rb") as file:
             partitions_list = pickle.load(file)
         rows_to_keep = partitions_list[client_index]
     else:
         rows_to_keep = None
-    train_dataset, test_dataset = load_gen_data_as_train_test_dataset(
-        data_path=data_path,
-        rows_to_keep=rows_to_keep,
+    df  = load_data(data_path,rows_to_keep)
+    df = preprocess_data(df)
+    train_dataset, test_dataset = df_train_test_dataset(
+        df,
         kfold_num=run_repeat,
-        random_state=random_state
+        random_state=random_state,
+        label=configs["label"],
+        scale=configs["scale"]
     )
     def ex_fn(device: tf.config.LogicalDevice) -> tff.framework.DataExecutor:
         return tff.framework.DataExecutor(
             tff.framework.EagerTFExecutor(device),
-            data_backend=GenDataBackend(
+            data_backend=DataBackend(
                 local_epochs=epochs,
                 train_dataset=train_dataset,
                 test_dataset=test_dataset))

@@ -20,7 +20,7 @@ do
     port=$((8000 + $i))
     echo "Creating worker ${i} with port ${port}"
     client_index=$(($i -1))
-    python worker_service.py --port $port --num_rounds $NUM_ROUNDS --client_index $client_index --data_path $DATA_PATH --random_state $repeat --unweighted "True" &
+    python worker_service.py --port $port --num_rounds $NUM_ROUNDS --client_index $client_index --data_path $DATA_PATH --random_state $repeat &
   done
   sleep 6
   echo "Start training for repeat ${repeat}"

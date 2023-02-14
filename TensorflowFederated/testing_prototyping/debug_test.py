@@ -1,6 +1,6 @@
 from matplotlib import pyplot as plt
 from sklearn.model_selection import StratifiedKFold
-from TensorflowFederated.data_loading import GenDataBackend
+from TensorflowFederated.data_loading import DataBackend
 from data_utils import create_unbalanced_splits
 import pandas as pd
 data_path ="../DataGenExpression/Alldata.csv"
