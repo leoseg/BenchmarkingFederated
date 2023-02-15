@@ -18,7 +18,7 @@ parser.add_argument(
     "--num_clients",type=int,help="number of clients", default=1
 )
 parser.add_argument(
-    "--data_path", type=str, help="path of data to load",default=configs["data_path"]
+    "--data_path", type=str, help="path of data to load",default=configs.get("data_path")
 )
 parser.add_argument(
     "--run_repeat",type=int,help="number of run with same config",default=1
@@ -34,7 +34,7 @@ args = parser.parse_args()
 def fit_config(server_round: int):
     """Return training configuration dict for each round."""
     config = {
-        "local_epochs": ceil(configs["epochs"]/args.num_rounds)
+        "local_epochs": ceil(configs.get("epochs")/args.num_rounds)
     }
     return config
 if args.system_metrics:

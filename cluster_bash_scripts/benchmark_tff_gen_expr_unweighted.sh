@@ -21,7 +21,7 @@ pip install -e utils
 pip3 install -r requirements.txt
 cd TensorflowFederated || exit
 rounds=10
-for rounds in {1,3,10}
+for rounds in {2,5}
 do
   for unweight_step in {0,2,4,6,8,9,10}
   do

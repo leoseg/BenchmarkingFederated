@@ -38,13 +38,13 @@ def train():
                                    save_model=False,
                                    save_weights_only=True)
 
-    model = get_seq_nn_model(X_train.shape[1], configs["num_nodes"],configs["dropout_rate"], configs["l1_v"], configs["l2_v"])
-    model.compile(optimizer=configs["optimizer"],
-                  loss=configs["loss"],
-                  metrics=configs["metrics"])
+    model = get_seq_nn_model(X_train.shape[1], configs.get("num_nodes"),configs.get("dropout_rate"), configs.get("l1_v"), configs.get("l2_v"))
+    model.compile(optimizer=configs.get("optimizer"),
+                  loss=configs.get("loss"),
+                  metrics=configs.get("metrics"))
 
 
-    model.fit(X_train, y_train, epochs=configs["epochs"], batch_size=configs["batch_size"], validation_freq=10, validation_split=0.2,callbacks=[wandb_callback])
+    model.fit(X_train, y_train, epochs=configs.get("epochs"), batch_size=configs.get("batch_size"), validation_freq=10, validation_split=0.2,callbacks=[wandb_callback])
 
     #evaluate utils
     score = model.evaluate(X_test, y_test, verbose = 0,return_dict=True)

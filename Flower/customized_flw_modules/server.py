@@ -118,7 +118,7 @@ class Server:
             metrics_type ="model"
 
         project_name = f"benchmark_rounds_{num_rounds}_{data_name}_{metrics_type}_metrics"
-        if configs["usecase"] == 2:
+        if configs.get("usecase") == 2:
             project_name = "usecase2_" + project_name
         if self.unweighted >= 0.0:
             project_name = "unweighted" + project_name

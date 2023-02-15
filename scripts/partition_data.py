@@ -16,7 +16,7 @@ def main():
         formatter_class=argparse.RawDescriptionHelpFormatter,
     )
     parser.add_argument(
-        "--data_path", type=str, help="path of data to load",default=configs["data_path"]
+        "--data_path", type=str, help="path of data to load",default=configs.get("data_path")
     )
     parser.add_argument(
         "--num_clients", type=int, help="number of clients"
@@ -38,7 +38,7 @@ def main():
     else:
         class_num_df,partitions = create_unbalanced_splits(df,label_name=args.label_name,unweight_step=args.unweighted_step)
         class_num_df.plot(kind="bar", stacked=True, xlabel="Clients", ylabel="Num examples")
-        class_num_df.to_csv("partitions_dict.csv")
+        class_num_df.to_csv(f"partitions_dict_{args.unweight_step}.csv")
         plt.title = "Examples per class and per client"
         percentage = args.unweighted_step * 0.05 *100
         plt.savefig(f"../plots/class_imbalance_{percentage}_clients_{args.num_clients}.png")

@@ -1,7 +1,7 @@
 import keras
 from keras.layers import Dense, Dropout
 from keras.models import Sequential
-from keras.regularizers import l1_l2
+from keras.regularizers import l1_l2, l2
 from config import configs
 
 
@@ -11,10 +11,10 @@ def get_model(**kwargs)->keras.Model:
     :param df: df to preprocess
     :return: preprocessed df
     """
-    if configs["usecase"] == 1:
+    if configs.get("usecase") == 1:
         return get_seq_nn_model(input_dim=kwargs["input_dim"],num_nodes=kwargs["num_nodes"],dropout_rate=kwargs["dropout_rate"],l1_v=kwargs["l1_v"],l2_v=kwargs["l2_v"])
-    elif configs["usecase"] == 2:
-        return None
+    elif configs.get("usecase") == 2:
+        return get_log_reg_keras(input_dim=kwargs["input_dim"],l2_v=kwargs["l2_v"])
 
 
 param_num_nodes = 1024
@@ -65,4 +65,16 @@ def get_seq_nn_model(input_dim:int,num_nodes: int = param_num_nodes, dropout_rat
 
     # output layer
     model.add(Dense(units=1, activation="tanh"))
+    return model
+
+
+def get_log_reg_keras(input_dim:int,l2_v):
+    """
+    Returns log regression model implemented in keras
+    :param input_dim: input dimension
+    :param l2_v: regularization in l2
+    :return: model
+    """
+    model = Sequential()
+    model.add(Dense(units=input_dim, kernel_initializer='glorot_uniform', activation='sigmoid', kernel_regularizer=l2(l2_v)))
     return model

@@ -13,17 +13,17 @@ parser = argparse.ArgumentParser(
     )
 
 parser.add_argument(
-    "--num_nodes", type=int, help="num of nodes for each layer",default=configs["num_nodes"]
+    "--num_nodes", type=int, help="num of nodes for each layer",default=configs.get("num_nodes")
 )
 
 parser.add_argument(
-    "--dropout_rate", type=float, help="dropout rate",default=configs["dropout_rate"]
+    "--dropout_rate", type=float, help="dropout rate",default=configs.get("dropout_rate")
 )
 parser.add_argument(
-    "--l1_v",type=float,help="l1 kernel regularizer",default=configs["l1_v"]
+    "--l1_v",type=float,help="l1 kernel regularizer",default=configs.get("l1_v")
 )
 parser.add_argument(
-    "--data_path", type=str, help="path of data to load",default=configs["data_path"]
+    "--data_path", type=str, help="path of data to load",default=configs.get("data_path")
 )
 # print help if no argument is specified
 args = parser.parse_args()
@@ -35,11 +35,11 @@ Ys=[]
 for data_path in data_pathes:
     df = load_data(data_path)
     df = preprocess_data(df)
-    X, Y = create_X_y_from_gen_df(df,label=configs["label"])
+    X, Y = create_X_y_from_gen_df(df,label=configs.get("label"))
     Xs.append(X)
     Ys.append(Y)
 random_state = 69
-kfold = StratifiedKFold(n_splits=configs["n_splits"], shuffle=True, random_state=random_state)
+kfold = StratifiedKFold(n_splits=configs.get("n_splits"), shuffle=True, random_state=random_state)
 
 num_nodes = args.num_nodes
 dropout_rate = args.dropout_rate
@@ -59,11 +59,11 @@ for count,((train,test),(train2,test2),(train3,test3)) in enumerate(zip(kfold.sp
                                    log_evaluation=True,
                                    save_model=False,
                                    save_weights_only=True)
-    model = get_seq_nn_model(X_train.iloc[train].shape[1], num_nodes,dropout_rate ,l1_v, configs["l2_v"])
-    model.compile(optimizer=configs["optimizer"],
-                  loss=configs["loss"],
-                  metrics=configs["metrics"])
-    model.fit(X_train, Y_train, epochs=configs["epochs"],batch_size=configs["batch_size"],callbacks=[wandb_callback])
+    model = get_seq_nn_model(X_train.iloc[train].shape[1], num_nodes,dropout_rate ,l1_v, configs.get("l2_v"))
+    model.compile(optimizer=configs.get("optimizer"),
+                  loss=configs.get("loss"),
+                  metrics=configs.get("metrics"))
+    model.fit(X_train, Y_train, epochs=configs.get("epochs"),batch_size=configs.get("batch_size"),callbacks=[wandb_callback])
 
     #evaluate utils
     score = model.evaluate(X_test,Y_test, verbose = 0,return_dict=True)

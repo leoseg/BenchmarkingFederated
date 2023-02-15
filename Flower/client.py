@@ -18,7 +18,7 @@ parser.add_argument(
 )
 
 parser.add_argument(
-    "--data_path", type=str, help="path of data to load",default=configs["data_path"]
+    "--data_path", type=str, help="path of data to load",default=configs.get("data_path")
 )
 parser.add_argument(
     "--run_repeat",type=int,help="number of run with same config",default=1
@@ -44,9 +44,9 @@ else:
 # Load model and data
 df = load_data(datapath,rows_to_keep)
 df = preprocess_data(df)
-model = get_model(input_dim=12708, num_nodes= configs["num_nodes"], dropout_rate=configs["dropout_rate"], l1_v= configs["l1_v"], l2_v=configs["l2_v"])
-train_ds,test_ds = df_train_test_dataset(df, kfold_num=args.random_state, random_state=args.run_repeat,label=configs["label"],scale=configs["scale"])
-model.compile(configs["optimizer"], configs["loss"], metrics=configs["metrics"])
+model = get_model(input_dim=12708, num_nodes= configs.get("num_nodes"), dropout_rate=configs.get("dropout_rate"), l1_v= configs.get("l1_v"), l2_v=configs.get("l2_v"))
+train_ds,test_ds = df_train_test_dataset(df, kfold_num=args.random_state, random_state=args.run_repeat,label=configs.get("label"),scale=configs.get("scale"))
+model.compile(configs.get("optimizer"), configs.get("loss"), metrics=configs.get("metrics"))
 
 # Define Flower client
 class Client(fl.client.NumPyClient):

@@ -55,7 +55,7 @@ class GenDataBackend(tff.framework.DataBackend):
 
 
 def model_fn():
-  keras_model = get_seq_nn_model(12708, configs["num_nodes"],configs["dropout_rate"], configs["l1_v"], configs["l2_v"])
+  keras_model = get_seq_nn_model(12708, configs.get("num_nodes"),configs.get("dropout_rate"), configs.get("l1_v"), configs.get("l2_v"))
   keras_model.trainable = True
   return tff.learning.from_keras_model(
       keras_model,
@@ -64,27 +64,27 @@ def model_fn():
       metrics=[tf.keras.metrics.BinaryAccuracy(),AUC(curve="PR"),Precision(),Recall()])
 
 def evaluate(server_state):
-  keras_model = get_seq_nn_model(12708, configs["num_nodes"],configs["dropout_rate"], configs["l1_v"], configs["l2_v"])
-  keras_model.compile(optimizer=configs["optimizer"],
-                loss=configs["loss"],
-                metrics=configs["metrics"])
+  keras_model = get_seq_nn_model(12708, configs.get("num_nodes"),configs.get("dropout_rate"), configs.get("l1_v"), configs.get("l2_v"))
+  keras_model.compile(optimizer=configs.get("optimizer"),
+                loss=configs.get("loss"),
+                metrics=configs.get("metrics"))
   server_state.assign_weights_to(keras_model)
   #keras_model.set_weights(server_state)
   keras_model.evaluate(X_test,y_test)
 
 # X, y = create_X_y(df)
 # test_dataset = tf.data.Dataset.from_tensor_slices((X,y)).shuffle(10000,reshuffle_each_iteration=True).batch(512).repeat(40)
-# model = get_seq_nn_model(12708, configs["num_nodes"],configs["dropout_rate"], configs["l1_v"], configs["l2_v"])
-# model.compile(optimizer=configs["optimizer"],
-#                   loss=configs["loss"],
-#                   metrics=configs["metrics"])
+# model = get_seq_nn_model(12708, configs.get("num_nodes"),configs.get("dropout_rate"), configs.get("l1_v"), configs.get("l2_v"))
+# model.compile(optimizer=configs.get("optimizer"),
+#                   loss=configs.get("loss"),
+#                   metrics=configs.get("metrics"))
 # print("WITH X,Y")
 # model.fit(X,y, epochs=40 ,batch_size=512)
 print("WITH TF DATASET")
-model = get_seq_nn_model(12708, configs["num_nodes"],configs["dropout_rate"], configs["l1_v"], configs["l2_v"])
-model.compile(optimizer=configs["optimizer"],
-                  loss=configs["loss"],
-                  metrics=configs["metrics"])
+model = get_seq_nn_model(12708, configs.get("num_nodes"),configs.get("dropout_rate"), configs.get("l1_v"), configs.get("l2_v"))
+model.compile(optimizer=configs.get("optimizer"),
+                  loss=configs.get("loss"),
+                  metrics=configs.get("metrics"))
 model.fit(client_dataset)
 
 def ex_fn(device: tf.config.LogicalDevice) -> tff.framework.DataExecutor:

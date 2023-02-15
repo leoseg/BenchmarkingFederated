@@ -19,7 +19,7 @@ _THREADS = 1
 flags.DEFINE_integer("port", 8050, "Sets port of workerservice")
 flags.DEFINE_integer("num_rounds",1,"Defines number of rounds")
 flags.DEFINE_integer("client_index",None,"index for client to load data partition")
-flags.DEFINE_string("data_path",configs["data_path"],"Defines path to data")
+flags.DEFINE_string("data_path",configs.get("data_path"),"Defines path to data")
 flags.DEFINE_integer("run_repeat",1,"number of run with same config")
 flags.DEFINE_integer("random_state",0,"random state for train test split")
 
@@ -27,7 +27,7 @@ flags.DEFINE_integer("random_state",0,"random state for train test split")
 def main(argv) -> None:
     port = FLAGS.port
     num_rounds = FLAGS.num_rounds
-    epochs = int(configs["epochs"]/num_rounds)
+    epochs = int(configs.get("epochs")/num_rounds)
     data_path  = FLAGS.data_path
     run_repeat = FLAGS.run_repeat
     random_state = FLAGS.random_state
@@ -44,8 +44,8 @@ def main(argv) -> None:
         df,
         kfold_num=run_repeat,
         random_state=random_state,
-        label=configs["label"],
-        scale=configs["scale"]
+        label=configs.get("label"),
+        scale=configs.get("scale")
     )
     def ex_fn(device: tf.config.LogicalDevice) -> tff.framework.DataExecutor:
         return tff.framework.DataExecutor(

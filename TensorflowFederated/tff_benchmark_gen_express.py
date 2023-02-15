@@ -28,7 +28,7 @@ parser.add_argument(
     "--num_clients",type=int,help="number of clients"
 )
 parser.add_argument(
-    "--data_path", type=str, help="path of data to load",default=configs["data_path"]
+    "--data_path", type=str, help="path of data to load",default=configs.get("data_path")
 )
 parser.add_argument(
     "--run_repeat",type=int,help="number of run with same config"
@@ -60,17 +60,17 @@ train_data_iterator = train_data_source.iterator()
 
 def model_fn():
 
-    model = get_model(input_dim=12708, num_nodes= configs["num_nodes"], dropout_rate=configs["dropout_rate"], l1_v= configs["l1_v"], l2_v=configs["l2_v"])
+    model = get_model(input_dim=12708, num_nodes= configs.get("num_nodes"), dropout_rate=configs.get("dropout_rate"), l1_v= configs.get("l1_v"), l2_v=configs.get("l2_v"))
     return tff.learning.from_keras_model(
         model,
         input_spec=element_spec,
-        loss=configs["loss"],
+        loss=configs.get("loss"),
         metrics=[BinaryAccuracy(),AUC(),Precision(),Recall()])
 
 
 trainer = build_weighted_fed_avg(
     model_fn,
-    client_optimizer_fn=lambda: configs["optimizer"],
+    client_optimizer_fn=lambda: configs.get("optimizer"),
     server_optimizer_fn=lambda: tf.keras.optimizers.SGD(learning_rate=1.0),
     model_aggregator=tff.learning.robust_aggregator(zeroing=False, clipping=False, debug_measurements_fn=tff.learning.add_debug_measurements))
 evaluation_process = tff.learning.algorithms.build_fed_eval(model_fn=model_fn)
@@ -84,7 +84,7 @@ else:
 
 
 project_name = f"benchmark_rounds_{args.num_rounds}_{data_name}_{metrics_type}_metrics"
-if configs["usecase"] == 2:
+if configs.get("usecase") == 2:
             project_name = "usecase2_" + project_name
 if unweighted >= 0.0:
     project_name = "unweighted" + project_name

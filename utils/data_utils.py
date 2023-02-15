@@ -14,10 +14,10 @@ def preprocess_data(df:pd.DataFrame)->pd.DataFrame:
     :param df: df to preprocess
     :return: preprocessed df
     """
-    if configs["usecase"] == 1:
+    if configs.get("usecase") == 1:
         return preprocess_genexpr_data(df)
-    elif configs["usecase"] == 2:
-        return df
+    elif configs.get("usecase") == 2:
+        return preprocess_genexpr_data(df)
 def preprocess_genexpr_data(df: pd.DataFrame) -> pd.DataFrame:
     """
     Cleans the data and formats data
@@ -89,7 +89,7 @@ def df_train_test_dataset(df: pd.DataFrame, kfold_num:int=0, random_state=0, lab
     :param kfold_num: used to choose which fold to use for test and train
     :return:
     """
-    kfold = StratifiedKFold(n_splits=configs["n_splits"], shuffle=True, random_state=random_state)
+    kfold = StratifiedKFold(n_splits=configs.get("n_splits"), shuffle=True, random_state=random_state)
     #df = load_data(data_path, rows_to_keep)
     X, Y = create_X_y_from_gen_df(df, False,label)
     for count, (train, test) in enumerate(kfold.split(X, Y)):
@@ -104,8 +104,8 @@ def df_train_test_dataset(df: pd.DataFrame, kfold_num:int=0, random_state=0, lab
             test_dataset = tf.data.Dataset.from_tensor_slices((X_test,Y[test]))
             return train_dataset,test_dataset
 
-def preprocess(dataset : tf.data.Dataset,epochs :int = configs["epochs"]):
-        return dataset.shuffle(configs["shuffle"], seed =1,reshuffle_each_iteration=True).batch(configs["batch_size"]).repeat(epochs)
+def preprocess(dataset : tf.data.Dataset,epochs :int = configs.get("epochs")):
+        return dataset.shuffle(configs.get("shuffle"), seed =1,reshuffle_each_iteration=True).batch(configs.get("batch_size")).repeat(epochs)
 
 
 def create_class_balanced_partitions(df: pd.DataFrame, num_partitions:int,label="Condition"):

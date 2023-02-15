@@ -25,18 +25,18 @@ train_data_iterator = train_data_source.iterator()
 
 
 def model_fn():
-    model = get_seq_nn_model(12708, configs["num_nodes"],configs["dropout_rate"], configs["l1_v"], configs["l2_v"])
+    model = get_seq_nn_model(12708, configs.get("num_nodes"),configs.get("dropout_rate"), configs.get("l1_v"), configs.get("l2_v"))
     return tff.learning.from_keras_model(
         model,
         input_spec=element_spec,
-        loss=configs["loss"],
+        loss=configs.get("loss"),
         metrics=[BinaryAccuracy()])
 
 
 trainer = build_weighted_fed_avg(
     model_fn,
     use_experimental_simulation_loop=True,
-    client_optimizer_fn=lambda: configs["optimizer"],
+    client_optimizer_fn=lambda: configs.get("optimizer"),
     server_optimizer_fn=lambda: tf.keras.optimizers.SGD(learning_rate=1.0),
     model_aggregator=tff.learning.robust_aggregator(zeroing=False, clipping=False, debug_measurements_fn=tff.learning.add_debug_measurements),
 )
