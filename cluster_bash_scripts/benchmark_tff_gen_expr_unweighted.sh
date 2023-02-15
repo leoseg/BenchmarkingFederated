@@ -20,7 +20,12 @@ pip3 install --upgrade pip
 pip install -e utils
 pip3 install -r requirements.txt
 cd TensorflowFederated || exit
-for rounds in {2,5}
+if [ $3 =  "1"  ]; then
+   round_config=(1 2 5 10)
+elif [  $3 = "2" ]; then
+   round_config=(1 2 4 8)
+fi
+for rounds in "${round_config[@]}";
 do
   for unweight_step in {0,2,4,6,8,9,10}
   do

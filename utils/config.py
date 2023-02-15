@@ -11,7 +11,7 @@ if os.environ["USECASE"] == str(2):
         valid_freq=2,
         usecase=2,
         batch_size=512,
-        epochs=10,
+        epochs=8,
         optimizer=SGD(),
         loss=BinaryCrossentropy(),
         metrics=[BinaryAccuracy(), AUC(name="auc"), Precision(name="precision"), Recall(name="recall")],
@@ -21,10 +21,12 @@ if os.environ["USECASE"] == str(2):
         shuffle=10000,
         label="Condition",
         scale=True,
-        number_of_classes=1
+        number_of_classes=1,
+        random_state_partitions=69,
     )
 else:
     configs = dict(
+        random_state_partitions =69,
         valid_freq = 10,
         usecase = 1,
         batch_size = 512,

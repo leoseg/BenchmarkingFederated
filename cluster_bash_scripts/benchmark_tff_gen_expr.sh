@@ -21,7 +21,12 @@ pip install -e utils
 pip3 install -r requirements.txt
 cd TensorflowFederated || exit
 rounds=10
-for rounds in {1,2,5,10}
+if [ $3 =  "1"  ]; then
+   round_config=(1 2 5 10)
+elif [  $3 = "2" ]; then
+   round_config=(1 2 4 8)
+fi
+for rounds in "${round_config[@]}";
 do
   for client_num in {3,5,10}
   do

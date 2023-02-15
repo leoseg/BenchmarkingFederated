@@ -4,8 +4,8 @@ from sklearn.model_selection import train_test_split
 import numpy as np
 from sklearn.preprocessing import StandardScaler
 import dtale
-df = pd.read_csv("Maternal Health Risk Data Set.csv")
-df = df.replace([np.inf, -np.inf], np.nan).dropna(axis=1)
+df1 = pd.read_csv("human_MTG_gene_expression_matrices_2018-06-14/human_MTG_2018-06-14_exon-matrix.csv",nrows=100)
+df = pd.read_csv("human_MTG_gene_expression_matrices_2018-06-14/human_MTG_2018-06-14_samples-columns.csv")
 dtale.show(df)
 # train, test = train_test_split(df, test_size=0.2)
 # X = df.iloc[1:, 0:-1]

@@ -109,7 +109,7 @@ def preprocess(dataset : tf.data.Dataset,epochs :int = configs.get("epochs")):
 
 
 def create_class_balanced_partitions(df: pd.DataFrame, num_partitions:int,label="Condition"):
-    partitioner = StratifiedKFold(n_splits=num_partitions,shuffle=True)
+    partitioner = StratifiedKFold(n_splits=num_partitions,shuffle=True,random_state=configs["random_state_partitions"])
     partition_rows = []
     #df = load_data(data_path)
     X, y = create_X_y_from_gen_df(df, False,label)
@@ -147,13 +147,13 @@ def create_unbalanced_splits(df:pd.DataFrame,label_name:str,unweight_step:int):
             partition_value = 0.0
             if count == partition_split:
                 partition_value  = start_percentage +0.05 * unweight_step if (start_percentage +0.05 * unweight_step)< 1.0 else 1.0
-                sampled_index = df[df[label_name] == class_label].sample(floor(partition_value*partition_size)).index
+                sampled_index = df[df[label_name] == class_label].sample(floor(partition_value*partition_size),random_state=configs["random_state_partitions"]).index
                 indexes.extend(list(sampled_index))
                 df = df.drop(index=sampled_index)
                 # dfs.append(sampled_df)
             else:
                 partition_value  = start_percentage- 0.05/(num_classes-1) * unweight_step if  (start_percentage - 0.05/(num_classes-1) * unweight_step )> 0.0 else 0.0
-                sampled_index = df[df[label_name] == class_label].sample(floor(partition_value * partition_size)).index
+                sampled_index = df[df[label_name] == class_label].sample(floor(partition_value * partition_size),random_state=configs["random_state_partitions"]).index
                 indexes.extend(list(sampled_index))
                 df = df.drop(index=sampled_index)
                 # dfs.append(sampled_df)
