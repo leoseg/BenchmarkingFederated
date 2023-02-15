@@ -14,7 +14,13 @@ def get_model(**kwargs)->keras.Model:
     if configs.get("usecase") == 1:
         return get_seq_nn_model(input_dim=kwargs["input_dim"],num_nodes=kwargs["num_nodes"],dropout_rate=kwargs["dropout_rate"],l1_v=kwargs["l1_v"],l2_v=kwargs["l2_v"])
     elif configs.get("usecase") == 2:
-        return get_log_reg_keras(input_dim=kwargs["input_dim"],l2_v=kwargs["l2_v"])
+        return get_log_reg_keras(l2_v=kwargs["l2_v"])
+    elif configs.get("usecase") == 3:
+        return get_log_reg_keras(l2_v=kwargs["l2_v"])
+
+
+
+
 
 
 param_num_nodes = 1024
@@ -68,10 +74,9 @@ def get_seq_nn_model(input_dim:int,num_nodes: int = param_num_nodes, dropout_rat
     return model
 
 
-def get_log_reg_keras(input_dim:int,l2_v):
+def get_log_reg_keras(l2_v):
     """
     Returns log regression model implemented in keras
-    :param input_dim: input dimension
     :param l2_v: regularization in l2
     :return: model
     """

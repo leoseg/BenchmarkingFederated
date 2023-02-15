@@ -6,7 +6,25 @@ from keras.losses import BinaryCrossentropy
 tff_time_logging_directory = "timelogs/tff_logs_time.txt"
 flw_time_logging_directory = "timelogs/flw_logs_time.txt"
 DATA_PATH = ""
-if os.environ["USECASE"] == str(2):
+if os.environ["USECASE"] == str(3):
+    configs = dict(
+        valid_freq=2,
+        usecase=3,
+        batch_size=512,
+        epochs=8,
+        optimizer=SGD(),
+        loss=BinaryCrossentropy(),
+        metrics=[BinaryAccuracy(), AUC(name="auc"), Precision(name="precision"), Recall(name="recall")],
+        l2_v=0.001,
+        n_splits=5,
+        data_path="../DataGenExpression/Alldata.csv",
+        shuffle=10000,
+        label="Condition",
+        scale=False,
+        number_of_classes=6,
+        random_state_partitions=69,
+    )
+elif os.environ["USECASE"] == str(2):
     configs = dict(
         valid_freq=2,
         usecase=2,

@@ -6,6 +6,7 @@ from config import configs
 import tensorflow as tf
 import numpy
 from math import floor
+import numpy as np
 
 
 def preprocess_data(df:pd.DataFrame)->pd.DataFrame:
@@ -18,6 +19,88 @@ def preprocess_data(df:pd.DataFrame)->pd.DataFrame:
         return preprocess_genexpr_data(df)
     elif configs.get("usecase") == 2:
         return preprocess_genexpr_data(df)
+    elif configs.get("usecase") == 3:
+        return df
+
+
+def preprocess_brain_cell_data(df:pd.DataFrame):
+    cell_types = sorted(set(list(df["Classification"])))
+    median_df = pd.DataFrame(np.zeros((len(cell_types), df.shape[1])))  # 75 rows × 13945 columns
+    median_df.columns = df.columns
+    median_df.index = cell_types
+    for classification in cell_types:
+        subset = df.loc[df["Classification"] == classification]
+        subset = subset.iloc[:, 0:subset.shape[1] - 1]
+        median_df.loc[classification, :] = subset.median(axis=0)
+    median_df = median_df.drop(columns=["Classification"], axis=1)
+    median_df_mean = median_df.mean(axis=0)
+    median_df_var = median_df.var(axis=0)
+    median_df_cov = median_df_var / median_df_mean
+    cov_threshold = 2.5
+    cov_filtered = df[median_df_cov[median_df_cov > cov_threshold].index]
+    cov_filtered["Classification"] = df["Classification"]
+    final_df = pd.DataFrame(np.zeros((len(cell_types), cov_filtered.shape[1])))
+    final_df.columns = cov_filtered.columns
+    final_df.index = cell_types
+    final_df = final_df.drop(columns=["Classification"], axis=1)
+    for val in range(0, len(cell_types)):
+        temp_target = pd.DataFrame(np.repeat(median_df[val:val + 1].values, 75, axis=0))
+        temp_df = np.divide(median_df, temp_target)
+        temp_df = temp_df.replace(np.nan, 1)
+        temp_df = temp_df.where(temp_df < 1, 1)
+        vec = temp_df.sum(axis=0)
+        final_df.iloc[val] = vec
+    seventy5 = pd.DataFrame(np.ones((len(cell_types), cov_filtered.shape[1] - 1))) * len(cell_types)
+    binary_score_df = np.divide(np.subtract(seventy5, final_df), len(cell_types) - 1)
+    binary_score_df.index = final_df.index
+    binary_score_df.columns = final_df.columns
+
+    cluster_cutoff = round(binary_score_df.shape[1] * 0.01)
+    genes_kept = pd.Series()
+    for val in range(len(cell_types)):
+        bs_cluster = binary_score_df.iloc[val]
+        bs_thresh = bs_cluster.mean()
+        cluster_thresh = bs_cluster.sort_values(ascending=False)[cluster_cutoff]
+        thresh = cluster_thresh if cluster_thresh > bs_thresh else bs_thresh
+        bs_cluster_genes = bs_cluster[bs_cluster > thresh]
+        genes_kept = genes_kept.combine(bs_cluster_genes, max)
+    final_filtered = df[genes_kept.index]
+    final_filtered.to_csv("../Datasets2/Alldata.csv")
+
+
+def assign_label_to_brain_cell(data_path:str,label:str):
+    """
+    Assigns label to the brain cell dataframe
+    :param data_path: datapath to brain cell dataframe
+    :param label: label to use "brain_subregion", "class", "cluster"
+    :return: new dataframe with label as condition column
+    """
+    df = pd.read_csv(data_path)
+    sample_columns = pd.read_csv("../Dataset2/human_MTG_gene_expression_matrices_2018-06-14/human_MTG_2018-06-14_samples-columns.csv")
+    sample_columns = sample_columns[sample_columns["label"] != "no class"]
+    sample_columns.set_index("sample_name")
+    label_df = sample_columns[["label"]]
+    df =pd.merge(df,label_df,how="inner",on="left_index")
+    df = df.drop("Classification")
+    df.rename({label:"Condition"})
+    return df
+
+def create_brain_cell_patient_partitions():
+    """
+    Splits brain data in indices for three partitions
+    :return: list of partitions indices
+    """
+    sample_columns = pd.read_csv("../Dataset2/human_MTG_gene_expression_matrices_2018-06-14/human_MTG_2018-06-14_samples-columns.csv")
+    sample_columns = sample_columns[sample_columns["label"] != "no class"]
+    client_one_row_numbs = list(sample_columns[sample_columns["donor"]=="H200.1030"].index)
+    client_one_row_numbs.append(0)
+    client_two_row_numbs = list(sample_columns[sample_columns["donor"] == "HH200.1023"].index)
+    client_two_row_numbs.append(0)
+    client_three_row_numbs = list(sample_columns[sample_columns["donor"] != "HH200.1023" and sample_columns["donor"]!="H200.1030"].index)
+    client_three_row_numbs.append(0)
+    return [client_one_row_numbs,client_two_row_numbs,client_three_row_numbs]
+
+
 def preprocess_genexpr_data(df: pd.DataFrame) -> pd.DataFrame:
     """
     Cleans the data and formats data
