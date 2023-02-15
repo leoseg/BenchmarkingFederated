@@ -127,7 +127,7 @@ class Server:
             group = f"flwr_{self.num_clients}"
         wandb.init(project=project_name, group=group, name=f"run_{self.run_repeat}")
         if self.unweighted >= 0.0:
-            wandb.log({"class_num_table":pd.read_csv("partitions_dict.csv")})
+            wandb.log({f"class_num_table_{int(self.unweighted)}":pd.read_csv(f"partitions_dict_{int(self.unweighted)}.csv")})
         for current_round in range(1, num_rounds + 1):
             begin = tf.timestamp()
             # Train model and replace previous global model

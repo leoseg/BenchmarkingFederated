@@ -25,6 +25,9 @@ parser.add_argument(
 parser.add_argument(
     "--data_path", type=str, help="path of data to load",default=configs.get("data_path")
 )
+parser.add_argument(
+    "--l2_v",type=float,help="l1 kernel regularizer",default=configs.get("l2_v")
+)
 # print help if no argument is specified
 args = parser.parse_args()
 
@@ -43,7 +46,10 @@ num_nodes = args.num_nodes
 dropout_rate = args.dropout_rate
 l1_v = args.l1_v
 group_name= f"no_crossfold_{random_state}_{num_nodes}_dropout_{dropout_rate}_l1_{l1_v}"
-wandb.init(project=f"choose-best-config-central_{data_name}_gen_expr", config=configs,group=group_name,job_type='train',name=f"no_crossfold")
+project_name = f"choose-best-config-central_{data_name}_gen_expr"
+if configs["usecase"] == 2:
+    project_name = "usecase2_" + project_name
+wandb.init(project=project_name, config=configs,group=group_name,job_type='train',name=f"no_crossfold")
 wandb_callback = WandbCallback(monitor='val_loss',
                                log_weights=True,
                                log_evaluation=True,
@@ -51,16 +57,17 @@ wandb_callback = WandbCallback(monitor='val_loss',
                                save_weights_only=True)
 
 X_train, X_test, y_train, y_test =train_test_split(X, Y, test_size=0.2, random_state=69)
-scaler = StandardScaler()
-X_train = scaler.fit_transform(X_train)
-X_test = scaler.transform(X_test)
+if configs["scale"]:
+    scaler = StandardScaler()
+    X_train = scaler.fit_transform(X_train)
+    X_test = scaler.transform(X_test)
 model = get_model(input_dim=X_train.shape[1], num_nodes=num_nodes,dropout_rate=dropout_rate, l1_v=l1_v, l2_v=configs.get("l2_v"))
 model.compile(optimizer=configs.get("optimizer"),
               loss=configs.get("loss"),
               metrics=configs.get("metrics"))
 
 
-model.fit(X_train, y_train, epochs=configs.get("epochs"), batch_size=configs.get("batch_size"), validation_freq=10, validation_split=0.2,callbacks=[wandb_callback])
+model.fit(X_train, y_train, epochs=configs.get("epochs"), batch_size=configs.get("batch_size"), validation_freq=configs["valid_freq"], validation_split=0.2,callbacks=[wandb_callback])
 score = model.evaluate(X_test, y_test, verbose = 0,return_dict=True)
 for key,value in score.items():
     wandb.log({f"eval_{key}": value})
@@ -68,7 +75,10 @@ wandb.finish()
 
 for count,(train,test) in enumerate(kfold.split(X,Y)):
     group_name = f"crossfold_random_state_{random_state}_{num_nodes}_dropout_{dropout_rate}_l1_{l1_v}"
-    wandb.init(project=f"choose-best-config-central_{data_name}_gen_expr", config=configs,group=f"crossfold_random_state_{random_state}_{num_nodes}_dropout_{dropout_rate}_l1_{l1_v}",job_type='train',name=f"k_fold_{count}")
+    project_name = f"choose-best-config-central_{data_name}_gen_expr"
+    if configs["usecase"] == 2:
+        project_name = "usecase2_" + project_name
+    wandb.init(project=project_name, config=configs,group=f"crossfold_random_state_{random_state}_{num_nodes}_dropout_{dropout_rate}_l1_{l1_v}",job_type='train',name=f"k_fold_{count}")
 
     wandb_callback = WandbCallback(monitor='val_loss',
                                    log_weights=True,

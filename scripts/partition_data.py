@@ -38,7 +38,7 @@ def main():
     else:
         class_num_df,partitions = create_unbalanced_splits(df,label_name=args.label_name,unweight_step=args.unweighted_step)
         class_num_df.plot(kind="bar", stacked=True, xlabel="Clients", ylabel="Num examples")
-        class_num_df.to_csv(f"partitions_dict_{args.unweight_step}.csv")
+        class_num_df.to_csv(f"partitions_dict_{args.unweighted_step}.csv")
         plt.title = "Examples per class and per client"
         percentage = args.unweighted_step * 0.05 *100
         plt.savefig(f"../plots/class_imbalance_{percentage}_clients_{args.num_clients}.png")

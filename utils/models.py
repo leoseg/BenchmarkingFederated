@@ -1,5 +1,5 @@
 import keras
-from keras.layers import Dense, Dropout
+from keras.layers import Dense, Dropout,Input
 from keras.models import Sequential
 from keras.regularizers import l1_l2, l2
 from config import configs
@@ -76,5 +76,6 @@ def get_log_reg_keras(input_dim:int,l2_v):
     :return: model
     """
     model = Sequential()
-    model.add(Dense(units=input_dim, kernel_initializer='glorot_uniform', activation='sigmoid', kernel_regularizer=l2(l2_v)))
+    #model.add(Input(shape=(configs["batch_size"],input_dim)))
+    model.add(Dense(units=configs["number_of_classes"], kernel_initializer='glorot_uniform', activation='sigmoid', kernel_regularizer=l2(l2_v)))
     return model
