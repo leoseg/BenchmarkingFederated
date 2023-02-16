@@ -65,7 +65,7 @@ def preprocess_brain_cell_data(df:pd.DataFrame):
         bs_cluster_genes = bs_cluster[bs_cluster > thresh]
         genes_kept = genes_kept.combine(bs_cluster_genes, max)
     final_filtered = df[genes_kept.index]
-    final_filtered.to_csv("../Datasets2/Alldata.csv")
+    final_filtered.to_csv("../Datasets2/Braindata.csv")
 
 
 def assign_label_to_brain_cell(data_path:str,label:str):
