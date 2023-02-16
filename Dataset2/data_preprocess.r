@@ -1,10 +1,9 @@
-#library("edgeR")
-#library("matrixStats")
-#library(stringr)
-#library(DescTools)
+library("edgeR")
+library("matrixStats")
+library(stringr)
+library(DescTools)
 memory.limit(60000)
-
-
+setwd("~/BenchmarkingFederated/Dataset2")
 
 # Loads in data
 intron_matrix <- read.csv("human_MTG_gene_expression_matrices_2018-06-14/human_MTG_2018-06-14_intron-matrix.csv")
@@ -96,3 +95,4 @@ rownames(full_matrix_log2cpm_subset)[50282] <- "Classification"
 final.matrix <- full_matrix_log2cpm_subset[c(keep.var.genes, "Classification"),]
 
 write.csv(final.matrix, file = "everything.csv", row.names = TRUE, col.names = TRUE)
+
