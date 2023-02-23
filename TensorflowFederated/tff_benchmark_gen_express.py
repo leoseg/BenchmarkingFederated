@@ -1,9 +1,5 @@
 import collections
 import concurrent.futures
-import pickle
-
-import keras.metrics
-
 from TensorflowFederated.testing_prototyping.tff_config import *
 import grpc
 import tensorflow as tf
@@ -16,7 +12,8 @@ import wandb
 from utils.config import configs
 from utils.config import tff_time_logging_directory
 import argparse
-from keras.metrics import AUC,BinaryAccuracy,Recall,Precision
+from keras.metrics import AUC,BinaryAccuracy,Recall,Precision, SparseCategoricalAccuracy
+from metrics import SparseAUC
 import os
 import pandas as pd
 parser = argparse.ArgumentParser(
@@ -64,7 +61,7 @@ def model_fn():
 
     model = get_model(input_dim=12708, num_nodes= configs.get("num_nodes"), dropout_rate=configs.get("dropout_rate"), l1_v= configs.get("l1_v"), l2_v=configs.get("l2_v"))
     if configs["usecase"] ==3:
-        metrics = [keras.metrics.get("accuracy"),AUC(multi_label=True)]
+        metrics = [SparseCategoricalAccuracy(),SparseAUC(),SparseAUC(curve="PR",name="prauc")],
     else:
         metrics = [BinaryAccuracy(),AUC(),Precision(),Recall()]
     return tff.learning.from_keras_model(
