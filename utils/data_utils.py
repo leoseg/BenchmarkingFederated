@@ -63,7 +63,7 @@ def relabel_brain_cell_data(data_path:str, label_data_path, label:str=None):
     :param data_path dataframe to relabel
     :param label_data_path: dataframe with index sample name and one column with new label
     :param label: label to use "brain_subregion", "class", "cluster"
-    :return: new dataframe with label as condition column
+    :return: new dataframe with label column classification
     """
     df = pd.read_csv(data_path)
     lable_columns = pd.read_csv(label_data_path)
@@ -107,7 +107,7 @@ def preprocess_genexpr_data(df: pd.DataFrame) -> pd.DataFrame:
     return df
 
 
-def create_X_y_from_gen_df(df: pd.DataFrame, scaling=True,label="Condition") -> (pd.DataFrame, pd.DataFrame):
+def create_X_y_from_gen_df(df: pd.DataFrame, scaling=True,label=configs["label"]) -> (pd.DataFrame, pd.DataFrame):
     """
     Gets X and y from dataframe and scales X
     :param df: dataframe with data
@@ -152,7 +152,7 @@ def load_data(data_path: str, rows_to_keep= None):
     return  df
 
 
-def df_train_test_dataset(df: pd.DataFrame, kfold_num:int=0, random_state=0, label="Condition", scale=True):
+def df_train_test_dataset(df: pd.DataFrame, kfold_num:int=0, random_state=0, label=configs["label"], scale=True):
     """
     Loads gen data from given path and splits is into train and test dataset
     :param data_path: path to gen data file
@@ -179,7 +179,7 @@ def preprocess(dataset : tf.data.Dataset,epochs :int = configs.get("epochs")):
         return dataset.shuffle(configs.get("shuffle"), seed =1,reshuffle_each_iteration=True).batch(configs.get("batch_size")).repeat(epochs)
 
 
-def create_class_balanced_partitions(df: pd.DataFrame, num_partitions:int,label="Condition"):
+def create_class_balanced_partitions(df: pd.DataFrame, num_partitions:int,label=configs["label"]):
     partitioner = StratifiedKFold(n_splits=num_partitions,shuffle=True,random_state=configs["random_state_partitions"])
     partition_rows = []
     #df = load_data(data_path)
