@@ -6,7 +6,8 @@ from wandb.keras import WandbCallback
 from utils.config import configs
 import argparse
 from sklearn.preprocessing import StandardScaler
-
+from sklearn.metrics import balanced_accuracy_score
+import tensorflow
 parser = argparse.ArgumentParser(
         prog="train_model_wandb_gen_expr.py",
         formatter_class=argparse.RawDescriptionHelpFormatter,
@@ -69,6 +70,7 @@ model.compile(optimizer=configs.get("optimizer"),
 
 model.fit(X_train, y_train, epochs=configs.get("epochs"), batch_size=configs.get("batch_size"), validation_freq=configs["valid_freq"], validation_split=0.2,callbacks=[wandb_callback])
 score = model.evaluate(X_test, y_test, verbose = 0,return_dict=True)
+
 for key,value in score.items():
     wandb.log({f"eval_{key}": value})
 wandb.finish()

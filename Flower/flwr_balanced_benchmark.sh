@@ -28,27 +28,27 @@ do
   echo "<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<"
 done
 echo "---------------------------------------------------------------------------------------------------------"
-#echo "Benchmark system metrics"
-#for (( repeat = 0; repeat < $REPEATS; repeat++ ))
-#do
-#  echo "Start repeat system metrics ${repeat} num clients ${NUM_CLIENTS} num rounds ${NUM_ROUNDS} and data ${DATA_NAME}"
-#  rm timelogs/flw_logs_time.txt
-#  echo "Creating server"
-#  python server.py --data_path $DATA_PATH --run_repeat $repeat --num_clients $NUM_CLIENTS --num_rounds $NUM_ROUNDS --system_metrics true &
-#  server_id=$!
-#  #sleep 3
-#  echo "Start client"
-#  python client.py --client_index 1 --data_path $DATA_PATH --run_repeat $repeat --system_metrics true &
-#  client_id=$!
-#  client_time_logs="timelogs/flwr_client_${DATA_NAME}_${NUM_CLIENTS}_${NUM_ROUNDS}_repeat_${repeat}.txt"
-#  server_time_logs="timelogs/flwr_server_${DATA_NAME}_${NUM_CLIENTS}_${NUM_ROUNDS}_repeat_${repeat}.txt"
-#  psrecord $client_id --log $client_time_logs  --interval 0.5 &
-#  psrecord $server_id --log $server_time_logs --interval 0.5 &
-#  wait
-#  project_name="benchmark_rounds_${NUM_ROUNDS}_${DATA_NAME}_system_metrics"
-#  run_name="run_${repeat}"
-#  python ../scripts/mem_data_to_wandb.py --logs_path $client_time_logs --project_name $project_name --run_name $run_name --group_name "flwr_${NUM_CLIENTS}"  --memory_type "client"
-#  python ../scripts/mem_data_to_wandb.py --logs_path $server_time_logs --project_name $project_name  --run_name $run_name --group_name "flwr_${NUM_CLIENTS}"  --memory_type "server"
-#  echo "Repeat system metrics ${repeat} num clients ${NUM_CLIENTS} num rounds ${NUM_ROUNDS} and data ${DATA_NAME} complete"
-#  echo "<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<"
-#done
+echo "Benchmark system metrics"
+for (( repeat = 0; repeat < $REPEATS; repeat++ ))
+do
+  echo "Start repeat system metrics ${repeat} num clients ${NUM_CLIENTS} num rounds ${NUM_ROUNDS} and data ${DATA_NAME}"
+  rm timelogs/flw_logs_time.txt
+  echo "Creating server"
+  python server.py --data_path $DATA_PATH --run_repeat $repeat --num_clients $NUM_CLIENTS --num_rounds $NUM_ROUNDS --system_metrics true &
+  server_id=$!
+  #sleep 3
+  echo "Start client"
+  python client.py --client_index 1 --data_path $DATA_PATH --run_repeat $repeat --system_metrics true &
+  client_id=$!
+  client_time_logs="timelogs/flwr_client_${DATA_NAME}_${NUM_CLIENTS}_${NUM_ROUNDS}_repeat_${repeat}.txt"
+  server_time_logs="timelogs/flwr_server_${DATA_NAME}_${NUM_CLIENTS}_${NUM_ROUNDS}_repeat_${repeat}.txt"
+  psrecord $client_id --log $client_time_logs  --interval 0.5 &
+  psrecord $server_id --log $server_time_logs --interval 0.5 &
+  wait
+  project_name="benchmark_rounds_${NUM_ROUNDS}_${DATA_NAME}_system_metrics"
+  run_name="run_${repeat}"
+  python ../scripts/mem_data_to_wandb.py --logs_path $client_time_logs --project_name $project_name --run_name $run_name --group_name "flwr_${NUM_CLIENTS}"  --memory_type "client"
+  python ../scripts/mem_data_to_wandb.py --logs_path $server_time_logs --project_name $project_name  --run_name $run_name --group_name "flwr_${NUM_CLIENTS}"  --memory_type "server"
+  echo "Repeat system metrics ${repeat} num clients ${NUM_CLIENTS} num rounds ${NUM_ROUNDS} and data ${DATA_NAME} complete"
+  echo "<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<"
+done

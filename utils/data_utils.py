@@ -1,12 +1,13 @@
 from collections import defaultdict
 import pandas as pd
 from sklearn.model_selection import train_test_split, StratifiedKFold
-from sklearn.preprocessing import StandardScaler
+from sklearn.preprocessing import StandardScaler,LabelEncoder
 from config import configs
 import tensorflow as tf
 import numpy
 from math import floor
 import numpy as np
+from keras.utils import to_categorical
 
 
 def preprocess_data(df:pd.DataFrame)->pd.DataFrame:
@@ -20,10 +21,22 @@ def preprocess_data(df:pd.DataFrame)->pd.DataFrame:
     elif configs.get("usecase") == 2:
         return preprocess_genexpr_data(df)
     elif configs.get("usecase") == 3:
+        if "Unnamed: 0" in df.columns:
+            df = df.rename(columns={'Unnamed: 0': 'Sample'})
+        df = df.set_index("Sample")
+        le = LabelEncoder()
+        df[configs["label"]] = le.fit_transform(df[configs["label"]])
         return df
 
 
-def preprocess_brain_cell_data(df:pd.DataFrame):
+def select_feature_genes(df:pd.DataFrame, cov_threshold=3.5):
+    """
+    Preprocesses brain cell data by choosing most relevant genees by median filtering
+    :param df: dataframe to filter
+    :param cov_threshold: threshold for filtering genes
+    :return: filtered df
+    """
+    df = df[df["Classification"] !="no class"]
     cell_types = sorted(set(list(df["Classification"])))
     median_df = pd.DataFrame(np.zeros((len(cell_types), df.shape[1])))  # 75 rows × 13945 columns
     median_df.columns = df.columns
@@ -36,53 +49,28 @@ def preprocess_brain_cell_data(df:pd.DataFrame):
     median_df_mean = median_df.mean(axis=0)
     median_df_var = median_df.var(axis=0)
     median_df_cov = median_df_var / median_df_mean
-    cov_threshold = 2.5
+    cov_threshold =cov_threshold
     cov_filtered = df[median_df_cov[median_df_cov > cov_threshold].index]
     cov_filtered["Classification"] = df["Classification"]
-    final_df = pd.DataFrame(np.zeros((len(cell_types), cov_filtered.shape[1])))
-    final_df.columns = cov_filtered.columns
-    final_df.index = cell_types
-    final_df = final_df.drop(columns=["Classification"], axis=1)
-    for val in range(0, len(cell_types)):
-        temp_target = pd.DataFrame(np.repeat(median_df[val:val + 1].values, 75, axis=0))
-        temp_df = np.divide(median_df, temp_target)
-        temp_df = temp_df.replace(np.nan, 1)
-        temp_df = temp_df.where(temp_df < 1, 1)
-        vec = temp_df.sum(axis=0)
-        final_df.iloc[val] = vec
-    seventy5 = pd.DataFrame(np.ones((len(cell_types), cov_filtered.shape[1] - 1))) * len(cell_types)
-    binary_score_df = np.divide(np.subtract(seventy5, final_df), len(cell_types) - 1)
-    binary_score_df.index = final_df.index
-    binary_score_df.columns = final_df.columns
-
-    cluster_cutoff = round(binary_score_df.shape[1] * 0.01)
-    genes_kept = pd.Series()
-    for val in range(len(cell_types)):
-        bs_cluster = binary_score_df.iloc[val]
-        bs_thresh = bs_cluster.mean()
-        cluster_thresh = bs_cluster.sort_values(ascending=False)[cluster_cutoff]
-        thresh = cluster_thresh if cluster_thresh > bs_thresh else bs_thresh
-        bs_cluster_genes = bs_cluster[bs_cluster > thresh]
-        genes_kept = genes_kept.combine(bs_cluster_genes, max)
-    final_filtered = df[genes_kept.index]
-    final_filtered.to_csv("../Datasets2/Braindata.csv")
+    cov_filtered.set_index(df["Unnamed: 0"],inplace=True)
+    cov_filtered.to_csv("../Dataset2/Braindata.csv")
+    return cov_filtered
 
 
-def assign_label_to_brain_cell(data_path:str,label:str):
+def relabel_brain_cell_data(data_path:str, label_data_path, label:str=None):
     """
-    Assigns label to the brain cell dataframe
-    :param data_path: datapath to brain cell dataframe
+    Assigns clustered label to the brain cell dataframe
+    :param data_path dataframe to relabel
+    :param label_data_path: dataframe with index sample name and one column with new label
     :param label: label to use "brain_subregion", "class", "cluster"
     :return: new dataframe with label as condition column
     """
     df = pd.read_csv(data_path)
-    sample_columns = pd.read_csv("../Dataset2/human_MTG_gene_expression_matrices_2018-06-14/human_MTG_2018-06-14_samples-columns.csv")
-    sample_columns = sample_columns[sample_columns["label"] != "no class"]
-    sample_columns.set_index("sample_name")
-    label_df = sample_columns[["label"]]
-    df =pd.merge(df,label_df,how="inner",on="left_index")
-    df = df.drop("Classification")
-    df.rename({label:"Condition"})
+    lable_columns = pd.read_csv(label_data_path)
+    lable_columns.set_index(lable_columns['Sample'])
+    df =lable_columns.join(df)
+    df = df.set_index(df["Sample"])
+    df = df.drop(columns=["Unnamed: 0", "Classification","Sample"])
     return df
 
 def create_brain_cell_patient_partitions():

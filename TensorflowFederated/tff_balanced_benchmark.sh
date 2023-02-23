@@ -29,26 +29,26 @@ do
   echo "<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<"
 done
 echo "---------------------------------------------------------------------------------------------------------"
-#echo "Benchmark system metrics"
-#for (( repeat = 0; repeat < $REPEATS; repeat++ ))
-#do
-#  echo "Start repeat system metrics ${repeat} num clients ${NUM_CLIENTS} num rounds ${NUM_ROUNDS} and data ${DATA_NAME}"
-#  rm timelogs/tff_logs_time.txt
-#  echo "Creating single worker service"
-#  python worker_service.py --port 8001 --num_rounds $NUM_ROUNDS --client_index 1 --data_path $DATA_PATH --random_state $repeat &
-#  worker_id=$!
-#  echo "Start training"
-#  python tff_benchmark_gen_express.py --num_clients $NUM_CLIENTS --num_rounds $NUM_ROUNDS --data_path $DATA_PATH --run_repeat $repeat --system_metrics true &
-#  train_id=$!
-#  worker_time_logs="timelogs/tff_worker_${DATA_NAME}_${NUM_CLIENTS}_${NUM_ROUNDS}_repeat_${repeat}.txt"
-#  train_time_logs="timelogs/tff_train_${DATA_NAME}_${NUM_CLIENTS}_${NUM_ROUNDS}_repeat_${repeat}.txt"
-#  psrecord $worker_id --log $worker_time_logs --interval 0.5 &
-#  psrecord $train_id --log $train_time_logs --interval 0.5
-#  pkill worker_service
-#  project_name="benchmark_rounds_${NUM_ROUNDS}_${DATA_NAME}_system_metrics"
-#  run_name="run_${repeat}"
-#  python ../scripts/mem_data_to_wandb.py --logs_path $worker_time_logs --project_name $project_name --run_name $run_name --group_name "tff_${NUM_CLIENTS}"  --memory_type "client"
-#  python ../scripts/mem_data_to_wandb.py --logs_path $train_time_logs --project_name $project_name  --run_name $run_name --group_name "tff_${NUM_CLIENTS}"  --memory_type "server"
-#  echo "Repeat system metrics ${repeat} num clients ${NUM_CLIENTS} num rounds ${NUM_ROUNDS} and data ${DATA_NAME} complete"
-#  echo "<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<"
-#done
+echo "Benchmark system metrics"
+for (( repeat = 0; repeat < $REPEATS; repeat++ ))
+do
+  echo "Start repeat system metrics ${repeat} num clients ${NUM_CLIENTS} num rounds ${NUM_ROUNDS} and data ${DATA_NAME}"
+  rm timelogs/tff_logs_time.txt
+  echo "Creating single worker service"
+  python worker_service.py --port 8001 --num_rounds $NUM_ROUNDS --client_index 1 --data_path $DATA_PATH --random_state $repeat &
+  worker_id=$!
+  echo "Start training"
+  python tff_benchmark_gen_express.py --num_clients $NUM_CLIENTS --num_rounds $NUM_ROUNDS --data_path $DATA_PATH --run_repeat $repeat --system_metrics true &
+  train_id=$!
+  worker_time_logs="timelogs/tff_worker_${DATA_NAME}_${NUM_CLIENTS}_${NUM_ROUNDS}_repeat_${repeat}.txt"
+  train_time_logs="timelogs/tff_train_${DATA_NAME}_${NUM_CLIENTS}_${NUM_ROUNDS}_repeat_${repeat}.txt"
+  psrecord $worker_id --log $worker_time_logs --interval 0.5 &
+  psrecord $train_id --log $train_time_logs --interval 0.5
+  pkill worker_service
+  project_name="benchmark_rounds_${NUM_ROUNDS}_${DATA_NAME}_system_metrics"
+  run_name="run_${repeat}"
+  python ../scripts/mem_data_to_wandb.py --logs_path $worker_time_logs --project_name $project_name --run_name $run_name --group_name "tff_${NUM_CLIENTS}"  --memory_type "client"
+  python ../scripts/mem_data_to_wandb.py --logs_path $train_time_logs --project_name $project_name  --run_name $run_name --group_name "tff_${NUM_CLIENTS}"  --memory_type "server"
+  echo "Repeat system metrics ${repeat} num clients ${NUM_CLIENTS} num rounds ${NUM_ROUNDS} and data ${DATA_NAME} complete"
+  echo "<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<"
+done

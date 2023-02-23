@@ -2,6 +2,8 @@ import collections
 import concurrent.futures
 import pickle
 
+import keras.metrics
+
 from TensorflowFederated.testing_prototyping.tff_config import *
 import grpc
 import tensorflow as tf
@@ -61,11 +63,15 @@ train_data_iterator = train_data_source.iterator()
 def model_fn():
 
     model = get_model(input_dim=12708, num_nodes= configs.get("num_nodes"), dropout_rate=configs.get("dropout_rate"), l1_v= configs.get("l1_v"), l2_v=configs.get("l2_v"))
+    if configs["usecase"] ==3:
+        metrics = [keras.metrics.get("accuracy"),AUC(multi_label=True)]
+    else:
+        metrics = [BinaryAccuracy(),AUC(),Precision(),Recall()]
     return tff.learning.from_keras_model(
         model,
         input_spec=element_spec,
         loss=configs.get("loss"),
-        metrics=[BinaryAccuracy(),AUC(),Precision(),Recall()])
+        metrics=metrics)
 
 
 trainer = build_weighted_fed_avg(

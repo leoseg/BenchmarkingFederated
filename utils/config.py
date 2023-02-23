@@ -1,31 +1,34 @@
 import os
-
-from keras.metrics import AUC,Precision,Recall,BinaryAccuracy
+from metrics import SparseAUC
+from keras.metrics import AUC,Precision,Recall,BinaryAccuracy,CategoricalCrossentropy,SparseCategoricalAccuracy
 from keras.optimizers import Adam,SGD
-from keras.losses import BinaryCrossentropy
+from keras.losses import BinaryCrossentropy,SparseCategoricalCrossentropy
 tff_time_logging_directory = "timelogs/tff_logs_time.txt"
 flw_time_logging_directory = "timelogs/flw_logs_time.txt"
 DATA_PATH = ""
 if os.environ["USECASE"] == str(3):
     configs = dict(
+        activation="softmax",
         valid_freq=2,
         usecase=3,
         batch_size=512,
-        epochs=8,
-        optimizer=SGD(),
-        loss=BinaryCrossentropy(),
-        metrics=[BinaryAccuracy(), AUC(name="auc"), Precision(name="precision"), Recall(name="recall")],
-        l2_v=0.001,
+        epochs=10,
+        optimizer=Adam(),
+        loss=SparseCategoricalCrossentropy(),
+        metrics=[SparseCategoricalAccuracy(),SparseAUC(),SparseAUC(curve="PR",name="prauc")],
+        l2_v=1.0,
         n_splits=5,
-        data_path="../DataGenExpression/Alldata.csv",
         shuffle=10000,
-        label="Condition",
+        label="Classification",
         scale=False,
-        number_of_classes=6,
+        number_of_classes=5,
         random_state_partitions=69,
+        categorical=True,
+        data_path="../Dataset2/Braindata_first_five.csv"
     )
 elif os.environ["USECASE"] == str(2):
     configs = dict(
+        activation="sigmoid",
         valid_freq=2,
         usecase=2,
         batch_size=512,

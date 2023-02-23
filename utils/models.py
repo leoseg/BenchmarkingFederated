@@ -82,5 +82,5 @@ def get_log_reg_keras(l2_v):
     """
     model = Sequential()
     #model.add(Input(shape=(configs["batch_size"],input_dim)))
-    model.add(Dense(units=configs["number_of_classes"], kernel_initializer='glorot_uniform', activation='sigmoid', kernel_regularizer=l2(l2_v)))
+    model.add(Dense(units=configs["number_of_classes"], kernel_initializer='glorot_uniform', activation=configs["activation"], kernel_regularizer=l2(l2_v)))
     return model
