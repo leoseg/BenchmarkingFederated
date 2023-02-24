@@ -2,6 +2,7 @@
 #SBATCH -J tff_bal
 #SBATCH --time=2-00:00:00
 #SBATCH --ntasks=1
+#SBATCH --partition=clara
 #SBATCH --cpus-per-task=11
 #SBATCH --mem=50G
 module load Python/3.10.4-GCCcore-11.3.0
@@ -12,6 +13,7 @@ USECASE=$3
 export USECASE=$USECASE
 DATA_PATH=$4
 echo $WANDB_API_KEY
+SYSTEM_ONLY=$5
 cd ..
 python3.10 -m venv venvtff
 source venvtff/bin/activate
@@ -30,7 +32,7 @@ for rounds in "${round_config[@]}";
 do
   for client_num in {3,5,10}
   do
-    bash tff_balanced_benchmark.sh $DATA_PATH $client_num $rounds $WANDB_API_KEY $NUM_REPEATS
+    bash tff_balanced_benchmark.sh $DATA_PATH $client_num $rounds $WANDB_API_KEY $NUM_REPEATS $SYSTEM_ONLY
   done
 done
 
