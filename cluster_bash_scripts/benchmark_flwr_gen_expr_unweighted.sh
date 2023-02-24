@@ -18,21 +18,26 @@ export USECASE=$USECASE
 DATA_PATH=$4
 echo $WANDB_API_KEY
 cd ..
-python3.10 -m venv venvFlwr
-source venvFlwr/bin/activate
-python3 -c 'import sys; print(sys.version_info[:])'
-pip3 install --upgrade pip
-pip install -e utils
-pip3 install -r requirements.txt
+#python3.10 -m venv venvFlwr
+#source venvFlwr/bin/activate
+#python3 -c 'import sys; print(sys.version_info[:])'
+#pip3 install --upgrade pip
+#pip install -e utils
+#pip3 install -r requirements.txt
 cd Flower || exit
 if [ $3 =  "1" ] ||  [ $3 = "3" ]; then
-   round_config=(1 2 5 10)
+   round_config=(10)
 elif [  $3 = "2" ]; then
    round_config=(1 2 4 8)
 fi
+if [ $3 =  "1" ] ||  [ $3 = "2" ]; then
+   unweight_config=(10)
+elif [  $3 = "3" ]; then
+   unweight_config=(0 1 2 3 4)
+fi
 for rounds in "${round_config[@]}";
 do
-  for unweight_step in {0,2,4,6,8,9,10}
+  for unweight_step in "${unweight_config[@]}";
   do
     bash flwr_unbalanced_benchmark.sh $DATA_PATH 2 $rounds $WANDB_API_KEY $NUM_REPEATS $unweight_step
   done

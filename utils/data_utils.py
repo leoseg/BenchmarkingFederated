@@ -21,7 +21,7 @@ def preprocess_data(df:pd.DataFrame)->pd.DataFrame:
     elif configs.get("usecase") == 2:
         return preprocess_genexpr_data(df)
     elif configs.get("usecase") == 3:
-        if "Unnamed: 0" in df.columns:
+        if ("Unnamed: 0" or "Unnamed: 0.1") in df.columns:
             df = df.rename(columns={'Unnamed: 0': 'Sample'})
         df = df.set_index("Sample")
         le = LabelEncoder()

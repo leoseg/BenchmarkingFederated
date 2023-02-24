@@ -24,7 +24,8 @@ if os.environ["USECASE"] == str(3):
         number_of_classes=5,
         random_state_partitions=69,
         categorical=True,
-        data_path="../Dataset2/Braindata_first_five.csv"
+        data_path="../Dataset2/Braindata_five_classes.csv",
+        input_dim=1426,
     )
 elif os.environ["USECASE"] == str(2):
     configs = dict(
@@ -44,6 +45,7 @@ elif os.environ["USECASE"] == str(2):
         scale=True,
         number_of_classes=1,
         random_state_partitions=69,
+        input_dim=12708
     )
 else:
     configs = dict(
@@ -64,5 +66,6 @@ else:
         data_path="../DataGenExpression/Alldata.csv",
         shuffle=10000,
         label="Condition",
-        scale=True
+        scale=True,
+        input_dim=12708
     )

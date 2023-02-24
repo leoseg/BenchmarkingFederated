@@ -13,7 +13,7 @@ from utils.config import configs
 from utils.config import tff_time_logging_directory
 import argparse
 from keras.metrics import AUC,BinaryAccuracy,Recall,Precision, SparseCategoricalAccuracy
-from metrics import SparseAUC
+from metrics import SparseAUC,AUC
 import os
 import pandas as pd
 parser = argparse.ArgumentParser(
@@ -21,19 +21,19 @@ parser = argparse.ArgumentParser(
         formatter_class=argparse.RawDescriptionHelpFormatter,
     )
 parser.add_argument(
-    "--num_rounds",type=int,help="number of fl rounds"
+    "--num_rounds",type=int,help="number of fl rounds",default=2
 )
 parser.add_argument(
-    "--num_clients",type=int,help="number of clients"
+    "--num_clients",type=int,help="number of clients",default=2
 )
 parser.add_argument(
     "--data_path", type=str, help="path of data to load",default=configs.get("data_path")
 )
 parser.add_argument(
-    "--run_repeat",type=int,help="number of run with same config"
+    "--run_repeat",type=int,help="number of run with same config",default=0
 )
 parser.add_argument(
-    "--system_metrics",type=bool,help="flag for system metrics"
+    "--system_metrics",type=bool,help="flag for system metrics",default=False
 )
 parser.add_argument(
     "--unweighted_percentage",type=float,help="flag that show that data is that much unweighted",default=-1.0
@@ -43,7 +43,7 @@ args = parser.parse_args()
 unweighted = args.unweighted_percentage
 os.environ["TF_CPP_MIN_LOG_LEVEL"] = "3"
 element_spec = (
-    tf.TensorSpec(shape=(None, 12708), dtype=tf.float64, name=None),
+    tf.TensorSpec(shape=(None, configs["input_dim"]), dtype=tf.float64, name=None),
 tf.TensorSpec(shape=(None,), dtype=tf.int64, name=None)
 )
 print("Command line args are:\n")
@@ -61,7 +61,7 @@ def model_fn():
 
     model = get_model(input_dim=12708, num_nodes= configs.get("num_nodes"), dropout_rate=configs.get("dropout_rate"), l1_v= configs.get("l1_v"), l2_v=configs.get("l2_v"))
     if configs["usecase"] ==3:
-        metrics = [SparseCategoricalAccuracy(),SparseAUC(),SparseAUC(curve="PR",name="prauc")],
+        metrics = [SparseCategoricalAccuracy(),AUC(),AUC(curve="PR",name="prauc")]
     else:
         metrics = [BinaryAccuracy(),AUC(),Precision(),Recall()]
     return tff.learning.from_keras_model(

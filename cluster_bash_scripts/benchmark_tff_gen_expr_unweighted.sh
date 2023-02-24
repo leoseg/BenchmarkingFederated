@@ -25,9 +25,14 @@ if [ $3 =  "1" ] ||  [ $3 = "3" ]; then
 elif [  $3 = "2" ]; then
    round_config=(1 2 4 8)
 fi
+if [ $3 =  "1" ] ||  [ $3 = "2" ]; then
+   unweight_config=(0 2 4 6 8 9 10)
+elif [  $3 = "3" ]; then
+   unweight_config=(0 1 2 3 4)
+fi
 for rounds in "${round_config[@]}";
 do
-  for unweight_step in {0,2,4,6,8,9,10}
+  for unweight_step in "${unweight_config[@]}";
   do
     bash tff_unbalanced_benchmark.sh $DATA_PATH 2 $rounds $WANDB_API_KEY $NUM_REPEATS $unweight_step
   done
