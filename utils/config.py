@@ -1,5 +1,5 @@
 import os
-from metrics import SparseAUC
+from metrics import AUC as SparseAUC
 from keras.metrics import AUC,Precision,Recall,BinaryAccuracy,CategoricalCrossentropy,SparseCategoricalAccuracy
 from keras.optimizers import Adam,SGD
 from keras.losses import BinaryCrossentropy,SparseCategoricalCrossentropy
