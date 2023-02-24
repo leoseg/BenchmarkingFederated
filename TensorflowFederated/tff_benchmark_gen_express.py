@@ -61,7 +61,7 @@ def model_fn():
 
     model = get_model(input_dim=12708, num_nodes= configs.get("num_nodes"), dropout_rate=configs.get("dropout_rate"), l1_v= configs.get("l1_v"), l2_v=configs.get("l2_v"))
     if configs["usecase"] ==3:
-        metrics = [SparseCategoricalAccuracy(),AUC(),AUC(curve="PR",name="prauc")]
+        metrics = [SparseCategoricalAccuracy(),AUC(name="auc"),AUC(curve="PR",name="prauc")]
     else:
         metrics = [BinaryAccuracy(),AUC(),Precision(),Recall()]
     return tff.learning.from_keras_model(

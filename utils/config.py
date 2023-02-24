@@ -15,7 +15,7 @@ if os.environ["USECASE"] == str(3):
         epochs=10,
         optimizer=Adam(),
         loss=SparseCategoricalCrossentropy(),
-        metrics=[SparseCategoricalAccuracy(),SparseAUC(),SparseAUC(curve="PR",name="prauc")],
+        metrics=[SparseCategoricalAccuracy(),SparseAUC(name="auc"),SparseAUC(curve="PR",name="prauc")],
         l2_v=1.0,
         n_splits=5,
         shuffle=10000,
