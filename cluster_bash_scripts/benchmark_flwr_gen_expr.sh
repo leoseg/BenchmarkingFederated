@@ -1,6 +1,6 @@
 #!/bin/bash
 #SBATCH --nodes=1
-#SBATCH --job-name=training_unsupervised
+#SBATCH --job-name=flwr_bal
 #SBATCH --partition=clara
 #SBATCH --time=2-00:00:00
 #SBATCH --cpus-per-task=11

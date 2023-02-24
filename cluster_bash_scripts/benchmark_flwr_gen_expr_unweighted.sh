@@ -1,6 +1,6 @@
 #!/bin/bash
 #SBATCH --nodes=1
-#SBATCH --job-name=flwr
+#SBATCH --job-name=flwr_inb
 #SBATCH --partition=clara
 #SBATCH --time=2-00:00:00
 #SBATCH --cpus-per-task=11
