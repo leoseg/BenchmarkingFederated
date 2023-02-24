@@ -34,11 +34,11 @@ do
   echo "Start repeat system metrics ${repeat} num clients ${NUM_CLIENTS} num rounds ${NUM_ROUNDS} and data ${DATA_NAME}"
   rm timelogs/flw_logs_time.txt
   echo "Creating server"
-  python server.py --data_path $DATA_PATH --run_repeat $repeat --num_clients $NUM_CLIENTS --num_rounds $NUM_ROUNDS --system_metrics true &
+  taskset -c 0 python server.py --data_path $DATA_PATH --run_repeat $repeat --num_clients $NUM_CLIENTS --num_rounds $NUM_ROUNDS --system_metrics true &
   server_id=$!
   #sleep 3
   echo "Start client"
-  python client.py --client_index 1 --data_path $DATA_PATH --run_repeat $repeat --system_metrics true &
+  taskset -c 1 python client.py --client_index 1 --data_path $DATA_PATH --run_repeat $repeat --system_metrics true &
   client_id=$!
   client_time_logs="timelogs/flwr_client_${DATA_NAME}_${NUM_CLIENTS}_${NUM_ROUNDS}_repeat_${repeat}.txt"
   server_time_logs="timelogs/flwr_server_${DATA_NAME}_${NUM_CLIENTS}_${NUM_ROUNDS}_repeat_${repeat}.txt"

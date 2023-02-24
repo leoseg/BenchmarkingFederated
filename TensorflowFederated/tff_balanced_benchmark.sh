@@ -35,10 +35,10 @@ do
   echo "Start repeat system metrics ${repeat} num clients ${NUM_CLIENTS} num rounds ${NUM_ROUNDS} and data ${DATA_NAME}"
   rm timelogs/tff_logs_time.txt
   echo "Creating single worker service"
-  python worker_service.py --port 8001 --num_rounds $NUM_ROUNDS --client_index 1 --data_path $DATA_PATH --random_state $repeat &
+  taskset -c 0 python worker_service.py --port 8001 --num_rounds $NUM_ROUNDS --client_index 1 --data_path $DATA_PATH --random_state $repeat &
   worker_id=$!
   echo "Start training"
-  python tff_benchmark_gen_express.py --num_clients $NUM_CLIENTS --num_rounds $NUM_ROUNDS --data_path $DATA_PATH --run_repeat $repeat --system_metrics true &
+  taskset -c 1 python tff_benchmark_gen_express.py --num_clients $NUM_CLIENTS --num_rounds $NUM_ROUNDS --data_path $DATA_PATH --run_repeat $repeat --system_metrics true &
   train_id=$!
   worker_time_logs="timelogs/tff_worker_${DATA_NAME}_${NUM_CLIENTS}_${NUM_ROUNDS}_repeat_${repeat}.txt"
   train_time_logs="timelogs/tff_train_${DATA_NAME}_${NUM_CLIENTS}_${NUM_ROUNDS}_repeat_${repeat}.txt"

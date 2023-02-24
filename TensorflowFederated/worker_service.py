@@ -58,7 +58,7 @@ def main(argv) -> None:
 
     executor_factory = tff.framework.local_executor_factory(
         default_num_clients=1,
-        # Max fanout in the hierarchy of local executors
+        # Max fanout in the hierarchy of local executors,
         max_fanout=100,
         leaf_executor_fn=ex_fn)
 

@@ -1,6 +1,7 @@
 #!/bin/bash
 #SBATCH --nodes=1
-#SBATCH --job-name=training_unsupervised
+#SBATCH --job-name=central_syste,
+#SBATCH --cpus-per-task=1
 #SBATCH --partition=clara
 #SBATCH --time=2-00:00:00
 #SBATCH --mem-per-cpu=50G
@@ -26,7 +27,7 @@ GROUP_NAME=$5
 cd CentralizedApproach || exit
 for (( repeat = 0; repeat < $REPEATS; repeat++ ))
 do
-  python benchmark_central_system_metrics.py --run_repeat $repeat --data_path $DATA_PATH &
+  taskset -c 0 python benchmark_central_system_metrics.py --run_repeat $repeat --data_path $DATA_PATH &
   psrecord $! --log "timelogs/central_model_repeat_${repeat}.txt" --interval 0.5
   project_name="benchmark-central_${DATA_NAME}_system_metrics"
   python ../scripts/mem_data_to_wandb.py --logs_path "timelogs/central_model_repeat_${repeat}.txt" --project_name $project_name --run_name "run_${repeat}" --group_name $GROUP_NAME  --memory_type "central"
