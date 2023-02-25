@@ -28,7 +28,7 @@ cd CentralizedApproach || exit
 for (( repeat = 0; repeat < $REPEATS; repeat++ ))
 do
   python benchmark_central_system_metrics.py --run_repeat $repeat --data_path $DATA_PATH &
-  process_id = $!
+  process_id=$!
   taskset -c -pa 0 $process_id
   psrecord $process_id --log "timelogs/central_model_repeat_${repeat}.txt" --interval 0.5
   project_name="benchmark-central_${DATA_NAME}_system_metrics"
