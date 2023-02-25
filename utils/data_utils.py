@@ -31,7 +31,7 @@ def preprocess_data(df:pd.DataFrame)->pd.DataFrame:
 
 def select_feature_genes(df:pd.DataFrame, cov_threshold=3.5):
     """
-    Preprocesses brain cell data by choosing most relevant genees by median filtering
+    Preprocesses brain cell data by choosing most relevant genes by coefficient of variation filtering
     :param df: dataframe to filter
     :param cov_threshold: threshold for filtering genes
     :return: filtered df

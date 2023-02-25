@@ -18,20 +18,20 @@ export USECASE=$USECASE
 DATA_PATH=$4
 echo $WANDB_API_KEY
 cd ..
-#python3.10 -m venv venvFlwr
-#source venvFlwr/bin/activate
-#python3 -c 'import sys; print(sys.version_info[:])'
-#pip3 install --upgrade pip
-#pip install -e utils
-#pip3 install -r requirements.txt
+python3.10 -m venv venvFlwr
+source venvFlwr/bin/activate
+python3 -c 'import sys; print(sys.version_info[:])'
+pip3 install --upgrade pip
+pip install -e utils
+pip3 install -r requirements.txt
 cd Flower || exit
 if [ $3 =  "1" ] ||  [ $3 = "3" ]; then
-   round_config=(10)
+   round_config=(1 2 5 10)
 elif [  $3 = "2" ]; then
    round_config=(1 2 4 8)
 fi
 if [ $3 =  "1" ] ||  [ $3 = "2" ]; then
-   unweight_config=(10)
+   unweight_config=(0 2 4 6 8 9 10)
 elif [  $3 = "3" ]; then
    unweight_config=(0 1 2 3 4)
 fi
