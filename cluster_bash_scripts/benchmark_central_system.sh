@@ -27,8 +27,10 @@ GROUP_NAME=$5
 cd CentralizedApproach || exit
 for (( repeat = 0; repeat < $REPEATS; repeat++ ))
 do
-  taskset -c 0 python benchmark_central_system_metrics.py --run_repeat $repeat --data_path $DATA_PATH &
-  psrecord $! --log "timelogs/central_model_repeat_${repeat}.txt" --interval 0.5
+  python benchmark_central_system_metrics.py --run_repeat $repeat --data_path $DATA_PATH &
+  process_id = $!
+  taskset -c -pa 0 $process_id
+  psrecord $process_id --log "timelogs/central_model_repeat_${repeat}.txt" --interval 0.5
   project_name="benchmark-central_${DATA_NAME}_system_metrics"
   python ../scripts/mem_data_to_wandb.py --logs_path "timelogs/central_model_repeat_${repeat}.txt" --project_name $project_name --run_name "run_${repeat}" --group_name $GROUP_NAME  --memory_type "central"
 done

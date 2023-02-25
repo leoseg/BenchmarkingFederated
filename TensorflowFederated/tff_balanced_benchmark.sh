@@ -36,13 +36,15 @@ echo "Benchmark system metrics"
 for (( repeat = 0; repeat < $REPEATS; repeat++ ))
 do
   echo "Start repeat system metrics ${repeat} num clients ${NUM_CLIENTS} num rounds ${NUM_ROUNDS} and data ${DATA_NAME}"
-  rm timelogs/tff_logs_time.txt
+  rm -f timelogs/tff_logs_time.txt
   echo "Creating single worker service"
-  taskset -c 0 python worker_service.py --port 8001 --num_rounds $NUM_ROUNDS --client_index 1 --data_path $DATA_PATH --random_state $repeat &
+  python worker_service.py --port 8001 --num_rounds $NUM_ROUNDS --client_index 1 --data_path $DATA_PATH --random_state $repeat &
   worker_id=$!
+  taskset -c -pa 0 $worker_id
   echo "Start training"
-  taskset -c 1 python tff_benchmark_gen_express.py --num_clients $NUM_CLIENTS --num_rounds $NUM_ROUNDS --data_path $DATA_PATH --run_repeat $repeat --system_metrics true &
+  python tff_benchmark_gen_express.py --num_clients $NUM_CLIENTS --num_rounds $NUM_ROUNDS --data_path $DATA_PATH --run_repeat $repeat --system_metrics true &
   train_id=$!
+  taskset -c pa 1 $train_id
   worker_time_logs="timelogs/tff_worker_${DATA_NAME}_${NUM_CLIENTS}_${NUM_ROUNDS}_repeat_${repeat}.txt"
   train_time_logs="timelogs/tff_train_${DATA_NAME}_${NUM_CLIENTS}_${NUM_ROUNDS}_repeat_${repeat}.txt"
   psrecord $worker_id --log $worker_time_logs --interval 0.5 &
