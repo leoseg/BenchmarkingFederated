@@ -11,7 +11,7 @@ SYSTEM_ONLY=$6
 DATA_NAME=$(basename "$DATA_PATH" .csv)
 echo "Starting flwr experiment with num clients ${NUM_CLIENTS} num rounds ${NUM_ROUNDS} and data ${DATA_NAME} and ${REPEATS} repeats"
 python ../scripts/partition_data.py --num_clients $NUM_CLIENTS  --data_path $DATA_PATH
-if [ $SYSTEM_ONLY = 1 ]; then
+if [ $SYSTEM_ONLY = 0 ]; then
   echo "Benchmark model metrics"
   for (( repeat = 0; repeat < $REPEATS; repeat++ ))
   do
