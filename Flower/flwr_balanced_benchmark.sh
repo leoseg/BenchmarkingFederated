@@ -39,12 +39,16 @@ do
   echo "Creating server"
   python server.py --data_path $DATA_PATH --run_repeat $repeat --num_clients $NUM_CLIENTS --num_rounds $NUM_ROUNDS --system_metrics true &
   server_id=$!
-  taskset -c -pa 0 $server_id
+  read cpu_available <<< $(taskset -pc $server_id | awk '{print $NF}')
+  cpu_arr=(${cpu_available//,/ })
+  cpu_num_1=$(echo ${cpu_arr[0]} | cut -d'-' -f1)
+  cpu_num_2=$(echo ${cpu_arr[1]} | cut -d'-' -f1)
+  taskset -c -pa $cpu_num_1 $server_id
   #sleep 3
   echo "Start client"
   python client.py --client_index 1 --data_path $DATA_PATH --run_repeat $repeat --system_metrics true &
   client_id=$!
-  taskset -c -pa 1 $client_id
+  taskset -c -pa $cpu_num_2 $client_id
   client_time_logs="timelogs/flwr_client_${DATA_NAME}_${NUM_CLIENTS}_${NUM_ROUNDS}_repeat_${repeat}.txt"
   server_time_logs="timelogs/flwr_server_${DATA_NAME}_${NUM_CLIENTS}_${NUM_ROUNDS}_repeat_${repeat}.txt"
   psrecord $client_id --log $client_time_logs  --interval 0.5 &

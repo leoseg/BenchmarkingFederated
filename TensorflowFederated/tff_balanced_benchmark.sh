@@ -40,11 +40,15 @@ do
   echo "Creating single worker service"
   python worker_service.py --port 8001 --num_rounds $NUM_ROUNDS --client_index 1 --data_path $DATA_PATH --random_state $repeat &
   worker_id=$!
-  taskset -c -pa 0 $worker_id
+  read cpu_available <<< $(taskset -pc $worker_id| awk '{print $NF}')
+  cpu_arr=(${cpu_available//,/ })
+  cpu_num_1=$(echo ${cpu_arr[0]} | cut -d'-' -f1)
+  cpu_num_2=$(echo ${cpu_arr[1]} | cut -d'-' -f1)
+  taskset -c -pa $cpu_num_1 $worker_id
   echo "Start training"
   python tff_benchmark_gen_express.py --num_clients $NUM_CLIENTS --num_rounds $NUM_ROUNDS --data_path $DATA_PATH --run_repeat $repeat --system_metrics true &
   train_id=$!
-  taskset -c pa 1 $train_id
+  taskset -c -pa $cpu_num_2 $train_id
   worker_time_logs="timelogs/tff_worker_${DATA_NAME}_${NUM_CLIENTS}_${NUM_ROUNDS}_repeat_${repeat}.txt"
   train_time_logs="timelogs/tff_train_${DATA_NAME}_${NUM_CLIENTS}_${NUM_ROUNDS}_repeat_${repeat}.txt"
   psrecord $worker_id --log $worker_time_logs --interval 0.5 &

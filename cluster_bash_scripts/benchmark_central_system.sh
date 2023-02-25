@@ -29,7 +29,9 @@ for (( repeat = 0; repeat < $REPEATS; repeat++ ))
 do
   python benchmark_central_system_metrics.py --run_repeat $repeat --data_path $DATA_PATH &
   process_id=$!
-  taskset -c -pa 0 $process_id
+  read cpu_array <<< $(taskset -pc $process_id | awk '{print $NF}')
+  cpu_num=$(echo $cpu_array | cut -d'-' -f1)
+  taskset -c -pa $cpu_num $process_id
   psrecord $process_id --log "timelogs/central_model_repeat_${repeat}.txt" --interval 0.5
   project_name="benchmark-central_${DATA_NAME}_system_metrics"
   python ../scripts/mem_data_to_wandb.py --logs_path "timelogs/central_model_repeat_${repeat}.txt" --project_name $project_name --run_name "run_${repeat}" --group_name $GROUP_NAME  --memory_type "central"
