@@ -9,8 +9,10 @@ WANDB_API_KEY=$4
 REPEATS=$5
 UNWEIGHTED_STEP=$6
 DATA_NAME=$(basename "$DATA_PATH" .csv)
+echo "Usecase ${USECASE}"
 echo "Starting unbalanced flwr experiment with num clients ${NUM_CLIENTS} num rounds ${NUM_ROUNDS} and data ${DATA_NAME} and ${REPEATS} repeats"
-python ../scripts/partition_data.py --num_clients $NUM_CLIENTS  --data_path $DATA_PATH --unweighted_step $UNWEIGHTED_STEP --label_name "Condition"
+# Creates partitions and saves the row indices of each partition to file so it can be read from clients
+python ../scripts/partition_data.py --num_clients $NUM_CLIENTS  --data_path $DATA_PATH --unweighted_step $UNWEIGHTED_STEP
 echo "Benchmark model metrics"
 for (( repeat = 0; repeat < $REPEATS; repeat++ ))
 do
