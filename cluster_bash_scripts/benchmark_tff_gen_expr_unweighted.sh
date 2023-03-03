@@ -29,15 +29,17 @@ fi
 # Choose step config for "unweighting" the class distribution on each client
 if [ $3 =  "1" ] ||  [ $3 = "2" ]; then
    unweight_config=(0 2 4 6 8 9 10)
+   num_clients=2
 elif [  $3 = "3" ]; then
    unweight_config=(0 1 2 3 4)
+   num_clients=5
 fi
 # Loops trough configurations
 for rounds in "${round_config[@]}";
 do
   for unweight_step in "${unweight_config[@]}";
   do
-    bash tff_unbalanced_benchmark.sh $DATA_PATH 2 $rounds $WANDB_API_KEY $NUM_REPEATS $unweight_step
+    bash tff_unbalanced_benchmark.sh $DATA_PATH $num_clients $rounds $WANDB_API_KEY $NUM_REPEATS $unweight_step
   done
 done
 
