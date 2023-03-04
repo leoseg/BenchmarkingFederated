@@ -32,7 +32,7 @@ parser.add_argument(
 # print help if no argument is specified
 args = parser.parse_args()
 def fit_config(server_round: int):
-    """Return training configuration dict for each round."""
+    """Return training configuration dict for each round. Sets local epochs of each client"""
     config = {
         "local_epochs": ceil(configs.get("epochs")/args.num_rounds)
     }

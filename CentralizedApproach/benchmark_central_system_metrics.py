@@ -1,7 +1,4 @@
-import os
-
 from sklearn.preprocessing import StandardScaler
-
 from utils.data_utils import load_data, create_X_y_from_gen_df, preprocess_data
 from utils.models import get_model
 from sklearn.model_selection import StratifiedKFold
@@ -10,7 +7,7 @@ import tensorflow as tf
 from utils.data_utils import preprocess
 from utils.config import configs
 import argparse
-
+# Script that benchmarks the system metrics of the central model
 parser = argparse.ArgumentParser(
         prog="benchmark_central_system_metrics.py",
         formatter_class=argparse.RawDescriptionHelpFormatter,

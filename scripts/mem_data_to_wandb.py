@@ -1,6 +1,7 @@
 import argparse
 from utils.system_utils import read_system_logs
 from utils.config import configs
+# Reads file written by psrecord and writes them to wandb
 parser = argparse.ArgumentParser(
         prog="mem_data_to_wandb.py",
         formatter_class=argparse.RawDescriptionHelpFormatter,
@@ -20,7 +21,6 @@ parser.add_argument(
 parser.add_argument(
     "--memory_type",type=str,help="type of memory measured"
 )
-
 args = parser.parse_args()
 project_name = args.project_name
 if configs["usecase"] != 1:

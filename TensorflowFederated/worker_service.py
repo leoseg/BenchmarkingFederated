@@ -3,7 +3,6 @@ import tensorflow as tf
 import tensorflow_federated as tff
 from data_loading import DataBackend
 from absl import flags
-
 from data_utils import df_train_test_dataset,load_data,preprocess_data
 from utils.config import configs
 import pickle
@@ -32,12 +31,14 @@ def main(argv) -> None:
     run_repeat = FLAGS.run_repeat
     random_state = FLAGS.random_state
     client_index = FLAGS.client_index
+    # If client index flag is None reads whole dataset
     if (client_index or client_index == 0):
         with open("partitions_list", "rb") as file:
             partitions_list = pickle.load(file)
         rows_to_keep = partitions_list[client_index]
     else:
         rows_to_keep = None
+    # Loads and preprocesses data
     df  = load_data(data_path,rows_to_keep)
     df = preprocess_data(df)
     train_dataset, test_dataset = df_train_test_dataset(
@@ -47,6 +48,7 @@ def main(argv) -> None:
         label=configs.get("label"),
         scale=configs.get("scale")
     )
+    # Sets executor for local calculations
     def ex_fn(device: tf.config.LogicalDevice) -> tff.framework.DataExecutor:
         return tff.framework.DataExecutor(
             tff.framework.EagerTFExecutor(device),

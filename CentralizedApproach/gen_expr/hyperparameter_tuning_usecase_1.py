@@ -3,7 +3,7 @@ from utils.models import get_seq_nn_model
 from utils.config import configs
 import wandb
 from wandb.keras import WandbCallback
-
+#This script was used for tuning the hyper parameter for the first usecase
 
 sweep_configuration = {
     'method': 'random',

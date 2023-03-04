@@ -37,15 +37,18 @@ with open("partitions_list","rb") as file:
 # Make TensorFlow log less verbose
 os.environ["TF_CPP_MIN_LOG_LEVEL"] = "3"
 datapath = args.data_path
+# If client index flag is None reads whole dataset
 if (args.client_index or args.client_index == 0):
     rows_to_keep = partitions_list[args.client_index]
 else:
     rows_to_keep = None
-# Load model and data
+# Load and preprocess data
 df = load_data(datapath,rows_to_keep)
 df = preprocess_data(df)
-model = get_model(input_dim=12708, num_nodes= configs.get("num_nodes"), dropout_rate=configs.get("dropout_rate"), l1_v= configs.get("l1_v"), l2_v=configs.get("l2_v"))
 train_ds,test_ds = df_train_test_dataset(df, kfold_num=args.random_state, random_state=args.run_repeat,label=configs.get("label"),scale=configs.get("scale"))
+
+# Loads and compile model
+model = get_model(input_dim=12708, num_nodes= configs.get("num_nodes"), dropout_rate=configs.get("dropout_rate"), l1_v= configs.get("l1_v"), l2_v=configs.get("l2_v"))
 model.compile(configs.get("optimizer"), configs.get("loss"), metrics=configs.get("metrics"))
 
 # Define Flower client
@@ -59,6 +62,7 @@ class Client(fl.client.NumPyClient):
         begin = tf.timestamp()
         model.fit(preprocessed_ds)
         end = tf.timestamp()
+        # If system metrics write client time to file so the server can log it
         if args.system_metrics:
             tf.print("Client training time",output_stream=f"file://{flw_time_logging_directory}")
             tf.print(end-begin,output_stream=f"file://{flw_time_logging_directory}")

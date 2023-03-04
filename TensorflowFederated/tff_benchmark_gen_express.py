@@ -13,7 +13,7 @@ from utils.config import configs
 from utils.config import tff_time_logging_directory
 import argparse
 from keras.metrics import AUC,BinaryAccuracy,Recall,Precision, SparseCategoricalAccuracy
-from metrics import SparseAUC,AUC
+from metrics import AUC
 import os
 import pandas as pd
 parser = argparse.ArgumentParser(
@@ -57,9 +57,11 @@ train_data_source = FederatedData(type_spec=dataset_type)
 train_data_iterator = train_data_source.iterator()
 
 
+# Model function to use for FL
 def model_fn():
 
     model = get_model(input_dim=12708, num_nodes= configs.get("num_nodes"), dropout_rate=configs.get("dropout_rate"), l1_v= configs.get("l1_v"), l2_v=configs.get("l2_v"))
+    # Chooses metrics depending on usecase
     if configs["usecase"] ==3:
         metrics = [SparseCategoricalAccuracy(),AUC(name="auc"),AUC(curve="PR",name="prauc")]
     else:
@@ -70,12 +72,14 @@ def model_fn():
         loss=configs.get("loss"),
         metrics=metrics)
 
-
+# Build federated learning process
+# Uses customized classes that measure train time of clients and write that to a file
 trainer = build_weighted_fed_avg(
     model_fn,
     client_optimizer_fn=lambda: configs.get("optimizer"),
     server_optimizer_fn=lambda: tf.keras.optimizers.SGD(learning_rate=1.0),
     model_aggregator=tff.learning.robust_aggregator(zeroing=False, clipping=False, debug_measurements_fn=tff.learning.add_debug_measurements))
+# Build federated evaluation process
 evaluation_process = tff.learning.algorithms.build_fed_eval(model_fn=model_fn)
 data_name = args.data_path.split("/")[-1].split(".")[0]
 if args.system_metrics == True:
@@ -97,9 +101,16 @@ else:
     group = f"tff_{args.num_clients}"
 print("Training initialized")
 wandb.init(project=project_name, group=group, name=f"run_{args.run_repeat}")
+# If unweighted log number of samples per class per client
 if unweighted >= 0.0:
     wandb.log({"class_num_table":pd.read_csv("partitions_dict.csv")})
 def train_loop(num_rounds=1, num_clients=1):
+    """
+    Train loop function for FL
+    :param num_rounds: number of rounds FL
+    :param num_clients: number of clients for FL
+    :return:
+    """
     evaluation_state = evaluation_process.initialize()
     state = trainer.initialize()
     round_data_uris = [f'uri://{i}' for i in range(num_clients)]
@@ -108,14 +119,17 @@ def train_loop(num_rounds=1, num_clients=1):
     eval_data_uris = [f'e{i}' for i in range(num_clients)]
     eval_data = tff.framework.CreateDataDescriptor(
         arg_uris=eval_data_uris, arg_type=dataset_type)
+    # Loop trough rounds
     for round in range(1, num_rounds + 1):
         print(f"Begin round {round}")
         begin = tf.timestamp()
+        # Do training round with state before
         result = trainer.next(state, round_train_data)
         end = tf.timestamp()
-
+        # If not system metrics gets weights from averaged model and uses that for evaluation on clients
+        # then log to wandb
+        state = result.state
         if not args.system_metrics:
-            state = result.state
             model_weights = trainer.get_model_weights(state)
             evaluation_state = evaluation_process.set_model_weights(evaluation_state, model_weights)
             evaluation_output = evaluation_process.next(evaluation_state, eval_data)
@@ -134,10 +148,12 @@ ports = []
 port_num = 8000
 channels =[]
 executor = concurrent.futures.ThreadPoolExecutor()
+# Creates channels for each client for communication
 for i in range(1,num_clients+1):
     channels.append(grpc.insecure_channel(f'{ip_address}:{port_num+i}',options=[ ('grpc.max_send_message_length', 25586421),
         ('grpc.max_receive_message_length',25586421), ("grpc.max_metadata_size",25586421)]),)
 
-
+# Sets remote execution
 tff.backends.native.set_remote_python_execution_context(channels,thread_pool_executor=executor)
+# Start FL
 train_loop(args.num_rounds,num_clients)

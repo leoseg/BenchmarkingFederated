@@ -20,16 +20,25 @@ def get_time_logs(filepath:str,erase=False):
 
 
 def read_system_logs(log_path:str,project_name,group_name,run_name,memory_type):
-        wandb.init(project=project_name,
-                   group=group_name, name=run_name,job_type="train")
-        with open(log_path) as file:
-            lines = file.readlines()
-            for count,line in enumerate(lines):
-                if count == 0:
-                    continue
-                wandb.log({f"memory_{memory_type}": float(line.split()[2])},step=count-1)
-                wandb.log({f"cpu_{memory_type}":float(line.split()[1])},step=count-1)
-            wandb.log({"total_duration": float(lines[-1].split()[0])})
+    """
+    Reads data logged from psutil and log to wandb
+    :param log_path: path to log file
+    :param project_name: wandb project
+    :param group_name: wandb group name
+    :param run_name: wandb run name
+    :param memory_type: type of memory logged (central,client,server)
+    :return:
+    """
+    wandb.init(project=project_name,
+               group=group_name, name=run_name,job_type="train")
+    with open(log_path) as file:
+        lines = file.readlines()
+        for count,line in enumerate(lines):
+            if count == 0:
+                continue
+            wandb.log({f"memory_{memory_type}": float(line.split()[2])},step=count-1)
+            wandb.log({f"cpu_{memory_type}":float(line.split()[1])},step=count-1)
+        wandb.log({"total_duration": float(lines[-1].split()[0])})
 
 
 def draw_group_plot_of_df(list_dfs,time_filter:float=None):

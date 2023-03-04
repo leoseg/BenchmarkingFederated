@@ -11,75 +11,12 @@ from keras.utils.tf_utils import is_tensor_or_variable
 # isort: off
 from tensorflow.python.util.tf_export import keras_export
 
-class SparseAUC(AUC):
 
-    # def __init__( self,
-    #     num_thresholds=200,
-    #     curve="ROC",
-    #     summation_method="interpolation",
-    #     name=None,
-    #     dtype=None,
-    #     multi_label=False,
-    #     num_labels=None,
-    #     label_weights=None,
-    #     from_logits=False):
-    #     super().__init__(num_thresholds,curve, summation_method, name, dtype, None, multi_label, num_labels, label_weights, from_logits)
-
-    def update_state(self, y_true, y_pred, sample_weight=None):
-        y_true = tf.one_hot(tf.squeeze(y_true), depth=tf.shape(y_pred)[-1])
-        if not self._built:
-            self._build(tf.TensorShape(y_pred.shape))
-
-        if self.multi_label or (self.label_weights is not None):
-            # y_true should have shape (number of examples, number of labels).
-            shapes = [(y_true, ("N", "L"))]
-            if self.multi_label:
-                # TP, TN, FP, and FN should all have shape
-                # (number of thresholds, number of labels).
-                shapes.extend(
-                    [
-                        (self.true_positives, ("T", "L")),
-                        (self.true_negatives, ("T", "L")),
-                        (self.false_positives, ("T", "L")),
-                        (self.false_negatives, ("T", "L")),
-                    ]
-                )
-            if self.label_weights is not None:
-                # label_weights should be of length equal to the number of
-                # labels.
-                shapes.append((self.label_weights, ("L",)))
-                tf.debugging.assert_shapes(
-                    shapes, message="Number of labels is not consistent."
-                )
-
-        # Only forward label_weights to update_confusion_matrix_variables when
-        # multi_label is False. Otherwise the averaging of individual label AUCs
-        # is handled in AUC.result
-        label_weights = None if self.multi_label else self.label_weights
-
-        if self._from_logits:
-            y_pred = activations.sigmoid(y_pred)
-
-        return metrics_utils.update_confusion_matrix_variables(
-            {
-                metrics_utils.ConfusionMatrix.TRUE_POSITIVES: self.true_positives,  # noqa: E501
-                metrics_utils.ConfusionMatrix.TRUE_NEGATIVES: self.true_negatives,  # noqa: E501
-                metrics_utils.ConfusionMatrix.FALSE_POSITIVES: self.false_positives,  # noqa: E501
-                metrics_utils.ConfusionMatrix.FALSE_NEGATIVES: self.false_negatives,  # noqa: E501
-            },
-            y_true,
-            y_pred,
-            self._thresholds,
-            thresholds_distributed_evenly=self._thresholds_distributed_evenly,
-            sample_weight=sample_weight,
-            multi_label=self.multi_label,
-            label_weights=label_weights,
-        )
 
 @keras_export("keras.metrics.AUC")
 class AUC(base_metric.Metric):
     """Approximates the AUC (Area under the curve) of the ROC or PR curves.
-
+    Derived from original AUC from keras but does onehotencoding before evaluation.
     The AUC (Area under the curve) of the ROC (Receiver operating
     characteristic; default) or PR (Precision Recall) curves are quality
     measures of binary classifiers. Unlike the accuracy, and like cross-entropy

@@ -4,6 +4,9 @@ from utils.data_utils import df_train_test_dataset, preprocess
 
 
 class DataBackend(tff.framework.DataBackend):
+    """
+    Custom databackend that materalize and preprocesses dataset for federated learning
+    """
 
     def __init__(self,train_dataset,test_dataset,local_epochs):
         self.train_dataset= train_dataset

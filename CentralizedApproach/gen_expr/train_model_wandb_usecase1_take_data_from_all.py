@@ -6,7 +6,7 @@ from wandb.keras import WandbCallback
 from utils.config import configs
 import argparse
 import pandas
-
+# Script to see what happens if while training in each kfold there is data from all three datasets of usecase 1 which form the entire dataset
 parser = argparse.ArgumentParser(
         prog="train_model_wandb_gen_expr_take_data_from_all.py",
         formatter_class=argparse.RawDescriptionHelpFormatter,

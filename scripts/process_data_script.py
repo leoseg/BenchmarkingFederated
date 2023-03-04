@@ -1,6 +1,6 @@
-from utils.rawdataprocessing_utils import genexpr_txt_file_to_csv,genexpr_anotation_txt_to_csv
 from pyreadr import read_r
 import pandas as pd
+# Reads data from Rdata frame and saves single datasets as well as whole dataset
 data = read_r("../DataGenExpression/Datasets.RData")
 dataframes = []
 for i in range(1,4):

@@ -12,6 +12,7 @@
 module load Python/3.10.4-GCCcore-11.3.0
 export PYTHONPATH="${PYTHONPATH}:../."
 cd ..
+# Create environment and install packages
 python3.10 -m venv venv
 source venvBM/bin/activate
 pip3 install --upgrade pip
@@ -29,10 +30,15 @@ for (( repeat = 0; repeat < $REPEATS; repeat++ ))
 do
   python benchmark_central_system_metrics.py --run_repeat $repeat --data_path $DATA_PATH &
   process_id=$!
+  # Gets string of available cpus
   read cpu_array <<< $(taskset -pc $process_id | awk '{print $NF}')
+  # Reads this to an array
   cpu_num=$(echo $cpu_array | cut -d'-' -f1)
+  # Bind the process to one cpu
   taskset -c -pa $cpu_num $process_id
+  # Start recording memory stats
   psrecord $process_id --log "timelogs/central_model_repeat_${repeat}.txt" --interval 0.5
   project_name="benchmark-central_${DATA_NAME}_system_metrics"
+  # Reads memory stats from file written by psrecord
   python ../scripts/mem_data_to_wandb.py --logs_path "timelogs/central_model_repeat_${repeat}.txt" --project_name $project_name --run_name "run_${repeat}" --group_name $GROUP_NAME  --memory_type "central"
 done

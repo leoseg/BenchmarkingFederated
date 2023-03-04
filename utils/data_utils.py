@@ -180,6 +180,13 @@ def preprocess(dataset : tf.data.Dataset,epochs :int = configs.get("epochs")):
 
 
 def create_class_balanced_partitions(df: pd.DataFrame, num_partitions:int,label=configs["label"]):
+    """
+    Created same sized partitions which all have the class balance from the orignal dataset
+    :param df: Dataframe with whole dataset
+    :param num_partitions: number of partitions to create
+    :param label: label for classification
+    :return: list of lists of indices which indicates which rows belonging to the partition
+    """
     partitioner = StratifiedKFold(n_splits=num_partitions,shuffle=True,random_state=configs["random_state_partitions"])
     partition_rows = []
     #df = load_data(data_path)

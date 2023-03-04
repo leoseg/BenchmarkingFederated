@@ -126,6 +126,7 @@ class Server:
         else:
             group = f"flwr_{self.num_clients}"
         wandb.init(project=project_name, group=group, name=f"run_{self.run_repeat}")
+        # If unweighted step is set reads number of samples per class per clients and log to wandb
         if self.unweighted >= 0.0:
             wandb.log({f"class_num_table_{int(self.unweighted)}":pd.read_csv(f"partitions_dict_{int(self.unweighted)}.csv")})
         for current_round in range(1, num_rounds + 1):
@@ -137,6 +138,7 @@ class Server:
                 if parameters_prime:
                     self.parameters = parameters_prime
             end = tf.timestamp()
+            # Logs system metrics to wandb if flag is set
             if self.system_metrics:
                 wandb.log({"round_time":tf.get_static_value(end - begin)},step=current_round)
                 wandb.log(get_time_logs(flw_time_logging_directory, True),step=current_round)
@@ -162,6 +164,7 @@ class Server:
             if res_fed:
                 loss_fed, evaluate_metrics_fed, _ = res_fed
                 evaluate_metrics_fed["loss"] = loss_fed
+                # Logs metrics to wandb if its not system => model performance metrics
                 if not self.system_metrics:
                     wandb.log(evaluate_metrics_fed)
                 if loss_fed:

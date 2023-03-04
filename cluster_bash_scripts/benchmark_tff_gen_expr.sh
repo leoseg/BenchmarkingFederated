@@ -12,7 +12,6 @@ NUM_REPEATS=$2
 USECASE=$3
 export USECASE=$USECASE
 DATA_PATH=$4
-echo $WANDB_API_KEY
 SYSTEM_ONLY=$5
 cd ..
 python3.10 -m venv venvtff
@@ -22,12 +21,13 @@ pip3 install --upgrade pip
 pip install -e utils
 pip3 install -r requirements.txt
 cd TensorflowFederated || exit
-rounds=10
+# Choose rounds configuration depending on usecase
 if [ $3 =  "1" ] ||  [ $3 = "3" ]; then
    round_config=(1 2 5 10)
 elif [  $3 = "2" ]; then
    round_config=(1 2 4 8)
 fi
+# Loops trough round and number of clients configuration
 for rounds in "${round_config[@]}";
 do
   for client_num in {3,5,10}
