@@ -13,7 +13,7 @@ echo "Starting tff experiment with num clients ${NUM_CLIENTS} num rounds ${NUM_R
 # Creates partitions and saves the row indices of each partition to file so it can be read from clients
 python ../scripts/partition_data.py --num_clients $NUM_CLIENTS --data_path $DATA_PATH
 # Benchmark model performance metrics if system only is not set
-if [ $SYSTEM_ONLY = 0 ]; then
+if [ $SYSTEM_ONLY = "0" ]; then
   echo "Benchmark model metrics"
   for (( repeat = 0; repeat < $REPEATS; repeat++ ))
   do
