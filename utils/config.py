@@ -8,6 +8,7 @@ flw_time_logging_directory = "timelogs/flw_logs_time.txt"
 DATA_PATH = ""
 if os.environ["USECASE"] == str(4):
     configs = dict(
+        activation="softmax",
         random_state_partitions =69,
         valid_freq = 10,
         usecase = 4,
