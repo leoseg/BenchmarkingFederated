@@ -71,7 +71,7 @@ def get_seq_nn_model(input_dim:int,num_nodes: int = param_num_nodes, dropout_rat
     model.add(Dropout(dropout_rate))
 
     # output layer
-    model.add(Dense(units=1, activation="tanh"))
+    model.add(Dense(units=configs["number_of_classes"], activation=configs["activation"]))
     return model
 
 

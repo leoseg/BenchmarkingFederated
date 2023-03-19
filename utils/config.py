@@ -70,10 +70,11 @@ elif os.environ["USECASE"] == str(2):
         scale=True,
         number_of_classes=1,
         random_state_partitions=69,
-        input_dim=12708
+        input_dim=12708,
     )
 else:
     configs = dict(
+        activation = "sigmoid",
         random_state_partitions =69,
         valid_freq = 10,
         usecase = 1,
@@ -92,5 +93,6 @@ else:
         shuffle=10000,
         label="Condition",
         scale=True,
-        input_dim=12708
+        input_dim=12708,
+        number_of_classes =1
     )
