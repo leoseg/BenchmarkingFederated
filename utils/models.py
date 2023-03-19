@@ -3,8 +3,6 @@ from keras.layers import Dense, Dropout,Input
 from keras.models import Sequential
 from keras.regularizers import l1_l2, l2
 from config import configs
-import visualkeras
-from keras.utils import plot_model
 
 def get_model(**kwargs)->keras.Model:
     """
@@ -18,6 +16,8 @@ def get_model(**kwargs)->keras.Model:
         return get_log_reg_keras(l2_v=kwargs["l2_v"])
     elif configs.get("usecase") == 3:
         return get_log_reg_keras(l2_v=kwargs["l2_v"])
+    elif configs.get("usecase") == 4:
+        return get_seq_nn_model(input_dim=kwargs["input_dim"],num_nodes=kwargs["num_nodes"],dropout_rate=kwargs["dropout_rate"],l1_v=kwargs["l1_v"],l2_v=kwargs["l2_v"])
 
 
 
