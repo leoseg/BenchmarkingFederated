@@ -16,11 +16,9 @@ def preprocess_data(df:pd.DataFrame)->pd.DataFrame:
     :param df: df to preprocess
     :return: preprocessed df
     """
-    if configs.get("usecase") == 1:
+    if configs.get("usecase") == 1 or configs.get("usecase") == 2:
         return preprocess_genexpr_data(df)
-    elif configs.get("usecase") == 2:
-        return preprocess_genexpr_data(df)
-    elif configs.get("usecase") == 3:
+    elif configs.get("usecase") == 3 or configs.get("usecase") == 4:
         if ("Unnamed: 0" or "Unnamed: 0.1") in df.columns:
             df = df.rename(columns={'Unnamed: 0': 'Sample'})
         df = df.set_index("Sample")

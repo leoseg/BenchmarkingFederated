@@ -13,7 +13,7 @@ if os.environ["USECASE"] == str(4):
         valid_freq = 10,
         usecase = 4,
         batch_size = 512,
-        epochs = 100,
+        epochs = 30,
         optimizer = Adam(),
         loss=SparseCategoricalCrossentropy(),
         metrics=[SparseCategoricalAccuracy(), SparseAUC(name="auc"), SparseAUC(curve="PR", name="prauc")],

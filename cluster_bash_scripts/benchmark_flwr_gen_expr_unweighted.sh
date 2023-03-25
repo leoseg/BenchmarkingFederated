@@ -26,7 +26,7 @@ pip install -e utils
 pip3 install -r requirements.txt
 cd Flower || exit
 # Choose rounds configuration depending on usecase
-if [ $3 =  "1" ] ||  [ $3 = "3" ]; then
+if [ $3 =  "1" ] ||  [ $3 = "3" ] || [ $3 = "4" ]; then
    round_config=(1 2 5 10)
 elif [  $3 = "2" ]; then
    round_config=(1 2 4 8)
