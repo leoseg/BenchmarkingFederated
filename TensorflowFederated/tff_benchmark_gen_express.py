@@ -62,7 +62,7 @@ def model_fn():
 
     model = get_model(input_dim=configs.get("input_dim"), num_nodes= configs.get("num_nodes"), dropout_rate=configs.get("dropout_rate"), l1_v= configs.get("l1_v"), l2_v=configs.get("l2_v"))
     # Chooses metrics depending on usecase
-    if configs["usecase"] ==3:
+    if configs["usecase"] ==3 or configs["usecase"] == 4:
         metrics = [SparseCategoricalAccuracy(),AUC(name="auc"),AUC(curve="PR",name="prauc")]
     else:
         metrics = [BinaryAccuracy(),AUC(),Precision(),Recall()]
