@@ -48,7 +48,7 @@ df = preprocess_data(df)
 train_ds,test_ds = df_train_test_dataset(df, kfold_num=args.random_state, random_state=args.run_repeat,label=configs.get("label"),scale=configs.get("scale"))
 
 # Loads and compile model
-model = get_model(input_dim=12708, num_nodes= configs.get("num_nodes"), dropout_rate=configs.get("dropout_rate"), l1_v= configs.get("l1_v"), l2_v=configs.get("l2_v"))
+model = get_model(input_dim=configs.get("input_dim"), num_nodes= configs.get("num_nodes"), dropout_rate=configs.get("dropout_rate"), l1_v= configs.get("l1_v"), l2_v=configs.get("l2_v"))
 model.compile(configs.get("optimizer"), configs.get("loss"), metrics=configs.get("metrics"))
 
 # Define Flower client

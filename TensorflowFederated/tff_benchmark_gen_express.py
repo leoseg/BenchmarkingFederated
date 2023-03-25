@@ -60,7 +60,7 @@ train_data_iterator = train_data_source.iterator()
 # Model function to use for FL
 def model_fn():
 
-    model = get_model(input_dim=12708, num_nodes= configs.get("num_nodes"), dropout_rate=configs.get("dropout_rate"), l1_v= configs.get("l1_v"), l2_v=configs.get("l2_v"))
+    model = get_model(input_dim=configs.get("input_dim"), num_nodes= configs.get("num_nodes"), dropout_rate=configs.get("dropout_rate"), l1_v= configs.get("l1_v"), l2_v=configs.get("l2_v"))
     # Chooses metrics depending on usecase
     if configs["usecase"] ==3:
         metrics = [SparseCategoricalAccuracy(),AUC(name="auc"),AUC(curve="PR",name="prauc")]
