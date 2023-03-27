@@ -35,7 +35,7 @@ fi
 if [ $3 =  "1" ] ||  [ $3 = "2" ]; then
    unweight_config=(0 2 4 6 8 9 10)
    num_clients=2
-elif [  $3 = "3" ]; then
+elif [  $3 = "3" ] || [ $3 = "4" ]; then
    unweight_config=(0 4 8 10 12 14 16)
    num_clients=5
 fi
