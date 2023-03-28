@@ -22,8 +22,6 @@ WANDB_API_KEY=$1
 REPEATS=$2
 USECASE=$3
 export USECASE=$USECASE
-DATA_PATH=$4
-DATA_NAME=$(basename "$DATA_PATH" .csv)
 cd CentralizedApproach || exit
 for (( repeat = 0; repeat < $REPEATS; repeat++ ))
 do
