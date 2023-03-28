@@ -39,7 +39,18 @@ def read_system_logs(log_path:str,project_name,group_name,run_name,memory_type):
             wandb.log({f"memory_{memory_type}": float(line.split()[2])},step=count-1)
             wandb.log({f"cpu_{memory_type}":float(line.split()[1])},step=count-1)
         wandb.log({"total_duration": float(lines[-1].split()[0])})
-
+    total_sum = 0
+    log_path_network = log_path.split(".")[0] + "_network.txt"
+    with open(log_path_network, "r") as file:
+        for line in file:
+            entries = line.split()
+            if len(entries) >= 40:
+                try:
+                    entry_40 = float(entries[39])
+                    total_sum += entry_40
+                except ValueError:
+                    pass
+    wandb.log({"network_used":total_sum*0.000001})
 
 def draw_group_plot_of_df(list_dfs,time_filter:float=None):
     df = pd.concat(list_dfs,ignore_index=True)
