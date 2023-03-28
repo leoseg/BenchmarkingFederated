@@ -28,7 +28,7 @@ X_train, X_test, y_train, y_test = load_gen_data_as_train_test_split(data_path)
 
 #get utils
 def train():
-    wandb.init(project=f"benchmark-central_sweep_{data_name}", group=configs["u"],config=configs, job_type='train')
+    wandb.init(project=f"benchmark-central_sweep_{data_name}", group=f"USECASE_{configs['user']}",config=configs, job_type='train')
     ACCUMULATED_METRICS = {}
     # Define WandbCallback for experiment tracking
     wandb_callback = WandbCallback(monitor='val_loss',

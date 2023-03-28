@@ -47,8 +47,6 @@ for count,(train,test) in enumerate(kfold.split(X,Y)):
     if count != 0:
         continue
     project_name = "benchmark-central_system_metrics"
-    if configs["usecase"] != 1:
-        project_name = f"usecase_{configs['usecase']}_" + project_name
     wandb.init(project=project_name, config=configs, job_type='train',group=f"usecase_{configs['usecase']}",name=f"repeat_{args.run_repeat}")
     X_train = X.iloc[train]
     #X_test =X.iloc[test]
