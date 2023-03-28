@@ -17,9 +17,9 @@ sweep_configuration = {
         "l2_v" : {"values" : [0.0,0.005]}
      }
 }
-data_path = "../DataGenExpression/Alldata.csv"
+data_path = "../../DataGenExpression/Alldata.csv"
 data_name = data_path.split("/")[2].split(".")[0]
-sweep_id = wandb.sweep(sweep=sweep_configuration, project=f'benchmark-central_sweep_{data_name}_AUC(ROC)')
+sweep_id = wandb.sweep(sweep=sweep_configuration, project=f'benchmark-central_sweep_{data_name}')
 #create train test data
 
 modelname = data_path.split("/")[-1].split(".")[0]
@@ -28,7 +28,7 @@ X_train, X_test, y_train, y_test = load_gen_data_as_train_test_split(data_path)
 
 #get utils
 def train():
-    wandb.init(project=f"benchmark-central_sweep_{data_name}", config=configs, job_type='train')
+    wandb.init(project=f"benchmark-central_sweep_{data_name}", group=configs["u"],config=configs, job_type='train')
     ACCUMULATED_METRICS = {}
     # Define WandbCallback for experiment tracking
     wandb_callback = WandbCallback(monitor='val_loss',

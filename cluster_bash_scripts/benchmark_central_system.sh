@@ -25,7 +25,7 @@ export USECASE=$USECASE
 cd CentralizedApproach || exit
 for (( repeat = 0; repeat < $REPEATS; repeat++ ))
 do
-  python benchmark_central_system_metrics.py --run_repeat $repeat --data_path $DATA_PATH &
+  python benchmark_central_system_metrics.py --run_repeat $repeat &
   process_id=$!
   # Gets string of available cpus
   read cpu_array <<< $(taskset -pc $process_id | awk '{print $NF}')
