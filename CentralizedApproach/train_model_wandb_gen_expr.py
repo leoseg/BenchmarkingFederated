@@ -45,10 +45,8 @@ random_state = 69
 num_nodes = args.num_nodes
 dropout_rate = args.dropout_rate
 l1_v = args.l1_v
-group_name= f"no_crossfold_{random_state}_{num_nodes}_dropout_{dropout_rate}_l1_{l1_v}"
-project_name = f"choose-best-config-central_{data_name}_gen_expr"
-if configs["usecase"] != 1:
-    project_name = f"usecase_{configs['usecase']}_" + project_name
+group_name=f"usecase_{configs['usecase']}"
+project_name = "central_model_metrics"
 # Trains the model with a train, validation, test split
 wandb.init(project=project_name, config=configs,group=group_name,job_type='train',name=f"no_crossfold")
 wandb_callback = WandbCallback(monitor='val_loss',
@@ -76,8 +74,7 @@ wandb.finish()
 # Creates and loops trough all kfolds
 kfold = StratifiedKFold(n_splits=configs.get("n_splits"), shuffle=True, random_state=random_state)
 for count,(train,test) in enumerate(kfold.split(X,Y)):
-    group_name = f"crossfold_random_state_{random_state}_{num_nodes}_dropout_{dropout_rate}_l1_{l1_v}"
-    wandb.init(project=project_name, config=configs,group=f"crossfold_random_state_{random_state}_{num_nodes}_dropout_{dropout_rate}_l1_{l1_v}",job_type='train',name=f"k_fold_{count}")
+    wandb.init(project=project_name, config=configs,group=group_name,job_type='train',name=f"k_fold_{count}")
     wandb_callback = WandbCallback(monitor='val_loss',
                                    log_weights=True,
                                    log_evaluation=True,

@@ -100,7 +100,7 @@ if unweighted >= 0.0:
 else:
     group = f"tff_{args.num_clients}"
 print("Training initialized")
-wandb.init(project=project_name, group=group, name=f"run_{args.run_repeat}")
+wandb.init(project=project_name, group=group, name=f"run_{args.run_repeat}",config=configs)
 # If unweighted log number of samples per class per client
 if unweighted >= 0.0:
     wandb.log({"class_num_table":pd.read_csv("partitions_dict.csv")})
