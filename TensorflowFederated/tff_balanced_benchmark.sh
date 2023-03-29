@@ -13,7 +13,7 @@ echo "Starting tff experiment with num clients ${NUM_CLIENTS} num rounds ${NUM_R
 # Creates partitions and saves the row indices of each partition to file so it can be read from clients
 python ../scripts/partition_data.py --num_clients $NUM_CLIENTS --data_path $DATA_PATH
 # Benchmark model performance metrics if system only is not set
-if [ $SYSTEM_ONLY = "0" ]; then
+if [ $SYSTEM_ONLY != "1" ]; then
   echo "Benchmark model metrics"
   for (( repeat = 0; repeat < $REPEATS; repeat++ ))
   do
@@ -64,7 +64,7 @@ if [ $SYSTEM_ONLY != "2" ]; then
     psrecord $worker_id --log $worker_time_logs --interval 0.5 &
     psrecord $train_id --log $train_time_logs --interval 0.5
     pkill worker_service
-    project_name="benchmark_rounds_${NUM_ROUNDS}_${DATA_NAME}_system_metrics"
+    project_name="usecase_${USECASE}_benchmark_rounds_${NUM_ROUNDS}_${DATA_NAME}_system_metrics"
     run_name="run_${repeat}"
     # Read files logged from psutil to wandb
     python ../scripts/mem_data_to_wandb.py --logs_path $worker_time_logs --project_name $project_name --run_name $run_name --group_name "tff_${NUM_CLIENTS}"  --memory_type "client"

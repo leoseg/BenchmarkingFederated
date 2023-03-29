@@ -23,7 +23,5 @@ parser.add_argument(
 )
 args = parser.parse_args()
 project_name = args.project_name
-if configs["usecase"] != 1:
-    project_name = f"usecase_{configs['usecase']}_" + project_name
 read_system_logs(args.logs_path,project_name=project_name,group_name=args.group_name,run_name=args.run_name,memory_type=args.memory_type)
 
