@@ -19,7 +19,7 @@ class DataBackend(tff.framework.DataBackend):
 
     async def materialize(self, data, type_spec):
         if data.uri[0] == "e":
-            return preprocess(self.test_dataset,epochs=1)
+            return self.test_dataset.batch(32)
         else:
             return preprocess(self.train_dataset,epochs=self.local_epochs)
 

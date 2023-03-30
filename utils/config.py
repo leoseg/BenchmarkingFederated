@@ -6,7 +6,31 @@ from keras.losses import BinaryCrossentropy,SparseCategoricalCrossentropy
 tff_time_logging_directory = "timelogs/tff_logs_time.txt"
 flw_time_logging_directory = "timelogs/flw_logs_time.txt"
 DATA_PATH = ""
-if os.environ["USECASE"] == str(4):
+if os.environ["USECASE"] == "test":
+    configs = dict(
+        activation="sigmoid",
+        random_state_partitions=69,
+        valid_freq=10,
+        usecase=1,
+        batch_size=512,
+        epochs=100,
+        optimizer=Adam(),
+        loss=BinaryCrossentropy(),
+        metrics=[BinaryAccuracy(), AUC(name="auc"), Precision(name="precision"), Recall(name="recall")],
+        earlystopping_patience=5,
+        num_nodes=1024,
+        dropout_rate=0.3,
+        l1_v=0.0,
+        l2_v=0.005,
+        n_splits=5,
+        data_path="../DataGenExpression/Dataset1.csv",
+        shuffle=10000,
+        label="Condition",
+        scale=True,
+        input_dim=12708,
+        number_of_classes=1
+    )
+elif os.environ["USECASE"] == str(4):
     configs = dict(
         activation="softmax",
         random_state_partitions =69,
@@ -79,7 +103,7 @@ else:
         valid_freq = 10,
         usecase = 1,
         batch_size = 512,
-        epochs = 100,
+        epochs = 70,
         optimizer = Adam(),
         loss = BinaryCrossentropy(),
         metrics = [BinaryAccuracy(),AUC(name="auc"),Precision(name="precision"),Recall(name="recall")],

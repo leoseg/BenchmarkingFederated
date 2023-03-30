@@ -20,7 +20,7 @@ flags.DEFINE_integer("num_rounds",1,"Defines number of rounds")
 flags.DEFINE_integer("client_index",None,"index for client to load data partition")
 flags.DEFINE_string("data_path",configs.get("data_path"),"Defines path to data")
 flags.DEFINE_integer("run_repeat",1,"number of run with same config")
-flags.DEFINE_integer("random_state",0,"random state for train test split")
+flags.DEFINE_integer("random_state",1,"random state for train test split")
 
 
 def main(argv) -> None:
@@ -43,8 +43,8 @@ def main(argv) -> None:
     df = preprocess_data(df)
     train_dataset, test_dataset = df_train_test_dataset(
         df,
-        kfold_num=run_repeat,
-        random_state=random_state,
+        kfold_num=random_state,
+        random_state=run_repeat,
         label=configs.get("label"),
         scale=configs.get("scale")
     )

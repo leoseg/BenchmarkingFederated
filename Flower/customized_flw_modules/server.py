@@ -125,6 +125,9 @@ class Server:
         else:
             group = f"flwr_{self.num_clients}"
         wandb.init(project=project_name, group=group, name=f"run_{self.run_repeat}",config=configs)
+        with open("partitions_list", "rb") as file:
+            partitions_list = pickle.load(file)
+        wandb.log({"partitions_list":partitions_list})
         # If unweighted step is set reads number of samples per class per clients and log to wandb
         if self.unweighted >= 0.0:
             wandb.log({f"class_num_table_{int(self.unweighted)}":pd.read_csv(f"partitions_dict_{int(self.unweighted)}.csv")})

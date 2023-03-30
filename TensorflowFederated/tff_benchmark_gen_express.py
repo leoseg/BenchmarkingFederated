@@ -1,5 +1,7 @@
 import collections
 import concurrent.futures
+import pickle
+
 from TensorflowFederated.testing_prototyping.tff_config import *
 import grpc
 import tensorflow as tf
@@ -100,6 +102,9 @@ else:
     group = f"tff_{args.num_clients}"
 print("Training initialized")
 wandb.init(project=project_name, group=group, name=f"run_{args.run_repeat}",config=configs)
+with open("partitions_list", "rb") as file:
+    partitions_list = pickle.load(file)
+wandb.log({"partitions_list": partitions_list})
 # If unweighted log number of samples per class per client
 if unweighted >= 0.0:
     wandb.log({"class_num_table":pd.read_csv("partitions_dict.csv")})

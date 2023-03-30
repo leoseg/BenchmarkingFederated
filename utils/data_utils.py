@@ -159,8 +159,14 @@ def df_train_test_dataset(df: pd.DataFrame, kfold_num:int=0, random_state=0, lab
     :return:
     """
     kfold = StratifiedKFold(n_splits=configs.get("n_splits"), shuffle=True, random_state=random_state)
-    #df = load_data(data_path, rows_to_keep)
     X, Y = create_X_y_from_gen_df(df, False,label)
+    #X_train, X_test, Y_train, Y_test = train_test_split(X, Y, test_size=0.2, random_state=random_state,stratify=Y)
+    # if scale:
+    #     scaler = StandardScaler()
+    #     X_train = scaler.fit_transform(X_train)
+    #     X_test = scaler.transform(X_test)
+    # train_dataset = tf.data.Dataset.from_tensor_slices((X_train, Y_train))
+    # test_dataset = tf.data.Dataset.from_tensor_slices((X_test,Y_test))
     for count, (train, test) in enumerate(kfold.split(X, Y)):
         if count == kfold_num:
             X_train = X.iloc[train]
