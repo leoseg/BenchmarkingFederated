@@ -15,7 +15,7 @@ from utils.config import configs
 from utils.config import tff_time_logging_directory
 import argparse
 from keras.metrics import AUC,BinaryAccuracy,Recall,Precision, SparseCategoricalAccuracy
-from metrics import AUC
+from metrics import AUC as SparseAUC
 import os
 import pandas as pd
 parser = argparse.ArgumentParser(
@@ -65,9 +65,9 @@ def model_fn():
     model = get_model(input_dim=configs.get("input_dim"), num_nodes= configs.get("num_nodes"), dropout_rate=configs.get("dropout_rate"), l1_v= configs.get("l1_v"), l2_v=configs.get("l2_v"))
     # Chooses metrics depending on usecase
     if configs["usecase"] ==3 or configs["usecase"] == 4:
-        metrics = [SparseCategoricalAccuracy(),AUC(name="auc"),AUC(curve="PR",name="prauc")]
+        metrics = [SparseCategoricalAccuracy(),SparseAUC(name="auc"),SparseAUC(curve="PR",name="prauc")]
     else:
-        metrics = [BinaryAccuracy(),AUC(),Precision(),Recall()]
+        metrics = [BinaryAccuracy(),AUC(),Precision(),Recall(),AUC(curve="PR")]
     return tff.learning.from_keras_model(
         model,
         input_spec=element_spec,
