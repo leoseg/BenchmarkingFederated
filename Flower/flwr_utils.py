@@ -11,6 +11,8 @@ def evaluate_metrics_aggregation_fn(results, weighting = False):
     for num_examples, metrics in results:
         if weighting:
             metrics.update((x, y * num_examples) for x, y in metrics.items())
+        else:
+            metrics.update((x, y * num_total_evaluation_examples/len(results)) for x, y in metrics.items())
         for key,value in metrics.items():
             value_before = total_metrics.setdefault(key,0)
             total_metrics[key] = value_before + value
