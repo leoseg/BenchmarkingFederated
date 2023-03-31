@@ -30,7 +30,8 @@ if os.environ["USECASE"] == "test":
         label="Condition",
         scale=True,
         input_dim=12708,
-        number_of_classes=1
+        number_of_classes=1,
+        random_seed_set = True
     )
 elif os.environ["USECASE"] == str(4):
     configs = dict(
@@ -56,6 +57,7 @@ elif os.environ["USECASE"] == str(4):
         categorical=True,
         input_dim=1426,
         number_of_classes=5,
+        random_seed_set=True
     )
 elif os.environ["USECASE"] == str(3):
     configs = dict(
@@ -77,6 +79,7 @@ elif os.environ["USECASE"] == str(3):
         categorical=True,
         data_path="../Dataset2/Braindata_five_classes.csv",
         input_dim=1426,
+        random_seed_set=True
     )
 elif os.environ["USECASE"] == str(2):
     configs = dict(
@@ -97,6 +100,7 @@ elif os.environ["USECASE"] == str(2):
         number_of_classes=1,
         random_state_partitions=69,
         input_dim=12708,
+        random_seed_set=True
     )
 else:
     configs = dict(
@@ -120,5 +124,6 @@ else:
         label="Condition",
         scale=True,
         input_dim=12708,
-        number_of_classes =1
+        number_of_classes =1,
+        random_seed_set = True
     )
