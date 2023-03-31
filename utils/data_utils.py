@@ -1,3 +1,5 @@
+from keras.utils import set_random_seed
+set_random_seed(1)
 from collections import defaultdict
 import pandas as pd
 from sklearn.model_selection import train_test_split, StratifiedKFold

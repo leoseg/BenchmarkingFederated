@@ -1,3 +1,5 @@
+from keras.utils import set_random_seed
+set_random_seed(1)
 from keras.metrics import AUC
 import tensorflow as tf
 import numpy as np

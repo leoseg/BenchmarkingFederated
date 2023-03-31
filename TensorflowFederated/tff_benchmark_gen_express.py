@@ -1,7 +1,8 @@
+from keras.utils import set_random_seed
+set_random_seed(1)
 import collections
 import concurrent.futures
 import pickle
-
 from TensorflowFederated.testing_prototyping.tff_config import *
 import grpc
 import tensorflow as tf
@@ -67,7 +68,7 @@ def model_fn():
     if configs["usecase"] ==3 or configs["usecase"] == 4:
         metrics = [SparseCategoricalAccuracy(),SparseAUC(name="auc"),SparseAUC(curve="PR",name="prauc")]
     else:
-        metrics = [BinaryAccuracy(),AUC(),Precision(),Recall(),AUC(curve="PR")]
+        metrics = [BinaryAccuracy(),AUC(),Precision(),Recall(),AUC(curve="PR",name="prauc")]
     return tff.learning.from_keras_model(
         model,
         input_spec=element_spec,

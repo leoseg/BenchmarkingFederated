@@ -1,3 +1,5 @@
+from keras.utils import set_random_seed
+set_random_seed(1)
 import os
 from metrics import AUC as SparseAUC
 from keras.metrics import AUC,Precision,Recall,BinaryAccuracy,CategoricalCrossentropy,SparseCategoricalAccuracy

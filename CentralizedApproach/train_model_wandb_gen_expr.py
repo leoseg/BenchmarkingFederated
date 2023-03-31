@@ -1,3 +1,5 @@
+from keras.utils import set_random_seed
+set_random_seed(1)
 from utils.data_utils import load_data, create_X_y_from_gen_df, load_gen_data_as_train_test_split,preprocess_data
 from utils.models import get_model
 from sklearn.model_selection import StratifiedKFold, train_test_split

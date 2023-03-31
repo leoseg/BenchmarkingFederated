@@ -1,3 +1,5 @@
+from keras.utils import set_random_seed
+set_random_seed(1)
 from typing import Any, Optional, List
 import tensorflow_federated as tff
 from utils.data_utils import df_train_test_dataset, preprocess

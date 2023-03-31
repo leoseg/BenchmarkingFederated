@@ -14,9 +14,9 @@
 # ==============================================================================
 """Flower server."""
 
-
+from keras.utils import set_random_seed
+set_random_seed(1)
 import concurrent.futures
-import os
 import pickle
 import timeit
 from logging import DEBUG, INFO

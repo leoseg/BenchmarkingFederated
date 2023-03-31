@@ -1,9 +1,11 @@
+from keras.utils import set_random_seed
+set_random_seed(1)
 import keras
 from keras.layers import Dense, Dropout,Input
 from keras.models import Sequential
 from keras.regularizers import l1_l2, l2
 from config import configs
-
+import tensorflow as tf
 def get_model(**kwargs)->keras.Model:
     """
     Uses model depending on the configs
@@ -28,7 +30,7 @@ param_num_nodes = 1024
 param_dropout_rate = 0.3
 param_l1_v = 0.0
 param_l2_v = 0.005
-kernel_initialzier = 'glorot_uniform'
+kernel_initialzier = tf.keras.initializers.GlorotUniform(seed=1)
 def get_seq_nn_model(input_dim:int,num_nodes: int = param_num_nodes, dropout_rate: float = param_dropout_rate, l1_v: float = param_l1_v,
                      l2_v: float = param_l2_v):
     """

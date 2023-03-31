@@ -1,3 +1,5 @@
+from keras.utils import set_random_seed
+set_random_seed(1)
 import argparse
 import os
 import flwr as fl
