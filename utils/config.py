@@ -7,6 +7,7 @@ from keras.optimizers import Adam,SGD
 from keras.losses import BinaryCrossentropy,SparseCategoricalCrossentropy
 tff_time_logging_directory = "timelogs/tff_logs_time.txt"
 flw_time_logging_directory = "timelogs/flw_logs_time.txt"
+version = "without_global_seed_dropout_seed_set_partition_bug_fixed"
 DATA_PATH = ""
 if os.environ["USECASE"] == "test":
     configs = dict(
@@ -31,7 +32,8 @@ if os.environ["USECASE"] == "test":
         scale=True,
         input_dim=12708,
         number_of_classes=1,
-        random_seed_set = True
+        random_seed_set = True,
+        version=version
     )
 elif os.environ["USECASE"] == str(4):
     configs = dict(
@@ -57,7 +59,8 @@ elif os.environ["USECASE"] == str(4):
         categorical=True,
         input_dim=1426,
         number_of_classes=5,
-        random_seed_set=True
+        random_seed_set=True,
+        version=version
     )
 elif os.environ["USECASE"] == str(3):
     configs = dict(
@@ -79,7 +82,8 @@ elif os.environ["USECASE"] == str(3):
         categorical=True,
         data_path="../Dataset2/Braindata_five_classes.csv",
         input_dim=1426,
-        random_seed_set=True
+        random_seed_set=True,
+        version=version
     )
 elif os.environ["USECASE"] == str(2):
     configs = dict(
@@ -100,7 +104,8 @@ elif os.environ["USECASE"] == str(2):
         number_of_classes=1,
         random_state_partitions=69,
         input_dim=12708,
-        random_seed_set=True
+        random_seed_set=True,
+        version=version
     )
 else:
     configs = dict(
@@ -125,5 +130,6 @@ else:
         scale=True,
         input_dim=12708,
         number_of_classes =1,
-        random_seed_set = True
+        random_seed_set = True,
+        version=version
     )

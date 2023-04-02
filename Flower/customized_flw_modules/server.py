@@ -14,13 +14,13 @@
 # ==============================================================================
 """Flower server."""
 
-from keras.utils import set_random_seed
-set_random_seed(1)
 import concurrent.futures
 import pickle
 import timeit
 from logging import DEBUG, INFO
 from typing import Dict, List, Optional, Tuple, Union
+
+import numpy as np
 import tensorflow as tf
 from flwr.common import (
     Code,
@@ -32,6 +32,7 @@ from flwr.common import (
     Parameters,
     ReconnectIns,
     Scalar,
+    parameters_to_ndarrays
 )
 from flwr.common.logger import log
 from flwr.common.typing import GetParametersIns
@@ -279,6 +280,7 @@ class Server:
             Optional[Parameters],
             Dict[str, Scalar],
         ] = self.strategy.aggregate_fit(server_round, results, failures)
+
 
         parameters_aggregated, metrics_aggregated = aggregated_result
         return parameters_aggregated, metrics_aggregated, (results, failures)

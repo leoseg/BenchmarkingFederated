@@ -18,7 +18,7 @@ for (( repeat = 0; repeat < $REPEATS; repeat++ ))
 do
   echo "Start server for repeat model metrics ${repeat} num clients ${NUM_CLIENTS} num rounds ${NUM_ROUNDS} and data ${DATA_NAME} and unweighted step ${UNWEIGHTED_STEP}"
   python server.py --data_path $DATA_PATH --run_repeat $repeat --num_clients $NUM_CLIENTS --num_rounds $NUM_ROUNDS --unweighted_percentage $UNWEIGHTED_STEP &
-  sleep  $(($NUM_CLIENTS * 2))
+  sleep  $(($NUM_CLIENTS * 3))
   echo "Start repeat ${repeat}"
   for ((i=1;i<=$NUM_CLIENTS;i++))
   do

@@ -1,9 +1,9 @@
-from keras.utils import set_random_seed
-set_random_seed(1)
 import keras
 from keras.layers import Dense, Dropout,Input
 from keras.models import Sequential
 from keras.regularizers import l1_l2, l2
+from keras.utils import set_random_seed
+
 from config import configs
 import tensorflow as tf
 def get_model(**kwargs)->keras.Model:
@@ -12,6 +12,7 @@ def get_model(**kwargs)->keras.Model:
     :param **kwargs for model
     :return: model
     """
+    set_random_seed(1)
     if configs.get("usecase") == 1:
         return get_seq_nn_model(input_dim=kwargs["input_dim"],num_nodes=kwargs["num_nodes"],dropout_rate=kwargs["dropout_rate"],l1_v=kwargs["l1_v"],l2_v=kwargs["l2_v"])
     elif configs.get("usecase") == 2:
@@ -30,7 +31,6 @@ param_num_nodes = 1024
 param_dropout_rate = 0.3
 param_l1_v = 0.0
 param_l2_v = 0.005
-kernel_initialzier = tf.keras.initializers.GlorotUniform(seed=1)
 def get_seq_nn_model(input_dim:int,num_nodes: int = param_num_nodes, dropout_rate: float = param_dropout_rate, l1_v: float = param_l1_v,
                      l2_v: float = param_l2_v):
     """
@@ -44,33 +44,33 @@ def get_seq_nn_model(input_dim:int,num_nodes: int = param_num_nodes, dropout_rat
     """
     model = Sequential()
     # input layer
-    model.add(Dense(256, activation='relu',kernel_initializer=kernel_initialzier , kernel_regularizer=l1_l2(l1=0.0, l2=0.0), input_dim=input_dim))
-    model.add(Dropout(0.4))
+    model.add(Dense(256, activation='relu',kernel_initializer=tf.keras.initializers.GlorotUniform(seed=1) , kernel_regularizer=l1_l2(l1=0.0, l2=0.0), input_dim=input_dim))
+    model.add(Dropout(0.4,seed=1))
 
     # first layer
-    model.add(Dense(num_nodes, activation='relu', kernel_initializer=kernel_initialzier ,kernel_regularizer=l1_l2(l1=l1_v, l2=l2_v), input_dim=input_dim))
-    model.add(Dropout(dropout_rate))
+    model.add(Dense(num_nodes, activation='relu', kernel_initializer=tf.keras.initializers.GlorotUniform(seed=1) ,kernel_regularizer=l1_l2(l1=l1_v, l2=l2_v), input_dim=input_dim))
+    model.add(Dropout(dropout_rate,seed=1))
     # second layer
-    model.add(Dense(int(num_nodes / 2), activation='relu',kernel_initializer=kernel_initialzier , kernel_regularizer=l1_l2(l1=l1_v, l2=l2_v), input_dim=input_dim))
-    model.add(Dropout(dropout_rate))
+    model.add(Dense(int(num_nodes / 2), activation='relu',kernel_initializer=tf.keras.initializers.GlorotUniform(seed=1) , kernel_regularizer=l1_l2(l1=l1_v, l2=l2_v), input_dim=input_dim))
+    model.add(Dropout(dropout_rate,seed=1))
     # third layer
-    model.add(Dense(int(num_nodes / 2), activation='relu', kernel_initializer=kernel_initialzier ,kernel_regularizer=l1_l2(l1=l1_v, l2=l2_v), input_dim=input_dim))
-    model.add(Dropout(dropout_rate))
+    model.add(Dense(int(num_nodes / 2), activation='relu', kernel_initializer=tf.keras.initializers.GlorotUniform(seed=1),kernel_regularizer=l1_l2(l1=l1_v, l2=l2_v), input_dim=input_dim))
+    model.add(Dropout(dropout_rate,seed=1))
     # fourth layer
-    model.add(Dense(int(num_nodes / 4), activation='relu',kernel_initializer=kernel_initialzier , kernel_regularizer=l1_l2(l1=l1_v, l2=l2_v), input_dim=input_dim))
-    model.add(Dropout(dropout_rate))
+    model.add(Dense(int(num_nodes / 4), activation='relu',kernel_initializer=tf.keras.initializers.GlorotUniform(seed=1) , kernel_regularizer=l1_l2(l1=l1_v, l2=l2_v), input_dim=input_dim))
+    model.add(Dropout(dropout_rate,seed=1 ))
     # fifth layer
-    model.add(Dense(int(num_nodes / 4), activation='relu',kernel_initializer=kernel_initialzier , kernel_regularizer=l1_l2(l1=l1_v, l2=l2_v), input_dim=input_dim))
-    model.add(Dropout(dropout_rate))
+    model.add(Dense(int(num_nodes / 4), activation='relu',kernel_initializer=tf.keras.initializers.GlorotUniform(seed=1) , kernel_regularizer=l1_l2(l1=l1_v, l2=l2_v), input_dim=input_dim))
+    model.add(Dropout(dropout_rate,seed=1 ))
     # sixth layer
-    model.add(Dense(int(num_nodes / 8), activation='relu', kernel_initializer=kernel_initialzier ,kernel_regularizer=l1_l2(l1=l1_v, l2=l2_v), input_dim=input_dim))
-    model.add(Dropout(dropout_rate))
+    model.add(Dense(int(num_nodes / 8), activation='relu', kernel_initializer=tf.keras.initializers.GlorotUniform(seed=1) ,kernel_regularizer=l1_l2(l1=l1_v, l2=l2_v), input_dim=input_dim))
+    model.add(Dropout(dropout_rate,seed=1))
     # seventh layer
-    model.add(Dense(int(num_nodes / 8), activation='relu',kernel_initializer=kernel_initialzier , kernel_regularizer=l1_l2(l1=l1_v, l2=l2_v), input_dim=input_dim))
-    model.add(Dropout(dropout_rate))
+    model.add(Dense(int(num_nodes / 8), activation='relu',kernel_initializer=tf.keras.initializers.GlorotUniform(seed=1) , kernel_regularizer=l1_l2(l1=l1_v, l2=l2_v), input_dim=input_dim))
+    model.add(Dropout(dropout_rate,seed=1))
     # eighth layer
-    model.add(Dense(int(num_nodes / 16), activation='relu', kernel_initializer=kernel_initialzier ,kernel_regularizer=l1_l2(l1=l1_v, l2=l2_v), input_dim=input_dim))
-    model.add(Dropout(dropout_rate))
+    model.add(Dense(int(num_nodes / 16), activation='relu', kernel_initializer=tf.keras.initializers.GlorotUniform(seed=1) ,kernel_regularizer=l1_l2(l1=l1_v, l2=l2_v), input_dim=input_dim))
+    model.add(Dropout(dropout_rate,seed=1))
 
     # output layer
     model.add(Dense(units=configs["number_of_classes"], activation=configs["activation"]))
@@ -85,7 +85,7 @@ def get_log_reg_keras(l2_v):
     """
     model = Sequential()
     #model.add(Input(shape=(configs["batch_size"],input_dim)))
-    model.add(Dense(input_dim=configs["input_dim"],units=configs["number_of_classes"], kernel_initializer='glorot_uniform', activation=configs["activation"], kernel_regularizer=l2(l2_v)))
+    model.add(Dense(input_dim=configs["input_dim"],units=configs["number_of_classes"], kernel_initializer=tf.keras.initializers.GlorotUniform(seed=1), activation=configs["activation"], kernel_regularizer=l2(l2_v)))
     return model
 
 

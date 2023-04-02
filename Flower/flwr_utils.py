@@ -1,3 +1,10 @@
+from typing import Tuple, Optional, Dict
+
+from flwr.common import NDArrays, Scalar
+
+from evaluation_utils import evaluate_model,load_test_data_for_evaluation
+
+
 def evaluate_metrics_aggregation_fn(results, weighting = False):
     """
     Aggregates metrics of all clients by averaging their metrics
@@ -20,5 +27,21 @@ def evaluate_metrics_aggregation_fn(results, weighting = False):
     return total_metrics
 
 
+def get_evaluate_fn(model):
+    """Return an evaluation function for server-side evaluation."""
+
+    # Load data and model here to avoid the overhead of doing it in `evaluate` itself
+
+
+    # The `evaluate` function will be called after every round
+    X_text, y_test = load_test_data_for_evaluation()
+    def evaluate(
+        server_round: int, parameters: NDArrays, config: Dict[str, Scalar]
+    ) -> Optional[Tuple[float, Dict[str, Scalar]]]:
+        metrics = evaluate_model(parameters, X_text, y_test)
+        loss = metrics.pop("loss")
+        return loss,metrics
+
+    return evaluate
 
 

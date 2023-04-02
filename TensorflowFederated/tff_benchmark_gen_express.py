@@ -1,14 +1,16 @@
-from keras.utils import set_random_seed
-set_random_seed(1)
 import collections
 import concurrent.futures
 import pickle
+
+import numpy as np
+from keras.utils import set_random_seed
+
 from TensorflowFederated.testing_prototyping.tff_config import *
 import grpc
 import tensorflow as tf
 import tensorflow_federated as tff
 from customized_tff_modules.fed_avg_with_time import build_weighted_fed_avg
-from data_loading import FederatedData
+from evaluation_utils import evaluate_model, load_test_data_for_evaluation
 from utils.system_utils import get_time_logs
 from utils.models import get_model
 import wandb
@@ -56,13 +58,13 @@ element_type = tff.types.StructWithPythonType(
     container_type=collections.OrderedDict)
 dataset_type = tff.types.SequenceType(element_type)
 
-train_data_source = FederatedData(type_spec=dataset_type)
-train_data_iterator = train_data_source.iterator()
+# train_data_source = FederatedData(type_spec=dataset_type)
+# train_data_iterator = train_data_source.iterator()
 
 
 # Model function to use for FL
 def model_fn():
-
+    set_random_seed(1)
     model = get_model(input_dim=configs.get("input_dim"), num_nodes= configs.get("num_nodes"), dropout_rate=configs.get("dropout_rate"), l1_v= configs.get("l1_v"), l2_v=configs.get("l2_v"))
     # Chooses metrics depending on usecase
     if configs["usecase"] ==3 or configs["usecase"] == 4:
@@ -118,6 +120,8 @@ def train_loop(num_rounds=1, num_clients=1):
     """
     evaluation_state = evaluation_process.initialize()
     state = trainer.initialize()
+    print("inital weights are:")
+    print(trainer.get_model_weights(state).trainable)
     round_data_uris = [f'uri://{i}' for i in range(num_clients)]
     round_train_data = tff.framework.CreateDataDescriptor(
         arg_uris=round_data_uris, arg_type=dataset_type)
@@ -134,6 +138,8 @@ def train_loop(num_rounds=1, num_clients=1):
         # If not system metrics gets weights from averaged model and uses that for evaluation on clients
         # then log to wandb
         state = result.state
+        print("weights after round {round} are:")
+        print(trainer.get_model_weights(state).trainable)
         if not args.system_metrics:
             model_weights = trainer.get_model_weights(state)
             evaluation_state = evaluation_process.set_model_weights(evaluation_state, model_weights)
@@ -144,7 +150,11 @@ def train_loop(num_rounds=1, num_clients=1):
             round_time = end-begin
             wandb.log({"round_time":tf.get_static_value(round_time)},step=round)
             wandb.log(get_time_logs(tff_time_logging_directory,True),step=round)
-
+    weights = trainer.get_model_weights(state)
+    # Save model weights
+    model = get_model(input_dim=configs.get("input_dim"), num_nodes= configs.get("num_nodes"), dropout_rate=configs.get("dropout_rate"), l1_v= configs.get("l1_v"), l2_v=configs.get("l2_v"))
+    model.set_weights(weights.trainable)
+    model.save_weights(f"tff_weights.h5")
 
 
 

@@ -1,11 +1,9 @@
-from keras.utils import set_random_seed
-set_random_seed(1)
 from absl import app
 import tensorflow as tf
 import tensorflow_federated as tff
 from data_loading import DataBackend
 from absl import flags
-from data_utils import df_train_test_dataset,load_data,preprocess_data
+from data_utils import df_train_test_dataset, load_data, preprocess_data, log_df_info
 from utils.config import configs
 import pickle
 import os
@@ -43,6 +41,7 @@ def main(argv) -> None:
     # Loads and preprocesses data
     df  = load_data(data_path,rows_to_keep)
     df = preprocess_data(df)
+    log_df_info(df, configs["label"])
     train_dataset, test_dataset = df_train_test_dataset(
         df,
         kfold_num=random_state,

@@ -1,10 +1,12 @@
-from keras.utils import set_random_seed
-set_random_seed(1)
 import argparse
 import os
 import flwr as fl
+import numpy as np
+from keras.utils import set_random_seed
+
+from evaluation_utils import evaluate_model, load_test_data_for_evaluation
 from utils.models import get_model
-from utils.data_utils import df_train_test_dataset,preprocess, load_data, preprocess_data
+from utils.data_utils import df_train_test_dataset, preprocess, load_data, preprocess_data, log_df_info
 import tensorflow as tf
 from utils.config import configs
 from utils.config import flw_time_logging_directory
@@ -46,9 +48,10 @@ else:
     rows_to_keep = None
 # Load and preprocess data
 df = load_data(datapath,rows_to_keep)
+log_df_info(df, configs["label"])
 df = preprocess_data(df)
 train_ds,test_ds = df_train_test_dataset(df, kfold_num=args.random_state, random_state=args.run_repeat,label=configs.get("label"),scale=configs.get("scale"))
-
+print("Loading data backend dataset of client has num of examples",train_ds.cardinality())
 # Loads and compile model
 model = get_model(input_dim=configs.get("input_dim"), num_nodes= configs.get("num_nodes"), dropout_rate=configs.get("dropout_rate"), l1_v= configs.get("l1_v"), l2_v=configs.get("l2_v"))
 model.compile(configs.get("optimizer"), configs.get("loss"), metrics=configs.get("metrics"))
@@ -59,10 +62,23 @@ class Client(fl.client.NumPyClient):
         return model.get_weights()
 
     def fit(self, parameters, config):
+        tf.print(f"Materializing data for client {args.client_index}"
+                 f"Train dataset has size {train_ds.cardinality()}",
+                 f"Test dataset has size {test_ds.cardinality()}")
+        #for i in range(0,5):
+        tf.print(f"train dataset entry {0} from client {args.client_index} is {list(train_ds.as_numpy_iterator())[0]}")
+        tf.print(f"test dataset entry {0} from client {args.client_index} is {list(test_ds.as_numpy_iterator())[0]}")
+        print(parameters)
         model.set_weights(parameters)
+        set_random_seed(1)
         preprocessed_ds = preprocess(train_ds,epochs=config["local_epochs"])
+        print(f"epochs are {config['local_epochs']}")
+        tf.print(
+            f"preprocessed dataset entry {0} from client {args.client_index} is {list(preprocessed_ds.as_numpy_iterator())[0]}")
         begin = tf.timestamp()
         model.fit(preprocessed_ds)
+        print(f"weights after fitting client {args.client_index}")
+        print(model.get_weights())
         end = tf.timestamp()
         # If system metrics write client time to file so the server can log it
         if args.system_metrics:
@@ -74,6 +90,8 @@ class Client(fl.client.NumPyClient):
         model.set_weights(parameters)
         metrics = model.evaluate(test_ds.batch(32),return_dict=True)
         loss = metrics.pop("loss")
+        if not args.system_metrics and args.client_index == 0:
+            model.save_weights(f"flwr_weights.h5")
         return loss, len(list(test_ds)), metrics
 
 
