@@ -68,7 +68,6 @@ class Client(fl.client.NumPyClient):
         #for i in range(0,5):
         tf.print(f"train dataset entry {0} from client {args.client_index} is {list(train_ds.as_numpy_iterator())[0]}")
         tf.print(f"test dataset entry {0} from client {args.client_index} is {list(test_ds.as_numpy_iterator())[0]}")
-        print(parameters)
         model.set_weights(parameters)
         set_random_seed(1)
         preprocessed_ds = preprocess(train_ds,epochs=config["local_epochs"])
@@ -77,8 +76,6 @@ class Client(fl.client.NumPyClient):
             f"preprocessed dataset entry {0} from client {args.client_index} is {list(preprocessed_ds.as_numpy_iterator())[0]}")
         begin = tf.timestamp()
         model.fit(preprocessed_ds)
-        print(f"weights after fitting client {args.client_index}")
-        print(model.get_weights())
         end = tf.timestamp()
         # If system metrics write client time to file so the server can log it
         if args.system_metrics:
