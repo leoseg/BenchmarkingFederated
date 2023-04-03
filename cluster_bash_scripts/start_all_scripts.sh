@@ -4,7 +4,7 @@ WANDB_API_KEY=$1
 NUM_REPEATS=$2
 SYSTEM_ONLY=$3
 ls
-jid1=$(sbatch benchmark_flwr_gen_expr.sh $WANDB_API_KEY $NUM_REPEATS 1 "../DataGenExpression/Alldata.csv" $SYSTEM_ONLY)
+jid1=$(sbatch job_scripts_without_sbatch/benchmark_flwr_gen_expr.sh $WANDB_API_KEY $NUM_REPEATS 1 "../DataGenExpression/Alldata.csv" $SYSTEM_ONLY)
 jid2=$(sbatch --dependency=afterany:$jid1 benchmark_flwr_gen_expr.sh $WANDB_API_KEY $NUM_REPEATS 2 "../DataGenExpression/Alldata.csv" $SYSTEM_ONLY)
 jid3=$(sbatch --dependency=afterany:$jid2 benchmark_flwr_gen_expr.sh $WANDB_API_KEY $NUM_REPEATS 3 "../Dataset2/Braindata_five_classes.csv" $SYSTEM_ONLY)
 jid4=$(sbatch --dependency=afterany:$jid3 benchmark_flwr_gen_expr.sh $WANDB_API_KEY $NUM_REPEATS 4 "../Dataset2/Braindata_five_classes.csv" $SYSTEM_ONLY)
