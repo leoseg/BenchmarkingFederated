@@ -133,6 +133,9 @@ def train_loop(num_rounds=1, num_clients=1):
         print(f"Begin round {round}")
         begin = tf.timestamp()
         # Do training round with state before
+        round_data_uris = [f'{round}_uri://{i}' for i in range(num_clients)]
+        round_train_data = tff.framework.CreateDataDescriptor(
+            arg_uris=round_data_uris, arg_type=dataset_type)
         result = trainer.next(state, round_train_data)
         end = tf.timestamp()
         # If not system metrics gets weights from averaged model and uses that for evaluation on clients

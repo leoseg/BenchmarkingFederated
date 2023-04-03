@@ -358,3 +358,39 @@ Client training time
 0.86689496040344238
 Client training time
 0.976639986038208
+Client training time
+0.65572595596313477
+Client training time
+0.76341509819030762
+Client training time
+1.0724408626556396
+Client training time
+1.0734479427337646
+Client training time
+Client training time
+0.87117409706115723
+0.85266709327697754
+Client training time
+0.7540888786315918
+Client training time
+0.85571813583374023
+Client training time
+0.81214213371276855
+Client training time
+0.891981840133667
+Client training time
+0.98124003410339355
+Client training time
+0.992901086807251
+Client training time
+0.75346899032592773
+Client training time
+0.86657404899597168
+Client training time
+0.86105918884277344
+Client training time
+0.86597585678100586
+Client training time
+0.66143393516540527
+Client training time
+0.81806492805480957

@@ -23,15 +23,13 @@ class DataBackend(tff.framework.DataBackend):
         tf.print(f"Materializing data for client {data.uri}"
                  f"Train dataset has size {self.train_dataset.cardinality()}",
                  f"Test dataset has size {self.test_dataset.cardinality()}")
-        #for i in range(0,5):
         tf.print(f"train dataset entry {0} from client {data.uri[-1]} is {list(self.train_dataset.as_numpy_iterator())[0]}")
         tf.print(f"test dataset entry {0} from client {data.uri[-1]} is {list(self.test_dataset.as_numpy_iterator())[0]}")
         if data.uri[0] == "e":
             return self.test_dataset.batch(32)
         else:
             tf.print(f"epochs are {self.local_epochs}")
-            set_random_seed(1)
-            preprocessed_ds =  preprocess(self.train_dataset,epochs=self.local_epochs)
+            preprocessed_ds =  preprocess(self.train_dataset,epochs=self.local_epochs,seed=int(data.uri[0]))
             tf.print(f"preprocessed dataset entry {0} from client {data.uri[-1]} is {list(preprocessed_ds.as_numpy_iterator())[0]}")
             return preprocessed_ds
 

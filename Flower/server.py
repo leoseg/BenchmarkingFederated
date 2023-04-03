@@ -35,7 +35,8 @@ args = parser.parse_args()
 def fit_config(server_round: int):
     """Return training configuration dict for each round. Sets local epochs of each client"""
     config = {
-        "local_epochs": ceil(configs.get("epochs")/args.num_rounds)
+        "local_epochs": ceil(configs.get("epochs")/args.num_rounds),
+        "server_round": server_round
     }
     return config
 if args.system_metrics:

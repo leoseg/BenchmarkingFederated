@@ -191,8 +191,8 @@ def df_train_test_dataset(df: pd.DataFrame, kfold_num:int=0, random_state=0, lab
             test_dataset = tf.data.Dataset.from_tensor_slices((X_test,Y[test]))
             return train_dataset,test_dataset
 
-def preprocess(dataset : tf.data.Dataset,epochs :int = configs.get("epochs")):
-        set_random_seed(1)
+def preprocess(dataset : tf.data.Dataset,epochs :int = configs.get("epochs"),seed:int=1):
+        set_random_seed(seed)
         return dataset.shuffle(configs.get("shuffle"), seed =1,reshuffle_each_iteration=True).batch(configs.get("batch_size")).repeat(epochs)
 
 

@@ -69,8 +69,7 @@ class Client(fl.client.NumPyClient):
         tf.print(f"train dataset entry {0} from client {args.client_index} is {list(train_ds.as_numpy_iterator())[0]}")
         tf.print(f"test dataset entry {0} from client {args.client_index} is {list(test_ds.as_numpy_iterator())[0]}")
         model.set_weights(parameters)
-        set_random_seed(1)
-        preprocessed_ds = preprocess(train_ds,epochs=config["local_epochs"])
+        preprocessed_ds = preprocess(train_ds,epochs=config["local_epochs"],seed = config["server_round"])
         print(f"epochs are {config['local_epochs']}")
         tf.print(
             f"preprocessed dataset entry {0} from client {args.client_index} is {list(preprocessed_ds.as_numpy_iterator())[0]}")
