@@ -3,16 +3,18 @@ from keras.layers import Dense, Dropout,Input
 from keras.models import Sequential
 from keras.regularizers import l1_l2, l2
 from keras.utils import set_random_seed
-
+from utils.config import SEED
 from config import configs
 import tensorflow as tf
+
+
 def get_model(**kwargs)->keras.Model:
     """
     Uses model depending on the configs
     :param **kwargs for model
     :return: model
     """
-    set_random_seed(1)
+    set_random_seed(SEED)
     if configs.get("usecase") == 1:
         return get_seq_nn_model(input_dim=kwargs["input_dim"],num_nodes=kwargs["num_nodes"],dropout_rate=kwargs["dropout_rate"],l1_v=kwargs["l1_v"],l2_v=kwargs["l2_v"])
     elif configs.get("usecase") == 2:

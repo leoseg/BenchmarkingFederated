@@ -394,3 +394,19 @@ Client training time
 0.66143393516540527
 Client training time
 0.81806492805480957
+Client training time
+0.79933786392211914
+Client training time
+0.81923007965087891
+Client training time
+0.75244784355163574
+Client training time
+0.80024194717407227
+Client training time
+0.802009105682373
+Client training time
+0.80954194068908691
+Client training time
+0.739422082901001
+Client training time
+0.8033139705657959

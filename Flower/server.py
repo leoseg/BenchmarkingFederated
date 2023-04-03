@@ -1,5 +1,3 @@
-from keras.utils import set_random_seed
-set_random_seed(1)
 from math import ceil
 import flwr as fl
 from flwr.server import SimpleClientManager

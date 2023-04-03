@@ -1,5 +1,3 @@
-from keras.utils import set_random_seed
-set_random_seed(1)
 import os
 from metrics import AUC as SparseAUC
 from keras.metrics import AUC,Precision,Recall,BinaryAccuracy,CategoricalCrossentropy,SparseCategoricalAccuracy
@@ -7,7 +5,9 @@ from keras.optimizers import Adam,SGD
 from keras.losses import BinaryCrossentropy,SparseCategoricalCrossentropy
 tff_time_logging_directory = "timelogs/tff_logs_time.txt"
 flw_time_logging_directory = "timelogs/flw_logs_time.txt"
-version = "seeds_everywhere"
+SEED = 42
+version = f"essential_seeds_{SEED}"
+
 DATA_PATH = ""
 if os.environ["USECASE"] == "test":
     configs = dict(
