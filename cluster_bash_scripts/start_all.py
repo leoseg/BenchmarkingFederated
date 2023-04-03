@@ -10,7 +10,7 @@ args = parser.parse_args()
 
 wandb_api_key = args.wandb_api_key
 num_repeats = args.num_repeats
-system_only = args.system_only_flag
+system_only = args.system_only
 
 jid1 = subprocess.run(['sbatch', 'benchmark_flwr_gen_expr.sh', wandb_api_key, num_repeats, '1', '../DataGenExpression/Alldata.csv', system_only], capture_output=True, text=True)
 jid2 = subprocess.run(['sbatch', '--dependency=afterany:' + jid1, 'benchmark_flwr_gen_expr.sh', wandb_api_key, num_repeats, '2', '../DataGenExpression/Alldata.csv', system_only], capture_output=True, text=True)
