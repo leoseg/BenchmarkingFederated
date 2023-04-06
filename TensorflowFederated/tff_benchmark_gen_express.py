@@ -121,9 +121,9 @@ def train_loop(num_rounds=1, num_clients=1):
     state = trainer.initialize()
     print("inital weights are:")
     print(trainer.get_model_weights(state).trainable)
-    round_data_uris = [f'uri://{i}' for i in range(num_clients)]
-    round_train_data = tff.framework.CreateDataDescriptor(
-        arg_uris=round_data_uris, arg_type=dataset_type)
+    # round_data_uris = [f'uri://{i}' for i in range(num_clients)]
+    # round_train_data = tff.framework.CreateDataDescriptor(
+    #     arg_uris=round_data_uris, arg_type=dataset_type)
     eval_data_uris = [f'e{i}' for i in range(num_clients)]
     eval_data = tff.framework.CreateDataDescriptor(
         arg_uris=eval_data_uris, arg_type=dataset_type)
