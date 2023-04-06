@@ -86,8 +86,6 @@ class Client(fl.client.NumPyClient):
         model.set_weights(parameters)
         metrics = model.evaluate(test_ds.batch(32),return_dict=True)
         loss = metrics.pop("loss")
-        if not args.system_metrics and args.client_index == 0:
-            model.save_weights(f"flwr_weights.h5")
         return loss, len(list(test_ds)), metrics
 
 

@@ -152,11 +152,11 @@ def train_loop(num_rounds=1, num_clients=1):
             round_time = end-begin
             wandb.log({"round_time":tf.get_static_value(round_time)},step=round)
             wandb.log(get_time_logs(tff_time_logging_directory,True),step=round)
-    weights = trainer.get_model_weights(state)
-    # Save model weights
-    model = get_model(input_dim=configs.get("input_dim"), num_nodes= configs.get("num_nodes"), dropout_rate=configs.get("dropout_rate"), l1_v= configs.get("l1_v"), l2_v=configs.get("l2_v"))
-    model.set_weights(weights.trainable)
-    model.save_weights(f"tff_weights.h5")
+    # weights = trainer.get_model_weights(state)
+    # # Save model weights
+    # model = get_model(input_dim=configs.get("input_dim"), num_nodes= configs.get("num_nodes"), dropout_rate=configs.get("dropout_rate"), l1_v= configs.get("l1_v"), l2_v=configs.get("l2_v"))
+    # model.set_weights(weights.trainable)
+    # model.save_weights(f"tff_weights.h5")
 
 
 
