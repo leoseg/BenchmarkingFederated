@@ -27,7 +27,15 @@ var/
 .installed.cfg
 *.egg
 .idea/
-
+*.png
+*.csv
+# exclude all text files except the requirements.txt
+*.txt
+!requirements.txt
+*.npz
+*.sqlite
+*.h5
+# exc
 # PyInstaller
 #  Usually these files are written by a python script from a template
 #  before PyInstaller builds the exe, so as to inject date/other infos into it.
