@@ -7,8 +7,20 @@ import tensorflow as tf
 import numpy
 from math import floor
 import numpy as np
-from keras.utils import to_categorical
+import logging
+from collections import Counter
+from keras.utils import set_random_seed
 
+
+logging.basicConfig(filename='log.txt', level=logging.INFO, format='%(asctime)s - %(process)d - %(levelname)s - %(message)s')
+
+def log_df_info(df, column):
+    # Log the first five rows of the DataFrame
+    logging.info(f"First five rows of the DataFrame:\n{df.head(5)}")
+
+    # Log the number of examples for each unique value in the specified column
+    unique_value_counts = Counter(df[column])
+    logging.info(f"Counts of unique values in column '{column}':\n{unique_value_counts}")
 
 def preprocess_data(df:pd.DataFrame)->pd.DataFrame:
     """
@@ -159,8 +171,14 @@ def df_train_test_dataset(df: pd.DataFrame, kfold_num:int=0, random_state=0, lab
     :return:
     """
     kfold = StratifiedKFold(n_splits=configs.get("n_splits"), shuffle=True, random_state=random_state)
-    #df = load_data(data_path, rows_to_keep)
     X, Y = create_X_y_from_gen_df(df, False,label)
+    #X_train, X_test, Y_train, Y_test = train_test_split(X, Y, test_size=0.2, random_state=random_state,stratify=Y)
+    # if scale:
+    #     scaler = StandardScaler()
+    #     X_train = scaler.fit_transform(X_train)
+    #     X_test = scaler.transform(X_test)
+    # train_dataset = tf.data.Dataset.from_tensor_slices((X_train, Y_train))
+    # test_dataset = tf.data.Dataset.from_tensor_slices((X_test,Y_test))
     for count, (train, test) in enumerate(kfold.split(X, Y)):
         if count == kfold_num:
             X_train = X.iloc[train]
@@ -173,7 +191,8 @@ def df_train_test_dataset(df: pd.DataFrame, kfold_num:int=0, random_state=0, lab
             test_dataset = tf.data.Dataset.from_tensor_slices((X_test,Y[test]))
             return train_dataset,test_dataset
 
-def preprocess(dataset : tf.data.Dataset,epochs :int = configs.get("epochs")):
+def preprocess(dataset : tf.data.Dataset,epochs :int = configs.get("epochs"),seed:int=1):
+        set_random_seed(seed)
         return dataset.shuffle(configs.get("shuffle"), seed =1,reshuffle_each_iteration=True).batch(configs.get("batch_size")).repeat(epochs)
 
 
@@ -205,40 +224,35 @@ def create_unbalanced_splits(df:pd.DataFrame,label_name:str,unweight_step:int):
     :param unweight_step: for each unweight step the choosen class has 5 percent more and the rest 5 percent less samples
     :return: dataframe with class number of examples per client
     """
-    df = df.reset_index()
+    classes = df[label_name].unique()
     class_percentages = df[label_name].value_counts(normalize=True)
-    num_classes = len(class_percentages)
+    num_classes = len(classes)
     partition_size = floor(min([ class_size * len(df) for class_size in class_percentages]))
     partitions_dict = defaultdict(list)
-    clients = []
-    #partitions_dfs = []
+    clients = [i for i in range(num_classes)]
     start_percentage = 1.0/ num_classes
+    chosen_class_percentage = start_percentage + (5 * unweight_step / 100)
+    other_classes_percentage = (1 - chosen_class_percentage) / (num_classes - 1)
+    chosen_class_samples = floor(chosen_class_percentage * partition_size)
+    other_classes_samples = floor(other_classes_percentage * partition_size)
     partitions_list = []
-    for partition_split in range(num_classes):
-        #dfs = []
-        clients.append(partition_split)
-        indexes = []
-        for count,(class_label,class_value) in enumerate(zip(class_percentages.index,class_percentages)):
-
-            partition_value = 0.0
-            if count == partition_split:
-                partition_value  = start_percentage +0.05 * unweight_step if (start_percentage +0.05 * unweight_step)< 1.0 else 1.0
-                sampled_index = df[df[label_name] == class_label].sample(floor(partition_value*partition_size),random_state=configs["random_state_partitions"]).index
-                indexes.extend(list(sampled_index))
-                df = df.drop(index=sampled_index)
-                # dfs.append(sampled_df)
+    for chosen_class in classes:
+        chosen_class_indices = df[df[label_name] == chosen_class].sample(chosen_class_samples).index.tolist()
+        other_classes_indices = df[df[label_name] != chosen_class].groupby(label_name).apply(
+            lambda x: x.sample(other_classes_samples).index.tolist()
+        ).explode().tolist()
+        if other_classes_percentage == 0.0:
+            other_classes_indices = []
+        partition_indices = chosen_class_indices + other_classes_indices
+        df = df.drop(index=partition_indices)
+        partition_indices = list(numpy.asarray(partition_indices) + 1)
+        partitions_list.append(partition_indices)
+        partition_indices.append(0)
+        for class_name in classes:
+            if class_name == chosen_class:
+                partitions_dict["class "+str(class_name)].append(chosen_class_samples)
             else:
-                partition_value  = start_percentage- 0.05/(num_classes-1) * unweight_step if  (start_percentage - 0.05/(num_classes-1) * unweight_step )> 0.0 else 0.0
-                sampled_index = df[df[label_name] == class_label].sample(floor(partition_value * partition_size),random_state=configs["random_state_partitions"]).index
-                indexes.extend(list(sampled_index))
-                df = df.drop(index=sampled_index)
-                # dfs.append(sampled_df)
-            partitions_dict["class "+str(class_label)].append(floor(partition_value*partition_size))
-        indexes.append(0)
-        partitions_list.append(indexes)
-        # partition_dataframe = pd.concat(dfs,ignore_index=True)
-        # partitions_dfs.append(partition_dataframe)
-        #partition_dataframe.to_csv(f"partition_{partition_split}.csv")
+                partitions_dict["class "+str(class_name)].append(other_classes_samples)
 
     return pd.DataFrame(partitions_dict,index=clients),partitions_list
 

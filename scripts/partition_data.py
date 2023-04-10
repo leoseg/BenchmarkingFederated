@@ -27,7 +27,7 @@ def main():
     args = parser.parse_args()
 
     df = load_data(data_path=args.data_path)
-    df = preprocess_data(df)
+    #df = preprocess_data(df)
     # If no unweighted_step created balance partitions
     if args.unweighted_step < 0:
         partitions = create_class_balanced_partitions(df, num_partitions=args.num_clients)

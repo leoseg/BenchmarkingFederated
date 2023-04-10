@@ -1,14 +1,25 @@
-def evaluate_metrics_aggregation_fn(results):
+from typing import Tuple, Optional, Dict
+
+from flwr.common import NDArrays, Scalar
+
+from evaluation_utils import evaluate_model,load_test_data_for_evaluation
+
+
+def evaluate_metrics_aggregation_fn(results, weighting = False):
     """
-    Aggregates metrics of all clients by averaging their metrisc weighted by the num of examples they processed
+    Aggregates metrics of all clients by averaging their metrics
     :param results: list of tuples in form num examples and metrics
+    :param weighting: flag that indicates if the metrics should be weighted by the num of examples
     :return: dictionary with summarized metrics
     """
 
     num_total_evaluation_examples = sum([num_examples for num_examples, _ in results])
     total_metrics = {}
     for num_examples, metrics in results:
-        metrics.update((x, y * num_examples) for x, y in metrics.items())
+        if weighting:
+            metrics.update((x, y * num_examples) for x, y in metrics.items())
+        else:
+            metrics.update((x, y * num_total_evaluation_examples/len(results)) for x, y in metrics.items())
         for key,value in metrics.items():
             value_before = total_metrics.setdefault(key,0)
             total_metrics[key] = value_before + value
@@ -16,5 +27,21 @@ def evaluate_metrics_aggregation_fn(results):
     return total_metrics
 
 
+def get_evaluate_fn(model):
+    """Return an evaluation function for server-side evaluation."""
+
+    # Load data and model here to avoid the overhead of doing it in `evaluate` itself
+
+
+    # The `evaluate` function will be called after every round
+    X_text, y_test = load_test_data_for_evaluation()
+    def evaluate(
+        server_round: int, parameters: NDArrays, config: Dict[str, Scalar]
+    ) -> Optional[Tuple[float, Dict[str, Scalar]]]:
+        metrics = evaluate_model(parameters, X_text, y_test)
+        loss = metrics.pop("loss")
+        return loss,metrics
+
+    return evaluate
 
 

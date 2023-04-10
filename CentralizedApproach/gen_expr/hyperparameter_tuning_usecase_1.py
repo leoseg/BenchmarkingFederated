@@ -17,9 +17,9 @@ sweep_configuration = {
         "l2_v" : {"values" : [0.0,0.005]}
      }
 }
-data_path = "../DataGenExpression/Alldata.csv"
+data_path = "../../DataGenExpression/Alldata.csv"
 data_name = data_path.split("/")[2].split(".")[0]
-sweep_id = wandb.sweep(sweep=sweep_configuration, project=f'benchmark-central_sweep_{data_name}_AUC(ROC)')
+sweep_id = wandb.sweep(sweep=sweep_configuration, project=f"sweep_usecase_{configs['usecase']}")
 #create train test data
 
 modelname = data_path.split("/")[-1].split(".")[0]
@@ -28,7 +28,7 @@ X_train, X_test, y_train, y_test = load_gen_data_as_train_test_split(data_path)
 
 #get utils
 def train():
-    wandb.init(project=f"benchmark-central_sweep_{data_name}", config=configs, job_type='train')
+    wandb.init(project=f"sweep_usecase_{configs['usecase']}",config=configs, job_type='train')
     ACCUMULATED_METRICS = {}
     # Define WandbCallback for experiment tracking
     wandb_callback = WandbCallback(monitor='val_loss',
@@ -37,8 +37,8 @@ def train():
                                    validation_steps=5 ,
                                    save_model=False,
                                    save_weights_only=True)
-
-    model = get_seq_nn_model(X_train.shape[1], configs.get("num_nodes"),configs.get("dropout_rate"), configs.get("l1_v"), configs.get("l2_v"))
+    config = wandb.config
+    model = get_seq_nn_model(X_train.shape[1], config.get("num_nodes"),config.get("dropout_rate"), config.get("l1_v"), config.get("l2_v"))
     model.compile(optimizer=configs.get("optimizer"),
                   loss=configs.get("loss"),
                   metrics=configs.get("metrics"))

@@ -14,13 +14,13 @@
 # ==============================================================================
 """Flower server."""
 
-
 import concurrent.futures
-import os
 import pickle
 import timeit
 from logging import DEBUG, INFO
 from typing import Dict, List, Optional, Tuple, Union
+
+import numpy as np
 import tensorflow as tf
 from flwr.common import (
     Code,
@@ -32,6 +32,7 @@ from flwr.common import (
     Parameters,
     ReconnectIns,
     Scalar,
+    parameters_to_ndarrays
 )
 from flwr.common.logger import log
 from flwr.common.typing import GetParametersIns
@@ -118,14 +119,16 @@ class Server:
             metrics_type ="model"
 
         project_name = f"benchmark_rounds_{num_rounds}_{data_name}_{metrics_type}_metrics"
-        if configs["usecase"] != 1:
-            project_name = f"usecase_{configs['usecase']}_" + project_name
+        project_name = f"usecase_{configs['usecase']}_" + project_name
         if self.unweighted >= 0.0:
             project_name = "unweighted" + project_name
             group = f"flwr_{self.unweighted}"
         else:
             group = f"flwr_{self.num_clients}"
-        wandb.init(project=project_name, group=group, name=f"run_{self.run_repeat}")
+        wandb.init(project=project_name, group=group, name=f"run_{self.run_repeat}",config=configs)
+        with open("partitions_list", "rb") as file:
+            partitions_list = pickle.load(file)
+        wandb.log({"partitions_list":partitions_list})
         # If unweighted step is set reads number of samples per class per clients and log to wandb
         if self.unweighted >= 0.0:
             wandb.log({f"class_num_table_{int(self.unweighted)}":pd.read_csv(f"partitions_dict_{int(self.unweighted)}.csv")})
@@ -277,6 +280,7 @@ class Server:
             Optional[Parameters],
             Dict[str, Scalar],
         ] = self.strategy.aggregate_fit(server_round, results, failures)
+
 
         parameters_aggregated, metrics_aggregated = aggregated_result
         return parameters_aggregated, metrics_aggregated, (results, failures)

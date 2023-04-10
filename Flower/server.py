@@ -1,10 +1,9 @@
 from math import ceil
-
 import flwr as fl
 from flwr.server import SimpleClientManager
 from flwr.server import start_server
 import argparse
-from Flower.flwr_utils import evaluate_metrics_aggregation_fn
+from Flower.flwr_utils import evaluate_metrics_aggregation_fn, get_evaluate_fn
 from config import configs
 from Flower.customized_flw_modules.server import Server
 parser = argparse.ArgumentParser(
@@ -34,7 +33,8 @@ args = parser.parse_args()
 def fit_config(server_round: int):
     """Return training configuration dict for each round. Sets local epochs of each client"""
     config = {
-        "local_epochs": ceil(configs.get("epochs")/args.num_rounds)
+        "local_epochs": ceil(configs.get("epochs")/args.num_rounds),
+        "server_round": server_round
     }
     return config
 if args.system_metrics:

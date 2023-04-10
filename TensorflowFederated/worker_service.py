@@ -3,7 +3,7 @@ import tensorflow as tf
 import tensorflow_federated as tff
 from data_loading import DataBackend
 from absl import flags
-from data_utils import df_train_test_dataset,load_data,preprocess_data
+from data_utils import df_train_test_dataset, load_data, preprocess_data, log_df_info
 from utils.config import configs
 import pickle
 import os
@@ -20,7 +20,7 @@ flags.DEFINE_integer("num_rounds",1,"Defines number of rounds")
 flags.DEFINE_integer("client_index",None,"index for client to load data partition")
 flags.DEFINE_string("data_path",configs.get("data_path"),"Defines path to data")
 flags.DEFINE_integer("run_repeat",1,"number of run with same config")
-flags.DEFINE_integer("random_state",0,"random state for train test split")
+flags.DEFINE_integer("random_state",1,"random state for train test split")
 
 
 def main(argv) -> None:
@@ -41,10 +41,11 @@ def main(argv) -> None:
     # Loads and preprocesses data
     df  = load_data(data_path,rows_to_keep)
     df = preprocess_data(df)
+    log_df_info(df, configs["label"])
     train_dataset, test_dataset = df_train_test_dataset(
         df,
-        kfold_num=run_repeat,
-        random_state=random_state,
+        kfold_num=random_state,
+        random_state=run_repeat,
         label=configs.get("label"),
         scale=configs.get("scale")
     )

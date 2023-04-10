@@ -70,3 +70,343 @@ Client training time
 0.57753777503967285
 Client training time
 0.58709096908569336
+Client training time
+0.96954798698425293
+Client training time
+0.97238302230834961
+Client training time
+0.93428993225097656
+Client training time
+0.93684697151184082
+Client training time
+1.2515242099761963
+Client training time
+1.2487180233001709
+Client training time
+0.92946791648864746
+Client training time
+0.93320822715759277
+Client training time
+0.95372200012207031
+Client training time
+0.95670795440673828
+Client training time
+0.860119104385376
+Client training time
+0.9125218391418457
+Client training time
+0.594506025314331
+Client training time
+0.58083105087280273
+Client training time
+0.54951691627502441
+Client training time
+0.5736689567565918
+Client training time
+0.57657480239868164
+Client training time
+0.5791938304901123
+Client training time
+0.40251898765563965
+Client training time
+0.55478501319885254
+Client training time
+0.60158801078796387
+Client training time
+0.60271096229553223
+Client training time
+0.56875491142272949
+Client training time
+0.56305599212646484
+Client training time
+0.56365799903869629
+Client training time
+0.59634900093078613
+Client training time
+0.51317095756530762
+Client training time
+0.57193112373352051
+Client training time
+0.80733180046081543
+Client training time
+0.82956790924072266
+Client training time
+0.74436783790588379
+Client training time
+0.80571985244750977
+Client training time
+0.81446695327758789
+Client training time
+0.81031894683837891
+Client training time
+0.60858416557312012
+Client training time
+0.7660830020904541
+Client training time
+0.7922208309173584
+Client training time
+0.80706596374511719
+Client training time
+0.767132043838501
+Client training time
+0.7824399471282959
+Client training time
+0.782512903213501
+Client training time
+0.79839587211608887
+Client training time
+0.64937090873718262
+Client training time
+0.827038049697876
+Client training time
+0.79669284820556641
+Client training time
+0.80214595794677734
+Client training time
+0.681628942489624
+Client training time
+0.796989917755127
+Client training time
+0.70836400985717773
+Client training time
+0.79088783264160156
+Client training time
+0.68557286262512207
+Client training time
+0.79685497283935547
+Client training time
+0.72454690933227539
+Client training time
+0.80967807769775391
+Client training time
+0.77708101272583008
+Client training time
+0.8486790657043457
+Client training time
+0.86605095863342285
+Client training time
+0.885883092880249
+Client training time
+0.81923699378967285
+Client training time
+0.83787989616394043
+Client training time
+0.79356193542480469
+Client training time
+0.78341102600097656
+Client training time
+Client training time
+0.79481983184814453
+0.80888915061950684
+Client training time
+0.81355810165405273
+Client training time
+0.81138110160827637
+Client training time
+0.60288286209106445
+Client training time
+0.75177288055419922
+Client training time
+Client training time
+0.936851978302002
+0.93076300621032715
+Client training time
+0.82176709175109863
+Client training time
+0.8248898983001709
+Client training time
+0.70319008827209473
+Client training time
+0.8268890380859375
+Client training time
+0.604341983795166
+Client training time
+0.77518200874328613
+Client training time
+0.876701831817627
+Client training time
+0.89508914947509766
+Client training time
+1.020751953125
+Client training time
+8.3857269287109375
+Client training time
+0.84134984016418457
+Client training time
+0.82451987266540527
+Client training time
+0.6755058765411377
+Client training time
+0.83675599098205566
+Client training time
+Client training time
+0.84346914291381836
+0.84331893920898438
+Client training time
+0.82937884330749512
+Client training time
+0.8302919864654541
+Client training time
+0.6737830638885498
+Client training time
+0.82001495361328125
+Client training time
+0.8045351505279541
+Client training time
+0.83189606666564941
+Client training time
+0.73154902458190918
+Client training time
+0.85178494453430176
+Client training time
+0.87766790390014648
+Client training time
+0.88589286804199219
+Client training time
+1.5151350498199463
+Client training time
+1.4974219799041748
+Client training time
+0.81224298477172852
+Client training time
+0.83539795875549316
+Client training time
+22.896687030792236
+Client training time
+34.7699818611145
+Client training time
+0.92580223083496094
+Client training time
+0.93579196929931641
+Client training time
+0.66854500770568848
+Client training time
+0.83807110786437988
+Client training time
+0.89812779426574707
+Client training time
+0.95064687728881836
+Client training time
+0.80630683898925781
+Client training time
+0.816540002822876
+Client training time
+0.83904480934143066
+Client training time
+0.82820391654968262
+Client training time
+0.82982206344604492
+Client training time
+0.822594165802002
+Client training time
+0.80669784545898438
+Client training time
+0.83370304107666016
+Client training time
+0.60100412368774414
+Client training time
+0.57032108306884766
+Client training time
+0.68778085708618164
+Client training time
+0.81685590744018555
+Client training time
+Client training time
+0.83630704879760742
+0.84002804756164551
+Client training time
+0.80155301094055176
+Client training time
+0.83468079566955566
+Client training time
+0.74074888229370117
+Client training time
+0.8200991153717041
+Client training time
+0.83143901824951172
+Client training time
+0.83401298522949219
+Client training time
+Client training time
+0.99570798873901367
+1.0035660266876221
+Client training time
+0.82722902297973633
+Client training time
+0.85256195068359375
+Client training time
+0.85537314414978027
+Client training time
+0.86322999000549316
+Client training time
+0.65976381301879883
+Client training time
+0.85377001762390137
+Client training time
+0.92235898971557617
+Client training time
+0.92493796348571777
+Client training time
+1.2369768619537354
+Client training time
+1.3357670307159424
+Client training time
+1.0438981056213379
+Client training time
+1.0875658988952637
+Client training time
+0.86689496040344238
+Client training time
+0.976639986038208
+Client training time
+0.65572595596313477
+Client training time
+0.76341509819030762
+Client training time
+1.0724408626556396
+Client training time
+1.0734479427337646
+Client training time
+Client training time
+0.87117409706115723
+0.85266709327697754
+Client training time
+0.7540888786315918
+Client training time
+0.85571813583374023
+Client training time
+0.81214213371276855
+Client training time
+0.891981840133667
+Client training time
+0.98124003410339355
+Client training time
+0.992901086807251
+Client training time
+0.75346899032592773
+Client training time
+0.86657404899597168
+Client training time
+0.86105918884277344
+Client training time
+0.86597585678100586
+Client training time
+0.66143393516540527
+Client training time
+0.81806492805480957
+Client training time
+0.79933786392211914
+Client training time
+0.81923007965087891
+Client training time
+0.75244784355163574
+Client training time
+0.80024194717407227
+Client training time
+0.802009105682373
+Client training time
+0.80954194068908691
+Client training time
+0.739422082901001
+Client training time
+0.8033139705657959

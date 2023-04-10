@@ -5,8 +5,37 @@ from keras.optimizers import Adam,SGD
 from keras.losses import BinaryCrossentropy,SparseCategoricalCrossentropy
 tff_time_logging_directory = "timelogs/tff_logs_time.txt"
 flw_time_logging_directory = "timelogs/flw_logs_time.txt"
+SEED = 42
+version = f"essential_seeds_{SEED}"
+
 DATA_PATH = ""
-if os.environ["USECASE"] == str(4):
+if os.environ["USECASE"] == "test":
+    configs = dict(
+        activation="sigmoid",
+        random_state_partitions=69,
+        valid_freq=10,
+        usecase=1,
+        batch_size=512,
+        epochs=100,
+        optimizer=Adam(),
+        loss=BinaryCrossentropy(),
+        metrics=[BinaryAccuracy(), AUC(name="auc"), Precision(name="precision"), Recall(name="recall")],
+        earlystopping_patience=5,
+        num_nodes=1024,
+        dropout_rate=0.3,
+        l1_v=0.0,
+        l2_v=0.005,
+        n_splits=5,
+        data_path="../DataGenExpression/Dataset1.csv",
+        shuffle=10000,
+        label="Condition",
+        scale=True,
+        input_dim=12708,
+        number_of_classes=1,
+        random_seed_set = True,
+        version=version
+    )
+elif os.environ["USECASE"] == str(4):
     configs = dict(
         activation="softmax",
         random_state_partitions =69,
@@ -18,8 +47,8 @@ if os.environ["USECASE"] == str(4):
         loss=SparseCategoricalCrossentropy(),
         metrics=[SparseCategoricalAccuracy(), SparseAUC(name="auc"), SparseAUC(curve="PR", name="prauc")],
         earlystopping_patience = 5,
-        num_nodes = 1024,
-        dropout_rate = 0.3,
+        num_nodes = 512,
+        dropout_rate = 0.15,
         l1_v = 0.0,
         l2_v = 0.005,
         n_splits = 5,
@@ -30,6 +59,8 @@ if os.environ["USECASE"] == str(4):
         categorical=True,
         input_dim=1426,
         number_of_classes=5,
+        random_seed_set=True,
+        version=version
     )
 elif os.environ["USECASE"] == str(3):
     configs = dict(
@@ -51,6 +82,8 @@ elif os.environ["USECASE"] == str(3):
         categorical=True,
         data_path="../Dataset2/Braindata_five_classes.csv",
         input_dim=1426,
+        random_seed_set=True,
+        version=version
     )
 elif os.environ["USECASE"] == str(2):
     configs = dict(
@@ -61,7 +94,7 @@ elif os.environ["USECASE"] == str(2):
         epochs=8,
         optimizer=SGD(),
         loss=BinaryCrossentropy(),
-        metrics=[BinaryAccuracy(), AUC(name="auc"), Precision(name="precision"), Recall(name="recall")],
+        metrics=[BinaryAccuracy(), AUC(name="auc"), Precision(name="precision"), Recall(name="recall"), AUC(curve="PR", name="prauc")],
         l2_v=0.001,
         n_splits=5,
         data_path="../DataGenExpression/Alldata.csv",
@@ -71,6 +104,8 @@ elif os.environ["USECASE"] == str(2):
         number_of_classes=1,
         random_state_partitions=69,
         input_dim=12708,
+        random_seed_set=True,
+        version=version
     )
 else:
     configs = dict(
@@ -79,13 +114,13 @@ else:
         valid_freq = 10,
         usecase = 1,
         batch_size = 512,
-        epochs = 100,
+        epochs = 70,
         optimizer = Adam(),
         loss = BinaryCrossentropy(),
-        metrics = [BinaryAccuracy(),AUC(name="auc"),Precision(name="precision"),Recall(name="recall")],
+        metrics = [BinaryAccuracy(),AUC(name="auc"),Precision(name="precision"),Recall(name="recall"), AUC(curve="PR", name="prauc")],
         earlystopping_patience = 5,
-        num_nodes = 1024,
-        dropout_rate = 0.3,
+        num_nodes = 512,
+        dropout_rate = 0.15,
         l1_v = 0.0,
         l2_v = 0.005,
         n_splits = 5,
@@ -94,5 +129,7 @@ else:
         label="Condition",
         scale=True,
         input_dim=12708,
-        number_of_classes =1
+        number_of_classes =1,
+        random_seed_set = True,
+        version=version
     )
