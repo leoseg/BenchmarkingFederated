@@ -7,6 +7,13 @@ from models import get_model
 
 
 def evaluate_model(weights,X_test,y_test):
+    """
+    Evaluates model on test data
+    :param weights:
+    :param X_test:
+    :param y_test:
+    :return:
+    """
     model = get_model(input_dim=configs["input_dim"], num_nodes=configs.get("num_nodes"),dropout_rate=configs.get("dropout_rate"), l1_v=configs.get("l1_v"), l2_v=configs.get("l2_v"))
     model.load_weights(weights)
     model.compile(loss= configs["loss"], optimizer=configs["optimizer"], metrics=configs["metrics"])
@@ -17,6 +24,10 @@ def evaluate_model(weights,X_test,y_test):
 
 
 def load_test_data_for_evaluation():
+    """
+    Loads test data for evaluation
+    :return:
+    """
     df = load_data(configs["data_path"])
     df = preprocess_data(df)
     X, Y = create_X_y_from_gen_df(df, False, configs.get("label"))
