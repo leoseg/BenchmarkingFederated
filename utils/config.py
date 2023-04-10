@@ -7,7 +7,7 @@ tff_time_logging_directory = "timelogs/tff_logs_time.txt"
 flw_time_logging_directory = "timelogs/flw_logs_time.txt"
 SEED = 42
 version = f"essential_seeds_{SEED}"
-
+n_splits = 10
 DATA_PATH = ""
 if os.environ["USECASE"] == "test":
     configs = dict(
@@ -25,7 +25,7 @@ if os.environ["USECASE"] == "test":
         dropout_rate=0.3,
         l1_v=0.0,
         l2_v=0.005,
-        n_splits=5,
+        n_splits=n_splits,
         data_path="../DataGenExpression/Dataset1.csv",
         shuffle=10000,
         label="Condition",
@@ -51,7 +51,7 @@ elif os.environ["USECASE"] == str(4):
         dropout_rate = 0.15,
         l1_v = 0.0,
         l2_v = 0.005,
-        n_splits = 5,
+        n_splits = n_splits,
         data_path="../Dataset2/Braindata_five_classes.csv",
         shuffle=10000,
         label="Classification",
@@ -73,7 +73,7 @@ elif os.environ["USECASE"] == str(3):
         loss=SparseCategoricalCrossentropy(),
         metrics=[SparseCategoricalAccuracy(),SparseAUC(name="auc"),SparseAUC(curve="PR",name="prauc")],
         l2_v=1.0,
-        n_splits=5,
+        n_splits=n_splits,
         shuffle=10000,
         label="Classification",
         scale=False,
@@ -96,7 +96,7 @@ elif os.environ["USECASE"] == str(2):
         loss=BinaryCrossentropy(),
         metrics=[BinaryAccuracy(), AUC(name="auc"), Precision(name="precision"), Recall(name="recall"), AUC(curve="PR", name="prauc")],
         l2_v=0.001,
-        n_splits=5,
+        n_splits=n_splits,
         data_path="../DataGenExpression/Alldata.csv",
         shuffle=10000,
         label="Condition",
@@ -123,7 +123,7 @@ else:
         dropout_rate = 0.15,
         l1_v = 0.0,
         l2_v = 0.005,
-        n_splits = 5,
+        n_splits = n_splits,
         data_path="../DataGenExpression/Alldata.csv",
         shuffle=10000,
         label="Condition",

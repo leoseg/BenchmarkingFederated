@@ -1,5 +1,7 @@
 import pickle
 import matplotlib.pyplot as plt
+from sklearn.model_selection import train_test_split
+
 from utils.config import configs
 from utils.data_utils import create_class_balanced_partitions,create_unbalanced_splits,load_data,preprocess_data
 import argparse
@@ -27,6 +29,7 @@ def main():
     args = parser.parse_args()
 
     df = load_data(data_path=args.data_path)
+    df, _ = train_test_split(df, test_size=0.1, random_state=69,stratify=configs["label"])
     #df = preprocess_data(df)
     # If no unweighted_step created balance partitions
     if args.unweighted_step < 0:
