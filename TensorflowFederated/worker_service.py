@@ -7,12 +7,13 @@ from data_utils import df_train_test_dataset, load_data, preprocess_data, log_df
 from utils.config import configs
 import pickle
 import os
+from customized_tff_modules import tff_simulation
 os.environ["TF_CPP_MIN_LOG_LEVEL"] = "3"
 FLAGS = flags.FLAGS
 _GRPC_OPTIONS = [
     ('grpc.max_receive_message_length', 25586421),
     ('grpc.max_send_message_length', 25586421),
-    ("grpc.max_metadata_size", 25586421)]
+    ("grpc.max_metadata_size", 25586421),]
 # Number of worker threads in thread pool.
 _THREADS = 1
 flags.DEFINE_integer("port", 8050, "Sets port of workerservice")
@@ -66,7 +67,7 @@ def main(argv) -> None:
         leaf_executor_fn=ex_fn)
 
     print(f"Worker created with port {port}")
-    tff.simulation.run_server(executor_factory, _THREADS, port, None,
+    tff_simulation.run_server(executor_factory, _THREADS, port, None,
                               _GRPC_OPTIONS)
 
 

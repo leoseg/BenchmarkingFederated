@@ -1,7 +1,9 @@
+from functools import wraps
+
 import pandas as pd
 import seaborn as sns
 import wandb
-
+import grpc
 from config import configs
 
 
@@ -62,5 +64,23 @@ def draw_group_plot_of_df(list_dfs,time_filter:float=None):
         df = df[df["times"]< time_filter]
     plot = sns.relplot(data=df, x="times", y="memory", kind="line",hue="num_clients")
     return plot
+
+
+
+
+import grpc
+from grpc._server import _Context
+
+class ByteCountInterceptor(grpc.ServerInterceptor):
+
+    def __init__(self):
+        self.bytes_sent = 0
+        self.bytes_received = 0
+
+    def intercept_service(self, continuation, handler_call_details):
+        print(handler_call_details)
+
+        return continuation(handler_call_details)
+
 
 

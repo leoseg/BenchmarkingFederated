@@ -60,11 +60,11 @@ if [ $SYSTEM_ONLY != "2" ]; then
     taskset -c -pa $cpu_num_2 $train_id
     worker_time_logs="timelogs/tff_worker_${DATA_NAME}_${NUM_CLIENTS}_${NUM_ROUNDS}_repeat_${repeat}.txt"
     train_time_logs="timelogs/tff_train_${DATA_NAME}_${NUM_CLIENTS}_${NUM_ROUNDS}_repeat_${repeat}.txt"
-    worker_network_logs="timelogs/tff_worker_${DATA_NAME}_${NUM_CLIENTS}_${NUM_ROUNDS}_repeat_${repeat}_network.txt"
-    train_network_logs="timelogs/tff_train_${DATA_NAME}_${NUM_CLIENTS}_${NUM_ROUNDS}_repeat_${repeat}_network.txt"
+#    worker_network_logs="timelogs/tff_worker_${DATA_NAME}_${NUM_CLIENTS}_${NUM_ROUNDS}_repeat_${repeat}_network.txt"
+#    train_network_logs="timelogs/tff_train_${DATA_NAME}_${NUM_CLIENTS}_${NUM_ROUNDS}_repeat_${repeat}_network.txt"
     # Record network usage from client and server process and log to file
-    strace -f -e trace=network -s 10000 -p $worker_id -o $worker_network_logs;
-    strace -f -e trace=network -s 10000 -p $train_id $train_network_logs;
+#    strace -f -e trace=network -s 10000 -p $worker_id -o $worker_network_logs;
+#    strace -f -e trace=network -s 10000 -p $train_id $train_network_logs;
     # Record memory from client and server process and log to file
     psrecord $worker_id --log $worker_time_logs --interval 0.5 &
     psrecord $train_id --log $train_time_logs --interval 0.5
@@ -77,3 +77,4 @@ if [ $SYSTEM_ONLY != "2" ]; then
     echo "Repeat system metrics ${repeat} num clients ${NUM_CLIENTS} num rounds ${NUM_ROUNDS} and data ${DATA_NAME} complete"
     echo "<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<"
   done
+fi

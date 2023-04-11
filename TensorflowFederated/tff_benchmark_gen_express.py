@@ -2,15 +2,12 @@ import collections
 import concurrent.futures
 import pickle
 
-import numpy as np
-from keras.utils import set_random_seed
-
+from py_grpc_prometheus.prometheus_client_interceptor import PromClientInterceptor
 from TensorflowFederated.testing_prototyping.tff_config import *
 import grpc
 import tensorflow as tf
 import tensorflow_federated as tff
 from customized_tff_modules.fed_avg_with_time import build_weighted_fed_avg
-from evaluation_utils import evaluate_model, load_test_data_for_evaluation
 from utils.system_utils import get_time_logs
 from utils.models import get_model
 import wandb
@@ -128,6 +125,7 @@ def train_loop(num_rounds=1, num_clients=1):
     eval_data = tff.framework.CreateDataDescriptor(
         arg_uris=eval_data_uris, arg_type=dataset_type)
     # Loop trough rounds
+
     for round in range(1, num_rounds + 1):
         print(f"Begin round {round}")
         begin = tf.timestamp()
@@ -152,6 +150,9 @@ def train_loop(num_rounds=1, num_clients=1):
             round_time = end-begin
             wandb.log({"round_time":tf.get_static_value(round_time)},step=round)
             wandb.log(get_time_logs(tff_time_logging_directory,True),step=round)
+            wandb.log()
+            #network_usage = interceptor.received + interceptor.sent
+            #wandb.log({"network_usage": interceptor._metrics},step=round)
     # weights = trainer.get_model_weights(state)
     # # Save model weights
     # model = get_model(input_dim=configs.get("input_dim"), num_nodes= configs.get("num_nodes"), dropout_rate=configs.get("dropout_rate"), l1_v= configs.get("l1_v"), l2_v=configs.get("l2_v"))
@@ -171,6 +172,7 @@ for i in range(1,num_clients+1):
         ('grpc.max_receive_message_length',25586421), ("grpc.max_metadata_size",25586421)]),)
 
 # Sets remote execution
+#start_http_server(8020)
 tff.backends.native.set_remote_python_execution_context(channels,thread_pool_executor=executor)
 # Start FL
 train_loop(args.num_rounds,num_clients)
