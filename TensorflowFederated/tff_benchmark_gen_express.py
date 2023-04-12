@@ -107,9 +107,7 @@ wandb.init(project=project_name, group=group, name=f"run_{args.run_repeat}",conf
 with open("partitions_list", "rb") as file:
     partitions_list = pickle.load(file)
 wandb.log({"partitions_list": partitions_list})
-# If unweighted log number of samples per class per client
-if unweighted >= 0.0:
-    wandb.log({"class_num_table":pd.read_csv("partitions_dict.csv")})
+
 def train_loop(num_rounds=1, num_clients=1):
     """
     Train loop function for FL
@@ -117,6 +115,8 @@ def train_loop(num_rounds=1, num_clients=1):
     :param num_clients: number of clients for FL
     :return:
     """
+    if args.unweighted_percentage > 0:
+        X_test, y_test = load_test_data_for_evaluation(args.run_repeat)
     evaluation_state = evaluation_process.initialize()
     state = trainer.initialize()
     print("inital weights are:")
@@ -152,11 +152,15 @@ def train_loop(num_rounds=1, num_clients=1):
             round_time = end-begin
             wandb.log({"round_time":tf.get_static_value(round_time)},step=round)
             wandb.log(get_time_logs(tff_time_logging_directory,True),step=round)
-    # weights = trainer.get_model_weights(state)
-    # # Save model weights
-    # model = get_model(input_dim=configs.get("input_dim"), num_nodes= configs.get("num_nodes"), dropout_rate=configs.get("dropout_rate"), l1_v= configs.get("l1_v"), l2_v=configs.get("l2_v"))
-    # model.set_weights(weights.trainable)
-    # model.save_weights(f"tff_weights.h5")
+        if args.unweighted_percentage > 0:
+            weights = trainer.get_model_weights(state)
+            # Save model weights
+            model = get_model(input_dim=configs.get("input_dim"), num_nodes= configs.get("num_nodes"), dropout_rate=configs.get("dropout_rate"), l1_v= configs.get("l1_v"), l2_v=configs.get("l2_v"))
+            model.compile(configs.get("optimizer"), configs.get("loss"), metrics=configs.get("metrics"))
+            model.set_weights(weights.trainable)
+            metrics = model.evaluate(X_test, y_test, verbose = 0,return_dict=True)
+            metrics_cen = {key + '_global': value for key, value in metrics.items()}
+            wandb.log(metrics_cen)
 
 
 

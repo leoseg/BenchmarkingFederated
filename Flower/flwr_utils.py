@@ -34,11 +34,11 @@ def get_evaluate_fn(model):
 
 
     # The `evaluate` function will be called after every round
-    X_text, y_test = load_test_data_for_evaluation()
+    X_test, y_test = load_test_data_for_evaluation(args.run_repeat)
     def evaluate(
         server_round: int, parameters: NDArrays, config: Dict[str, Scalar]
     ) -> Optional[Tuple[float, Dict[str, Scalar]]]:
-        metrics = evaluate_model(parameters, X_text, y_test)
+        metrics = evaluate_model(parameters, X_test, y_test)
         loss = metrics.pop("loss")
         return loss,metrics
 

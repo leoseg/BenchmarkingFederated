@@ -1,6 +1,6 @@
-from sklearn.model_selection import train_test_split
+import wandb
 from sklearn.preprocessing import StandardScaler
-
+import pandas as pd
 from config import configs
 from data_utils import load_data, create_X_y_from_gen_df, preprocess_data
 from models import get_model
@@ -16,13 +16,17 @@ def evaluate_model(weights,X_test,y_test):
 
 
 
-def load_test_data_for_evaluation():
-    df = load_data(configs["data_path"])
+
+
+def load_test_data_for_evaluation(repeat):
+    data_path = configs["data_directory"]+ "unweighted_test_df_"+str(repeat)+".csv"
+    df = load_data(data_path)
     df = preprocess_data(df)
-    X, Y = create_X_y_from_gen_df(df, False, configs.get("label"))
-    X_train, X_test, y_train, y_test = train_test_split(X, Y, test_size=0.2, random_state=69)
+    X_test, y_test = create_X_y_from_gen_df(df, False, configs.get("label"))
     if configs["scale"]:
+        train_df = pd.read_csv(configs["data_directory"]+ "downsampled.csv")
         scaler = StandardScaler()
-        X_train = scaler.fit_transform(X_train)
+        train_df = preprocess_data(train_df)
+        scaler.fit(train_df)
         X_test = scaler.transform(X_test)
     return X_test,y_test

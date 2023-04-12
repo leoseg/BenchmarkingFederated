@@ -97,17 +97,17 @@ class Server:
         # Initialize parameters
         log(INFO, "Initializing global parameters")
         self.parameters = self._get_initial_parameters(timeout=timeout)
-        log(INFO, "Evaluating initial parameters")
-        res = self.strategy.evaluate(0, parameters=self.parameters)
-        if res is not None:
-            log(
-                INFO,
-                "initial parameters (loss, other metrics): %s, %s",
-                res[0],
-                res[1],
-            )
-            history.add_loss_centralized(server_round=0, loss=res[0])
-            history.add_metrics_centralized(server_round=0, metrics=res[1])
+        # log(INFO, "Evaluating initial parameters")
+        # res = self.strategy.evaluate(0, parameters=self.parameters)
+        # if res is not None:
+        #     log(
+        #         INFO,
+        #         "initial parameters (loss, other metrics): %s, %s",
+        #         res[0],
+        #         res[1],
+        #     )
+        #     history.add_loss_centralized(server_round=0, loss=res[0])
+        #     history.add_metrics_centralized(server_round=0, metrics=res[1])
 
         # Run federated learning for num_rounds
         log(INFO, "FL starting")
@@ -146,37 +146,41 @@ class Server:
                 wandb.log({"round_time":tf.get_static_value(end - begin)},step=current_round)
                 wandb.log(get_time_logs(flw_time_logging_directory, True),step=current_round)
             # Evaluate model using strategy implementation
-            res_cen = self.strategy.evaluate(current_round, parameters=self.parameters)
-            if res_cen is not None:
-                loss_cen, metrics_cen = res_cen
-                log(
-                    INFO,
-                    "fit progress: (%s, %s, %s, %s)",
-                    current_round,
-                    loss_cen,
-                    metrics_cen,
-                    timeit.default_timer() - start_time,
-                )
-                history.add_loss_centralized(server_round=current_round, loss=loss_cen)
-                history.add_metrics_centralized(
-                    server_round=current_round, metrics=metrics_cen
-                )
+            if not self.system_metrics and self.unweighted>=0.0:
+                res_cen = self.strategy.evaluate(current_round, parameters=self.parameters)
+                if res_cen is not None:
+                    loss_cen, metrics_cen = res_cen
+                    metrics_cen = {key + '_global': value for key, value in metrics_cen.items()}
+                    wandb.log(metrics_cen)
+                    log(
+                        INFO,
+                        "fit progress: (%s, %s, %s, %s)",
+                        current_round,
+                        loss_cen,
+                        metrics_cen,
+                        timeit.default_timer() - start_time,
+                    )
+                    history.add_loss_centralized(server_round=current_round, loss=loss_cen)
+                    history.add_metrics_centralized(
+                        server_round=current_round, metrics=metrics_cen
+                    )
 
             # Evaluate model on a sample of available clients
-            res_fed = self.evaluate_round(server_round=current_round, timeout=timeout)
-            if res_fed:
-                loss_fed, evaluate_metrics_fed, _ = res_fed
-                evaluate_metrics_fed["loss"] = loss_fed
-                # Logs metrics to wandb if its not system => model performance metrics
-                if not self.system_metrics:
+            if not self.system_metrics:
+                res_fed = self.evaluate_round(server_round=current_round, timeout=timeout)
+                if res_fed:
+                    loss_fed, evaluate_metrics_fed, _ = res_fed
+                    evaluate_metrics_fed["loss"] = loss_fed
+                    # Logs metrics to wandb if its not system => model performance metrics
+
                     wandb.log(evaluate_metrics_fed)
-                if loss_fed:
-                    history.add_loss_distributed(
-                        server_round=current_round, loss=loss_fed
-                    )
-                    history.add_metrics_distributed(
-                        server_round=current_round, metrics=evaluate_metrics_fed
-                    )
+                    if loss_fed:
+                        history.add_loss_distributed(
+                            server_round=current_round, loss=loss_fed
+                        )
+                        history.add_metrics_distributed(
+                            server_round=current_round, metrics=evaluate_metrics_fed
+                        )
 
         # Bookkeeping
         end_time = timeit.default_timer()

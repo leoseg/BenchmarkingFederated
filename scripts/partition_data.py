@@ -29,7 +29,7 @@ def main():
     args = parser.parse_args()
 
     df = load_data(data_path=args.data_path)
-    df, _ = train_test_split(df, test_size=0.1, random_state=69,stratify=configs["label"])
+    #df, _ = train_test_split(df, test_size=0.1, random_state=69,stratify=configs["label"])
     #df = preprocess_data(df)
     # If no unweighted_step created balance partitions
     if args.unweighted_step < 0:
