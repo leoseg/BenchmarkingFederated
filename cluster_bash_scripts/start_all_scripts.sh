@@ -5,7 +5,7 @@ NUM_REPEATS=$2
 SYSTEM_ONLY=$3
 MODE=$4
 echo "Current working directory: $(pwd)"
-if [ $MODE = "1" ] || [ $MODE = "2" ];then
+if [ $MODE = "0" ] || [ $MODE = "2" ];then
   jid1=$(sbatch --parsable benchmark_flwr_gen_expr.sh  $WANDB_API_KEY $NUM_REPEATS 1 "../DataGenExpression/Alldata.csv" $SYSTEM_ONLY)
   jid2=$(sbatch --parsable --dependency=afterany:$jid1 benchmark_flwr_gen_expr.sh $WANDB_API_KEY $NUM_REPEATS 2 "../DataGenExpression/Alldata.csv" $SYSTEM_ONLY)
   jid3=$(sbatch --parsable --dependency=afterany:$jid2 benchmark_flwr_gen_expr.sh $WANDB_API_KEY $NUM_REPEATS 3 "../Dataset2/Braindata_five_classes.csv" $SYSTEM_ONLY)
@@ -23,7 +23,7 @@ if [ $MODE = "1" ] || [ $MODE = "2" ];then
   sbatch --dependency=afterany:$jid7 benchmark_flwr_gen_expr_unweighted.sh $WANDB_API_KEY $NUM_REPEATS 4 "../Dataset2/Braindata_five_classes.csv"
 fi
 # do the same for tff
-if [ $MODE = "1" ] || [ $MODE = "2" ];then
+if [ $MODE = "0" ] || [ $MODE = "2" ];then
   jid8=$(sbatch --parsable benchmark_tff_gen_expr.sh $WANDB_API_KEY $NUM_REPEATS 1 "../DataGenExpression/Alldata.csv" $SYSTEM_ONLY)
   jid9=$(sbatch --parsable --dependency=afterany:$jid8 benchmark_tff_gen_expr.sh $WANDB_API_KEY $NUM_REPEATS 2 "../DataGenExpression/Alldata.csv" $SYSTEM_ONLY)
   jid10=$(sbatch --parsable --dependency=afterany:$jid9 benchmark_tff_gen_expr.sh $WANDB_API_KEY $NUM_REPEATS 3 "../Dataset2/Braindata_five_classes.csv" $SYSTEM_ONLY)
