@@ -54,7 +54,7 @@ wandb_callback = WandbCallback(monitor='val_loss',
                                log_evaluation=True,
                                save_model=False,
                                save_weights_only=True)
-X_train, X_test, y_train, y_test =train_test_split(X, Y, test_size=0.2, random_state=69)
+X_train, X_test, y_train, y_test =train_test_split(X, Y, test_size=0.2, random_state=69,stratify=Y)
 if configs["scale"]:
     scaler = StandardScaler()
     X_train = scaler.fit_transform(X_train)
