@@ -39,9 +39,9 @@ def main(argv) -> None:
     else:
         rows_to_keep = None
     # Loads and preprocesses data
-    df  = load_data(data_path,rows_to_keep)
+    df = load_data(data_path,rows_to_keep)
     df = preprocess_data(df)
-    log_df_info(df, configs["label"])
+    #log_df_info(df, configs["label"])
     train_dataset, test_dataset = df_train_test_dataset(
         df,
         kfold_num=random_state,

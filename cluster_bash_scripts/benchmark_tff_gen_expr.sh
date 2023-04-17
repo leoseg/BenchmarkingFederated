@@ -4,7 +4,7 @@
 #SBATCH --ntasks=1
 #SBATCH --partition=clara
 #SBATCH --cpus-per-task=11
-#SBATCH --mem=50G
+#SBATCH --mem=100G
 module load Python/3.10.4-GCCcore-11.3.0
 export PYTHONPATH="${PYTHONPATH}:../."
 WANDB_API_KEY=$1
