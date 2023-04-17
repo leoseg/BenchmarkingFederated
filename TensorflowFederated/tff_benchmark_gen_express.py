@@ -115,7 +115,7 @@ def train_loop(num_rounds=1, num_clients=1):
     :param num_clients: number of clients for FL
     :return:
     """
-    if args.unweighted_percentage > 0:
+    if args.unweighted_percentage >= 0:
         X_test, y_test = load_test_data_for_evaluation(args.run_repeat)
     evaluation_state = evaluation_process.initialize()
     state = trainer.initialize()
@@ -155,7 +155,7 @@ def train_loop(num_rounds=1, num_clients=1):
             round_time = end-begin
             wandb.log({"round_time":tf.get_static_value(round_time)},step=round)
             wandb.log(get_time_logs(tff_time_logging_directory,True),step=round)
-        if args.unweighted_percentage > 0:
+        if args.unweighted_percentage >= 0:
             weights = trainer.get_model_weights(state)
             # Save model weights
             model.set_weights(weights.trainable)
