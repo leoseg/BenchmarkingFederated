@@ -151,7 +151,7 @@ class Server:
                 if res_cen is not None:
                     loss_cen, metrics_cen = res_cen
                     metrics_cen = {key + '_global': value for key, value in metrics_cen.items()}
-                    wandb.log(metrics_cen)
+                    wandb.log(metrics_cen,step=current_round)
                     log(
                         INFO,
                         "fit progress: (%s, %s, %s, %s)",
@@ -173,7 +173,7 @@ class Server:
                     evaluate_metrics_fed["loss"] = loss_fed
                     # Logs metrics to wandb if its not system => model performance metrics
 
-                    wandb.log(evaluate_metrics_fed)
+                    wandb.log(evaluate_metrics_fed,step=current_round)
                     if loss_fed:
                         history.add_loss_distributed(
                             server_round=current_round, loss=loss_fed

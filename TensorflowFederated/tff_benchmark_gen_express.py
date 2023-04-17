@@ -146,7 +146,7 @@ def train_loop(num_rounds=1, num_clients=1):
             model_weights = trainer.get_model_weights(state)
             evaluation_state = evaluation_process.set_model_weights(evaluation_state, model_weights)
             evaluation_output = evaluation_process.next(evaluation_state, eval_data)
-            wandb.log(evaluation_output.metrics["client_work"]["eval"]["current_round_metrics"])
+            wandb.log(evaluation_output.metrics["client_work"]["eval"]["current_round_metrics"],step=round)
 
         if args.system_metrics:
             round_time = end-begin
@@ -160,7 +160,7 @@ def train_loop(num_rounds=1, num_clients=1):
             model.set_weights(weights.trainable)
             metrics = model.evaluate(X_test, y_test, verbose = 0,return_dict=True)
             metrics_cen = {key + '_global': value for key, value in metrics.items()}
-            wandb.log(metrics_cen)
+            wandb.log(metrics_cen,step=round)
 
 
 
