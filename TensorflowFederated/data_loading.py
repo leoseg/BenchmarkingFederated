@@ -20,11 +20,11 @@ class DataBackend(tff.framework.DataBackend):
     #     return dataset.shuffle(, seed =1,reshuffle_each_iteration=True).batch(BATCH).repeat(EPOCHS)
 
     async def materialize(self, data, type_spec):
-        # tf.print(f"Materializing data for client {data.uri}"
-        #          f"Train dataset has size {self.train_dataset.cardinality()}",
-        #          f"Test dataset has size {self.test_dataset.cardinality()}")
-        # tf.print(f"train dataset entry {0} from client {data.uri[-1]} is {list(self.train_dataset.as_numpy_iterator())[0]}")
-        # tf.print(f"test dataset entry {0} from client {data.uri[-1]} is {list(self.test_dataset.as_numpy_iterator())[0]}")
+        tf.print(f"Materializing data for client {data.uri}"
+                 f"Train dataset has size {self.train_dataset.cardinality()}",
+                 f"Test dataset has size {self.test_dataset.cardinality()}")
+        tf.print(f"train dataset entry {0} from client {data.uri[-1]} is {list(self.train_dataset.as_numpy_iterator())[0]}")
+        tf.print(f"test dataset entry {0} from client {data.uri[-1]} is {list(self.test_dataset.as_numpy_iterator())[0]}")
         if data.uri[0] == "e":
             return self.test_dataset.batch(32)
         else:

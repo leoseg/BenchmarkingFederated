@@ -81,7 +81,7 @@ else:
     strat = fl.server.strategy.FedAvg(min_fit_clients=num_clients, min_available_clients=num_clients
                                       , min_evaluate_clients=num_clients, on_fit_config_fn=fit_config,
                                       evaluate_metrics_aggregation_fn=evaluate_metrics_aggregation_fn,
-                                  )
+                                )
 # Start Flower server
 print("Starting flowerserver with args:\n")
 print(args)

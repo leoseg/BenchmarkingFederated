@@ -38,6 +38,7 @@ def load_test_data_for_evaluation(repeat):
         train_df = pd.read_csv(configs["data_directory"]+ "downsampled.csv")
         scaler = StandardScaler()
         train_df = preprocess_data(train_df)
-        scaler.fit(train_df)
+        X , _ = create_X_y_from_gen_df(train_df, False, configs.get("label"))
+        scaler.fit(X)
         X_test = scaler.transform(X_test)
     return X_test,y_test

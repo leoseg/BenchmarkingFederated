@@ -127,6 +127,9 @@ def train_loop(num_rounds=1, num_clients=1):
     eval_data_uris = [f'e{i}' for i in range(num_clients)]
     eval_data = tff.framework.CreateDataDescriptor(
         arg_uris=eval_data_uris, arg_type=dataset_type)
+    model = get_model(input_dim=configs.get("input_dim"), num_nodes=configs.get("num_nodes"),
+                      dropout_rate=configs.get("dropout_rate"), l1_v=configs.get("l1_v"), l2_v=configs.get("l2_v"))
+    model.compile(configs.get("optimizer"), configs.get("loss"), metrics=configs.get("metrics"))
     # Loop trough rounds
     for round in range(1, num_rounds + 1):
         print(f"Begin round {round}")
@@ -155,8 +158,6 @@ def train_loop(num_rounds=1, num_clients=1):
         if args.unweighted_percentage > 0:
             weights = trainer.get_model_weights(state)
             # Save model weights
-            model = get_model(input_dim=configs.get("input_dim"), num_nodes= configs.get("num_nodes"), dropout_rate=configs.get("dropout_rate"), l1_v= configs.get("l1_v"), l2_v=configs.get("l2_v"))
-            model.compile(configs.get("optimizer"), configs.get("loss"), metrics=configs.get("metrics"))
             model.set_weights(weights.trainable)
             metrics = model.evaluate(X_test, y_test, verbose = 0,return_dict=True)
             metrics_cen = {key + '_global': value for key, value in metrics.items()}

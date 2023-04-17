@@ -11,7 +11,6 @@ import logging
 from collections import Counter
 from keras.utils import set_random_seed
 
-
 logging.basicConfig(filename='log.txt', level=logging.INFO, format='%(asctime)s - %(process)d - %(levelname)s - %(message)s')
 
 def log_df_info(df, column):
@@ -231,8 +230,8 @@ def create_unbalanced_splits(df:pd.DataFrame,label_name:str,unweight_step:int):
     partitions_dict = defaultdict(list)
     clients = [i for i in range(num_classes)]
     start_percentage = 1.0/ num_classes
-    chosen_class_percentage = start_percentage + (5 * unweight_step / 100)
-    other_classes_percentage = (1 - chosen_class_percentage) / (num_classes - 1)
+    chosen_class_percentage = round(start_percentage + (5 * unweight_step / 100),8)
+    other_classes_percentage = round((1 - chosen_class_percentage) / (num_classes - 1),8)
     chosen_class_samples = floor(chosen_class_percentage * partition_size)
     other_classes_samples = floor(other_classes_percentage * partition_size)
     partitions_list = []
@@ -241,11 +240,14 @@ def create_unbalanced_splits(df:pd.DataFrame,label_name:str,unweight_step:int):
     remaining_df = df.drop(downsampled_df.index)
     for chosen_class in classes:
         chosen_class_indices = downsampled_df[downsampled_df[label_name] == chosen_class].sample(chosen_class_samples,random_state=69).index.tolist()
-        other_classes_indices = downsampled_df[downsampled_df[label_name] != chosen_class].groupby(label_name,group_keys=False).apply(
-            lambda x: x.sample(other_classes_samples,random_state=69).index.tolist()
-        ).explode().tolist()
+
         if other_classes_percentage == 0.0:
             other_classes_indices = []
+        else:
+            other_classes_indices = downsampled_df[downsampled_df[label_name] != chosen_class].groupby(label_name,
+                                                                                                       group_keys=False).apply(
+                lambda x: x.sample(other_classes_samples, random_state=69).index.tolist()
+            ).explode().tolist()
         partition_indices = chosen_class_indices + other_classes_indices
         downsampled_df = downsampled_df.drop(index=partition_indices)
         partition_indices = list(numpy.asarray(partition_indices) + 1)
@@ -258,7 +260,7 @@ def create_unbalanced_splits(df:pd.DataFrame,label_name:str,unweight_step:int):
                 partitions_dict["class "+str(class_name)].append(other_classes_samples)
 
     for count,i in enumerate(range(69,69+10)):
-        test_df = remaining_df.groupby(label_name,group_keys=False).apply(lambda x: x.sample(int(1000/num_classes),random_state=i))
+        test_df = remaining_df.groupby(label_name,group_keys=False).apply(lambda x: x.sample(floor(700/num_classes),random_state=i))
         test_df.to_csv(configs["data_directory"]+ "unweighted_test_df_"+str(count)+".csv",index=False)
     return pd.DataFrame(partitions_dict,index=clients),partitions_list
 

@@ -48,7 +48,7 @@ else:
     rows_to_keep = None
 # Load and preprocess data
 df = load_data(datapath,rows_to_keep)
-#log_df_info(df, configs["label"])
+log_df_info(df, configs["label"])
 df = preprocess_data(df)
 train_ds,test_ds = df_train_test_dataset(df, kfold_num=args.random_state, random_state=args.run_repeat,label=configs.get("label"),scale=configs.get("scale"))
 print("Loading data backend dataset of client has num of examples",train_ds.cardinality())
@@ -62,17 +62,19 @@ class Client(fl.client.NumPyClient):
         return model.get_weights()
 
     def fit(self, parameters, config):
-        # tf.print(f"Materializing data for client {args.client_index}"
-        #          f"Train dataset has size {train_ds.cardinality()}",
-        #          f"Test dataset has size {test_ds.cardinality()}")
-        # #for i in range(0,5):
-        # tf.print(f"train dataset entry {0} from client {args.client_index} is {list(train_ds.as_numpy_iterator())[0]}")
-        # tf.print(f"test dataset entry {0} from client {args.client_index} is {list(test_ds.as_numpy_iterator())[0]}")
+        tf.print(f"Materializing data for client {args.client_index}"
+                 f"Train dataset has size {train_ds.cardinality()}",
+                 f"Test dataset has size {test_ds.cardinality()}")
+        #for i in range(0,5):
+        tf.print(f"train dataset entry {0} from client {args.client_index} is {list(train_ds.as_numpy_iterator())[0]}")
+        tf.print(f"test dataset entry {0} from client {args.client_index} is {list(test_ds.as_numpy_iterator())[0]}")
         model.set_weights(parameters)
+        if args.client_index == 0:
+            tf.print(f"Model weights before training {model.get_weights()}")
         preprocessed_ds = preprocess(train_ds,epochs=config["local_epochs"],seed = config["server_round"])
         print(f"epochs are {config['local_epochs']}")
-        # tf.print(
-        #     f"preprocessed dataset entry {0} from client {args.client_index} is {list(preprocessed_ds.as_numpy_iterator())[0]}")
+        tf.print(
+            f"preprocessed dataset entry {0} from client {args.client_index} is {list(preprocessed_ds.as_numpy_iterator())[0]}")
         begin = tf.timestamp()
         model.fit(preprocessed_ds)
         end = tf.timestamp()
