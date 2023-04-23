@@ -152,6 +152,7 @@ class Server:
                 if res_cen is not None:
                     loss_cen, metrics_cen = res_cen
                     metrics_cen = {key + '_global': value for key, value in metrics_cen.items()}
+                    metrics_cen["loss_global"] = loss_cen
                     wandb.log(metrics_cen,step=current_round)
                     log(
                         INFO,
