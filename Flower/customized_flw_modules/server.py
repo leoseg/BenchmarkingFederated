@@ -92,7 +92,7 @@ class Server:
     # pylint: disable=too-many-locals
     def fit(self, num_rounds: int, timeout: Optional[float]) -> History:
         """Run federated averaging for a number of rounds."""
-        self.client_manager().wait_for(self.num_clients,600000)
+        #self.client_manager().wait_for(self.num_clients,600000)
         history = History()
 
         # Initialize parameters
@@ -131,8 +131,8 @@ class Server:
             partitions_list = pickle.load(file)
         wandb.log({"partitions_list":partitions_list})
         # If unweighted step is set reads number of samples per class per clients and log to wandb
-        if self.unweighted >= 0.0:
-            wandb.log({f"class_num_table_{int(self.unweighted)}":pd.read_csv(f"partitions_dict_{int(self.unweighted)}.csv")})
+        # if self.unweighted >= 0.0:
+        #     wandb.log({f"class_num_table_{int(self.unweighted)}":pd.read_csv(f"partitions_dict_{int(self.unweighted)}.csv")})
         for current_round in range(1, num_rounds + 1):
             begin = tf.timestamp()
             # Train model and replace previous global model
