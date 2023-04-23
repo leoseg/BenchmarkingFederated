@@ -1,10 +1,6 @@
 import argparse
 import os
 import flwr as fl
-import numpy as np
-from keras.utils import set_random_seed
-
-from evaluation_utils import evaluate_model, load_test_data_for_evaluation
 from utils.models import get_model
 from utils.data_utils import df_train_test_dataset, preprocess, load_data, preprocess_data, log_df_info
 import tensorflow as tf
