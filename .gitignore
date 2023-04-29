@@ -4,6 +4,7 @@
 __pycache__/
 *.py[cod]
 *$py.class
+secrets.yaml
 TensorflowFederated/timelogs/tff_logs_time.txt
 Flower/timelogs/flw_logs_time.txt
 # C extensions
