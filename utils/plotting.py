@@ -125,11 +125,11 @@ def create_dfs_for_fl_metric(rounds_metrics,metric_name:str):
     return df
 
 
-def seaborn_plot (x,y,hue,data,palette,title,dodge=True):
+def seaborn_plot (x,metric_name,hue,data,palette,title,dodge=True,configuration_name="Number of Rounds"):
     """
     Plots a seaborn boxplot to easy exchange plottype
     :param x: x axis data
-    :param y: y axis data
+    :param metric_name: metric nane
     :param hue: hue data
     :param data: data to plot
     :param palette: color palette
@@ -137,11 +137,22 @@ def seaborn_plot (x,y,hue,data,palette,title,dodge=True):
     :param dodge: dodge parameter
     :return:
     """
-    sns.boxplot(x=x, y=y, hue=hue,
+    ax = sns.boxplot(x=x, y="metric", hue=hue,
                 data=data, palette=palette, dodge=dodge).set_title(title)
+    # set y axis title to metric name
+    plt.ylabel(metric_name)
+    # set x axis title to group name
+    plt.xlabel(configuration_name)
+    if configuration_name == "Percentage of chosen class":
+        if configs.get("usecase") == 1 or configs.get("usecase") == 2:
+            start_value = 50
+        else:
+            start_value = 20
+        ax.set_xticklabels([(x *5 + start_value) for x in data[x].unique()])
+
     plt.show()
 
-def plot_swarmplots(df,metric_name:str):
+def plot_swarmplots(df,metric_name:str,configuration_name:str):
     """
     Plots swarmplots for the given df which contains all data for onem metric
     :param df: df with all data for one metric
@@ -150,16 +161,20 @@ def plot_swarmplots(df,metric_name:str):
     for index,round_num in enumerate(ROUNDS):
         round_df = df[df["round configuration"] == "central"]
         round_df = pd.concat([round_df,df[df["round configuration"] == round_num]],ignore_index=True)
-        seaborn_plot("group", "metric", "framework", round_df, "Set2", f"Round configuration {round_num}")
+        seaborn_plot("group", metric_name, "framework", round_df, "Set2",
+                     f"Round configuration {round_num}",configuration_name=configuration_name)
         plt.show()
-    seaborn_plot("group", "metric", "framework", df, "Set2", f"Round configuration sumarized")
-    seaborn_plot("round configuration", "metric", "framework", df, "Set2", f"Group sumarized")
+    seaborn_plot("group", metric_name, "framework", df, "Set2", f"Round configuration summarized",
+                 configuration_name=configuration_name)
+    seaborn_plot("round configuration", metric_name, "framework", df, "Set2", f"Group summarized",
+                 configuration_name=configuration_name)
     for group in df["group"].unique():
         if group == "central":
             continue
         group_df = df[df["group"] == "central"]
         group_df = pd.concat([group_df,df[df["group"] == group]],ignore_index=True)
-        seaborn_plot("round configuration", "metric", "framework", group_df, "Set2", f"Group {group}")
+        seaborn_plot("round configuration", metric_name, "framework", group_df, "Set2", f"Group {group}",
+                     configuration_name=configuration_name)
 
 
 
