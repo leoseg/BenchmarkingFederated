@@ -138,7 +138,8 @@ def seaborn_plot (x,metric_name,hue,data,palette,title,dodge=True,configuration_
     :return:
     """
     ax = sns.boxplot(x=x, y="metric", hue=hue,
-                data=data, palette=palette, dodge=dodge).set_title(title)
+                data=data, palette=palette, dodge=dodge)
+    ax.set_title(title)
     # set y axis title to metric name
     plt.ylabel(metric_name)
     # set x axis title to group name
@@ -148,7 +149,7 @@ def seaborn_plot (x,metric_name,hue,data,palette,title,dodge=True,configuration_
             start_value = 50
         else:
             start_value = 20
-        ax.set_xticklabels([(x *5 + start_value) for x in data[x].unique()])
+        ax.set_xticklabels([(int(float(x)) *5 + start_value) for x in data[x].unique()])
 
     plt.show()
 
@@ -166,15 +167,13 @@ def plot_swarmplots(df,metric_name:str,configuration_name:str):
         plt.show()
     seaborn_plot("group", metric_name, "framework", df, "Set2", f"Round configuration summarized",
                  configuration_name=configuration_name)
-    seaborn_plot("round configuration", metric_name, "framework", df, "Set2", f"Group summarized",
-                 configuration_name=configuration_name)
+    seaborn_plot("round configuration", metric_name, "framework", df, "Set2", f"Group summarized")
     for group in df["group"].unique():
         if group == "central":
             continue
         group_df = df[df["group"] == "central"]
         group_df = pd.concat([group_df,df[df["group"] == group]],ignore_index=True)
-        seaborn_plot("round configuration", metric_name, "framework", group_df, "Set2", f"Group {group}",
-                     configuration_name=configuration_name)
+        seaborn_plot("round configuration", metric_name, "framework", group_df, "Set2", f"Group {group}")
 
 
 
