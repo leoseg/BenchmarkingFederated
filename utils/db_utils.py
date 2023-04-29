@@ -44,7 +44,7 @@ class MongoDBHandler:
             secrets = yaml.safe_load(file)
             return secrets["mongodb_adress"]
 
-    def get_data_by_name(self, name):
+    def get_data_by_name(self, name) ->list:
         """
         Get data from a document by its name.
 
