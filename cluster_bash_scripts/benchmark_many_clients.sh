@@ -1,7 +1,6 @@
 #!/bin/bash
 #SBATCH -J tff_bal
 #SBATCH --time=2-00:00:00
-#SBATCH --ntasks=1
 #SBATCH --partition=clara
 #SBATCH --cpus-per-task=111
 #SBATCH --mem=200G
