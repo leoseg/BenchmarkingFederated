@@ -38,6 +38,12 @@ if [ $FRAMEWORK = "TFF" ];then
     done
 fi
 if [ $FRAMEWORK = "FLWR" ];then
+  python3.10 -m venv venvFlwr
+  source venvFlwr/bin/activate
+  python3 -c 'import sys; print(sys.version_info[:])'
+  pip3 install --upgrade pip
+  pip install -e utils
+  pip3 install -r requirements.txt
   cd Flower || exit
   # Choose rounds configuration depending on usecase
   if [ $3 =  "1" ] ||  [ $3 = "3" ] || [ $3 = "4" ]; then
