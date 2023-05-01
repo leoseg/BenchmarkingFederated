@@ -149,7 +149,9 @@ def seaborn_plot (x,metric_name,hue,data,palette,title,dodge=True,configuration_
             start_value = 50
         else:
             start_value = 20
-        ax.set_xticklabels([(int(float(x)) *5 + start_value) for x in data[x].unique()])
+        x_ticks = [(int(float(x)) *5 + start_value) for x in data[x].unique() if x != "central"]
+        x_ticks.append("central")
+        ax.set_xticklabels(x_ticks)
 
     plt.show()
 
