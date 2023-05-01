@@ -31,10 +31,10 @@ if [ $FRAMEWORK = "TFF" ];then
     # Loops trough round and number of clients configuration
     for rounds in "${round_config[@]}";
     do
-      for client_num in {50}
-      do
-        bash tff_balanced_benchmark.sh $DATA_PATH $client_num $rounds $WANDB_API_KEY $NUM_REPEATS $SYSTEM_ONLY
-      done
+#      for client_num in {50}
+#      do
+        bash tff_balanced_benchmark.sh $DATA_PATH 50 $rounds $WANDB_API_KEY $NUM_REPEATS $SYSTEM_ONLY
+#      done
     done
 fi
 if [ $FRAMEWORK = "FLWR" ];then
@@ -54,9 +54,9 @@ if [ $FRAMEWORK = "FLWR" ];then
   # Loops trough round and number of clients configuration
   for rounds in "${round_config[@]}";
   do
-    for client_num in {50}
-    do
-      bash flwr_balanced_benchmark.sh $DATA_PATH $client_num $rounds $WANDB_API_KEY $NUM_REPEATS $SYSTEM_ONLY
-    done
+#    for client_num in { 50 }
+#    do
+      bash flwr_balanced_benchmark.sh $DATA_PATH 50 $rounds $WANDB_API_KEY $NUM_REPEATS $SYSTEM_ONLY
+#    done
   done
 fi
