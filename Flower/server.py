@@ -86,7 +86,7 @@ else:
 print("Starting flowerserver with args:\n")
 print(args)
 start_server(
-    server_address="0.0.0.0:8020",
+    server_address="0.0.0.0:8150",
     server=Server(
         data_path=args.data_path,
         num_clients=args.num_clients,

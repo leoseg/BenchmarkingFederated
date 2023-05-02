@@ -91,4 +91,4 @@ class Client(fl.client.NumPyClient):
 # Start Flower client
 print("Starting flowerclient with args:\n")
 print(args)
-fl.client.start_numpy_client(server_address="127.0.0.1:8020", client=Client())
+fl.client.start_numpy_client(server_address="127.0.0.1:8150", client=Client())
