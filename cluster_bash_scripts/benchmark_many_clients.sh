@@ -47,9 +47,9 @@ if [ $FRAMEWORK = "FLWR" ];then
   cd Flower || exit
   # Choose rounds configuration depending on usecase
   if [ $3 =  "1" ] ||  [ $3 = "3" ] || [ $3 = "4" ]; then
-     round_config=(1 10)
+     round_config=(1 2 5 10)
   elif [  $3 = "2" ]; then
-     round_config=(1 8)
+     round_config=(1 2 4 8)
   fi
   # Loops trough round and number of clients configuration
   for rounds in "${round_config[@]}";
