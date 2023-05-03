@@ -26,7 +26,7 @@ def get_group_stats(project:str,groups:list,version:str,metric_names:list,mode:s
         runs = api.runs(f"{ENTITY}/{project}",filters={"group": group})
         metrics_dicts = []
         for run in runs:
-            if run.config.get("version") == version:
+            if run.config.get("version") == version or version is None:
                 metrics_dicts.append(get_metrics_from_run(run, metric_names,group,mode))
         metrics  = put_metrics_together(metrics_dicts)
         project_metrics[group] = metrics
@@ -150,10 +150,43 @@ def seaborn_plot (x,metric_name,hue,data,palette,title,dodge=True,configuration_
         else:
             start_value = 20
         x_ticks = [(int(float(x)) *5 + start_value) for x in data[x].unique() if x != "central"]
-        x_ticks.append("central")
         ax.set_xticklabels(x_ticks)
 
     plt.show()
+
+def plot_heatmap(df,framework,standard_deviation=False,unweighted=False):
+    """
+    Plots a heatmap for the given df which contains all data for one metric
+    :param df: df with all data for one metric
+    :param framework: framework name
+    :param standard_deviation: if true, the standard deviation is plotted instead of the mean
+    :return:
+    """
+
+    df =df[df["framework"] == framework]
+    if unweighted:
+        df["group"] = df["group"].astype(float)
+    df["group"] = df["group"].astype(int)
+
+    if standard_deviation:
+        df = df.pivot_table(index="group",columns="round configuration",values= "metric",aggfunc="std")
+    else:
+        df = df.pivot_table(index="group",columns="round configuration",values= "metric")
+   # df = df.pivot("group", "round configuration", "metric")
+
+    ax = sns.heatmap(df,cmap="rocket_r")
+    y_title = "Number of clients"
+    if unweighted:
+        y_title = "Percentage of chosen class"
+        if configs.get("usecase") == 1 or configs.get("usecase") == 2:
+            start_value = 50
+        else:
+            start_value = 20
+        x_ticks = [(int(float(x)) *5 + start_value) for x in df["group"].unique() if x != "central"]
+        ax.set_yticklabels(x_ticks)
+    plt.ylabel(y_title)
+    plt.show()
+
 
 def plot_swarmplots(df,metric_name:str,configuration_name:str):
     """
@@ -230,6 +263,7 @@ def get_system_metrics(history, metric_names, group):
     if "client_time" in metrics.keys() and "round_time" in metrics.keys():
         # if both client_time and round_time are in the metric_names, get the time_diff
         metrics["time_diff"] = metrics["round_time"] - metrics["client_time"]
+        metrics["time_diff_percentage"] = metrics["time_diff"] / metrics["client_time"]
     if "total_memory_client" in metrics.keys() and "total_memory_server" in metrics.keys():
         # if both memory_client and memory_server are in metric_names calculate the sum
         # of both metrics summed up

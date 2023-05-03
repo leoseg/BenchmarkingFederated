@@ -86,12 +86,15 @@ for count,(train,test) in enumerate(kfold.split(X,Y)):
         scaler = StandardScaler()
         X_train = scaler.fit_transform(X_train)
         X_test = scaler.transform(X_test)
-
+    if configs.get("usecase") != 2:
+        validation_steps = configs.get("epochs")/10
+    else:
+        validation_steps = 1
     model = get_model(input_dim=X_train.shape[1], num_nodes=num_nodes,dropout_rate=dropout_rate, l1_v=l1_v, l2_v=configs.get("l2_v"))
     model.compile(optimizer=configs.get("optimizer"),
                   loss=configs.get("loss"),
                   metrics=configs.get("metrics"))
-    model.fit(X_train, Y[train], epochs=configs.get("epochs"),batch_size=configs.get("batch_size"),callbacks=[wandb_callback])
+    model.fit(X_train, Y[train], epochs=configs.get("epochs"),batch_size=configs.get("batch_size"),callbacks=[wandb_callback],validation_steps=validation_steps, validation_data=(X_test, Y[test]))
 
     #evaluate
     score = model.evaluate(X_test, Y[test], verbose = 0,return_dict=True)
