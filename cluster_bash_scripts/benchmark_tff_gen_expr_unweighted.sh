@@ -22,13 +22,13 @@ pip3 install -r requirements.txt
 cd TensorflowFederated || exit
 # Choose rounds configuration depending on usecase
 if [ $3 =  "1" ] ||  [ $3 = "3" ] || [ $3 = "4" ]; then
-   round_config=(1 2 5 10)
+   round_config=(2)
 elif [  $3 = "2" ]; then
    round_config=(1 2 4 8)
 fi
 # Choose step config for "unweighting" the class distribution on each client
 if [ $3 =  "1" ] ||  [ $3 = "2" ]; then
-   unweight_config=(0 2 4 6 8 9 10)
+   unweight_config=(8)
    num_clients=2
 elif [  $3 = "3" ] || [ $3 = "4" ]; then
    unweight_config=(0 4 8 10 12 14 16)
