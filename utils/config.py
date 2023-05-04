@@ -6,7 +6,7 @@ from keras.losses import BinaryCrossentropy,SparseCategoricalCrossentropy
 tff_time_logging_directory = "timelogs/tff_logs_time.txt"
 flw_time_logging_directory = "timelogs/flw_logs_time.txt"
 SEED = 42
-version = "essential_seeds_42"
+version = "loss_tracking_central"
 n_splits = 5
 DATA_PATH = ""
 if os.environ["USECASE"] == "test":
@@ -146,6 +146,6 @@ else:
         input_dim=12708,
         number_of_classes =1,
         random_seed_set = True,
-        version="unbalanced_with_global_evaluation",
+        version=version,
         data_directory="../DataGenExpression/"
     )

@@ -3,12 +3,77 @@ import pandas as pd
 import seaborn as sns
 from config import configs
 import matplotlib.pyplot as plt
+import numpy as np
 ENTITY = "Scads"
 if configs.get("usecase") == 2:
     ROUNDS = [1,2,4,8]
 else:
     ROUNDS = [1,2,5,10]
 
+
+
+def get_loss_stats(groups:list,version:str,mode:str):
+    data_path = configs.get("data_path").split("/")[-1].split(".")[0]
+    usecase = configs.get("usecase")
+    project_prefix = "usecase"
+    if mode == "unweighted":
+        project_prefix = "unweightusecase"
+    project = f"{project_prefix}_{str(usecase)}_benchmark_rounds_{10}_{data_path}_model_metrics"
+    if mode == "central":
+        project = "central_model_metrics"
+    api = wandb.Api()
+    project_metrics = {}
+    for group in groups:
+        runs = api.runs(f"{ENTITY}/{project}",filters={"group": group})
+        losses = []
+        for run in runs:
+            if run.config.get("version") == version and run.name != "no_crossfold":
+                history = run.history()
+                if mode == "unweighted":
+                    loss = history.get("loss_global")
+                elif mode == "central" and run.name != "no_crossfold":
+                    loss = history.get("val_loss")
+                else:
+                    loss = history.get("loss")
+                losses.append(loss.dropna().tolist())
+        means = np.mean(np.array(losses),axis=0).tolist()
+        project_metrics[group] = means
+    return project_metrics
+
+
+def create_loss_df(metrics_dict):
+    """
+
+    :param metrics_dict:
+    :return:
+    """
+    total_rows = []
+    for key,value in metrics_dict.items():
+        if key.startswith("usecase"):
+            group = "central"
+            framework = "central"
+        else:
+            group = key.split("_")[1]
+            framework = key.split("_")[0]
+        rows = []
+        for i in range(len(value)):
+            rows.append({"round":i+1,"loss":value[i],"group":group,"framework":framework})
+        total_rows.extend(rows)
+    df = pd.DataFrame(total_rows)
+    return df
+
+def create_loss_line_plot(df):
+
+    ax = sns.lineplot(df, x="round", y="loss", hue="framework")
+    plt.xlabel("Round(FL)/Epoch(central)")
+    num_rounds = 10
+    if configs.get('usecase') == 2:
+        num_rounds = 8
+    ticks = [f"{element}/{int(element * configs.get('epochs') / num_rounds)}" for element in
+             df["round"].unique().tolist()]
+    ax.set_xticks(df["round"].unique().tolist())
+    ax.set_xticklabels(ticks)
+    plt.show()
 
 def get_group_stats(project:str,groups:list,version:str,metric_names:list,mode:str):
     """
@@ -137,7 +202,7 @@ def seaborn_plot (x,metric_name,hue,data,palette,title,dodge=True,configuration_
     :param dodge: dodge parameter
     :return:
     """
-    ax = sns.boxplot(x=x, y="metric", hue=hue,
+    ax = sns.barplot(x=x, y="metric", hue=hue,
                 data=data, palette=palette, dodge=dodge)
     ax.set_title(title)
     # set y axis title to metric name
@@ -154,13 +219,13 @@ def seaborn_plot (x,metric_name,hue,data,palette,title,dodge=True,configuration_
 
     plt.show()
 
-def plot_heatmap(df,framework,standard_deviation=False,unweighted=False):
+def plot_heatmap(df,framework,standard_deviation=False,unweighted=False,scale=None):
     """
     Plots a heatmap for the given df which contains all data for one metric
     :param df: df with all data for one metric
     :param framework: framework name
     :param standard_deviation: if true, the standard deviation is plotted instead of the mean
-    :return:
+    :return: returns scale so it can be used for latter plots
     """
 
     df =df[df["framework"] == framework]
@@ -173,8 +238,9 @@ def plot_heatmap(df,framework,standard_deviation=False,unweighted=False):
     else:
         df = df.pivot_table(index="group",columns="round configuration",values= "metric")
    # df = df.pivot("group", "round configuration", "metric")
-
-    ax = sns.heatmap(df,cmap="rocket_r")
+    if scale is None:
+        scale = [df.min().min(),df.max().max()]
+    ax = sns.heatmap(df,cmap="rocket_r",vmin=scale[0],vmax=scale[1])
     y_title = "Number of clients"
     if unweighted:
         y_title = "Percentage of chosen class"
@@ -182,11 +248,11 @@ def plot_heatmap(df,framework,standard_deviation=False,unweighted=False):
             start_value = 50
         else:
             start_value = 20
-        x_ticks = [(int(float(x)) *5 + start_value) for x in df["group"].unique() if x != "central"]
+        x_ticks = [(int(float(x)) *5 + start_value) for x in df.index if x != "central"]
         ax.set_yticklabels(x_ticks)
     plt.ylabel(y_title)
     plt.show()
-
+    return scale
 
 def plot_swarmplots(df,metric_name:str,configuration_name:str):
     """
