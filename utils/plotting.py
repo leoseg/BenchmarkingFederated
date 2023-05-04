@@ -97,7 +97,13 @@ def get_group_stats(project:str,groups:list,version:str,metric_names:list,mode:s
         project_metrics[group] = metrics
     return project_metrics
 
-
+def group_scenarios(scenarios:list):
+    """
+    Group a list of dataframes by a column and return a df with the means over that column
+    """
+    df = pd.concat(scenarios)
+    df.groupby([df.index,'framework', 'round configuration'], as_index=False).agg({'metric': 'mean'})
+    return df
 
 def get_stats_for_usecase(groups,version = None,mode="balanced",rounds=None):
     """
@@ -142,7 +148,6 @@ def transform_scenario_metrics_to_df(metrics:dict,metric_name:str,round_num):
     """
     dfs= []
     for groupname,metrics in metrics.items():
-        for i in range(len(metrics[metric_name])):
             dfs.append(transform_to_df(metrics,metric_name,groupname.split("_")[0],groupname.split("_")[1],round_num, round_num))
     df = pd.concat(dfs)
     return df
