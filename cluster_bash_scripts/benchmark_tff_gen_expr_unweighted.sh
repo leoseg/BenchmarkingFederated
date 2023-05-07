@@ -22,7 +22,7 @@ pip3 install -r requirements.txt
 cd TensorflowFederated || exit
 # Choose rounds configuration depending on usecase
 if [ $3 =  "1" ] ||  [ $3 = "3" ] || [ $3 = "4" ]; then
-   round_config=(2)
+   round_config=(2 10)
 elif [  $3 = "2" ]; then
    round_config=(1 2 4 8)
 fi
@@ -31,7 +31,7 @@ if [ $3 =  "1" ] ||  [ $3 = "2" ]; then
    unweight_config=(8)
    num_clients=2
 elif [  $3 = "3" ] || [ $3 = "4" ]; then
-   unweight_config=(0 4 8 10 12 14 16)
+   unweight_config=(8)
    num_clients=5
 fi
 # Loops trough configurations
