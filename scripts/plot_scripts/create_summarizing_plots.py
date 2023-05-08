@@ -1,41 +1,64 @@
-from utils.plotting import plot_swarmplots,create_dfs_for_fl_metric,transform_to_df, plot_heatmap
+from utils.plotting import plot_swarmplots, create_dfs_for_fl_metric, transform_to_df, plot_heatmap, \
+    create_loss_df, group_scenarios, create_loss_line_plot, calc_scale
 from config import configs
 from utils.db_utils import MongoDBHandler
 import pandas as pd
 
 
 mongodb = MongoDBHandler()
-for mode in ["unweighted"]:
-    metric = "binary_accuracy_global"
-    scenario_metrics = mongodb.get_data_by_name(f"scenario_metrics_{configs.get('usecase')}_{mode}")
-    df = create_dfs_for_fl_metric(rounds_metrics=scenario_metrics,metric_name=metric)
-    if mode != "unweighted":
-        central= mongodb.get_data_by_name(f"central_metrics_{configs.get('usecase')}_{mode}")
-        central = { key.split("eval_",1)[1] : central[key] for key in central.keys()}
-        central_df = transform_to_df(central,metric_name=metric,framework="central",group="central",round_configuration="central")
-        df = pd.concat([central_df, df])
-    scale = plot_heatmap(df,"tff",standard_deviation=False,unweighted=True)
-    plot_heatmap(df,"flwr",unweighted=True,scale=scale)
-    scale = plot_heatmap(df,"tff",standard_deviation=True,unweighted=True)
-    plot_heatmap(df,"flwr",standard_deviation=True,unweighted=True,scale=scale)
-    plot_swarmplots(df,metric,"Number of clients")
-# for mode in ["balanced"]:
-#     metric = "prauc"
-#     scenario_metrics = mongodb.get_data_by_name(f"scenario_metrics_{configs.get('usecase')}_{mode}")
-#     df = create_dfs_for_fl_metric(rounds_metrics=scenario_metrics, metric_name=metric)
-#     if mode != "unweighted":
-#         central = mongodb.get_data_by_name(f"central_metrics_{configs.get('usecase')}_{mode}")
-#         central_df = transform_to_df(central, metric_name=metric, framework="central", group="central",
-#                                      round_configuration="central")
-#         df = pd.concat([central_df, df])
-#     plot_swarmplots(df, metric, "Percentage of chosen class")
-    # metric = "auc"
-    # scenario_metrics = mongodb.get_data_by_name(f"scenario_metrics_{configs.get('usecase')}_{mode}")
-    # df = create_summarize_dataframe_from_metrics(data=scenario_metrics,metric_name=metric,rounds=[1,3,5,10])
-    # round_headers = [ "Round 1 TFF", "Round 1 Flwr","Round 10 TFF", "Round 10 Flwr"]
-    # central = mongodb.get_data_by_name(f"central_metrics_{configs.get('usecase')}_{mode}")
-    # central_df = transform_central_metric_to_df(central,metric_name=metric)
-    #
-    # headers = ["Number of clients"] + round_headers
-    # transform_df_to_latex(df,headers=headers,rows_to_include=["round 1 tff","round 1 flwr","round 10 tff","round 10 flwr"],central_df=central_df)
-
+for mode in ["unweighted","balanced","system"]:
+    plot_path = configs.get("plot_path") + mode + "/"
+    unweighted = False
+    match mode:
+        case "unweighted":
+            if configs.get("usecase") == 1 or configs.get("usecase") == 2:
+                metric1 = "binary_accuracy_global"
+            else:
+                metric1 = "sparse_categorical_accuracy_global"
+            metric2 = "auc_global"
+            metric1_name = "Accuracy"
+            metric2_name = "AUC"
+            unweighted = True
+        case "balanced":
+            if configs.get("usecase") == 1 or configs.get("usecase") == 2:
+                metric1 = "binary_accuracy"
+            else:
+                metric1 = "sparse_categorical_accuracy"
+            metric2 = "auc"
+            metric1_name = "Accuracy"
+            metric2_name = "AUC"
+        case "system":
+            metric1 = "total_memory"
+            metric1_name = "Memory usage"
+            metric2 = "round_time"
+            metric2_name = "Training time"
+    for metric,metric_name in zip([metric1,metric2],[metric1_name,metric2_name]):
+        scenario_metrics = mongodb.get_data_by_name(f"scenario_metrics_{configs.get('usecase')}_{mode}")
+        df = create_dfs_for_fl_metric(rounds_metrics=scenario_metrics,metric_name=metric)
+        if mode != "unweighted":
+            central= mongodb.get_data_by_name(f"central_metrics_{configs.get('usecase')}_{mode}")
+            if mode == "balanced":
+                central = { key.split("eval_",1)[1] : central[key] for key in central.keys()}
+            if metric == "round_time":
+                central_metric = "training_time"
+            if metric == "total_memory":
+                central_metric = "total_memory_central"
+            else:
+                central_metric = metric
+            central_df = transform_to_df(central,metric_name=central_metric,framework="central",group="central",round_configuration="central")
+            df = pd.concat([central_df, df])
+        #scale =  calc_scale(df,mode)
+        df = df.pivot_table(index="group", columns="round configuration", values="metric", aggfunc="mean")
+        scale = [df.min().min(), df.max().max()]
+        plot_heatmap(df,"tff",standard_deviation=False,unweighted=unweighted,metric_name=metric_name,data_path=plot_path,scale=scale)
+        plot_heatmap(df,"flwr",unweighted=unweighted,scale=scale,metric_name=metric_name,data_path=plot_path)
+        df = df.pivot_table(index="group", columns="round configuration", values="metric", aggfunc="std")
+        scale = [df.min().min(), df.max().max()]
+        plot_heatmap(df,"tff",standard_deviation=True,unweighted=unweighted,metric_name=metric_name,data_path=plot_path,scale=scale)
+        plot_heatmap(df,"flwr",standard_deviation=True,unweighted=unweighted,scale=scale,metric_name=metric_name,data_path=plot_path)
+        for plot_type in ["box","bar"] :
+            plot_swarmplots(df,metric,"Number of clients",data_path=plot_path,plot_type=plot_type,scale=None)
+    if mode in ["balanced","unweighted"]:
+        loss_metrics = mongodb.get_data_by_name(f"Loss_data_usecase_{configs.get('usecase')}_{mode}")
+        loss_df = create_loss_df(loss_metrics)
+        create_loss_line_plot(loss_df,plot_path=plot_path)

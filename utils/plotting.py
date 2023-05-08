@@ -17,7 +17,7 @@ def get_loss_stats(groups:list,version:str,mode:str):
     usecase = configs.get("usecase")
     project_prefix = "usecase"
     if mode == "unweighted":
-        project_prefix = "unweightusecase"
+        project_prefix = "unweightedusecase"
     project = f"{project_prefix}_{str(usecase)}_benchmark_rounds_{10}_{data_path}_model_metrics"
     if mode == "central":
         project = "central_model_metrics"
@@ -27,7 +27,7 @@ def get_loss_stats(groups:list,version:str,mode:str):
         runs = api.runs(f"{ENTITY}/{project}",filters={"group": group})
         losses = []
         for run in runs:
-            if run.config.get("version") == version and run.name != "no_crossfold":
+            if (run.config.get("version") == version or run.config.get("version") == "unbalanced_with_global_evaluation") and run.name != "no_crossfold":
                 history = run.history()
                 if mode == "unweighted":
                     loss = history.get("loss_global")
@@ -35,7 +35,10 @@ def get_loss_stats(groups:list,version:str,mode:str):
                     loss = history.get("val_loss")
                 else:
                     loss = history.get("loss")
-                losses.append(loss.dropna().tolist())
+                if run.state == "crashed":
+                    continue
+                else:
+                    losses.append(loss.dropna().tolist())
         means = np.mean(np.array(losses),axis=0).tolist()
         project_metrics[group] = means
     return project_metrics
@@ -62,7 +65,7 @@ def create_loss_df(metrics_dict):
     df = pd.DataFrame(total_rows)
     return df
 
-def create_loss_line_plot(df):
+def create_loss_line_plot(df,plot_path:str):
 
     ax = sns.lineplot(df, x="round", y="loss", hue="framework")
     plt.xlabel("Round(FL)/Epoch(central)")
@@ -73,7 +76,9 @@ def create_loss_line_plot(df):
              df["round"].unique().tolist()]
     ax.set_xticks(df["round"].unique().tolist())
     ax.set_xticklabels(ticks)
+    plt.savefig(plot_path + "loss.png")
     plt.show()
+
 
 def get_group_stats(project:str,groups:list,version:str,metric_names:list,mode:str):
     """
@@ -97,13 +102,16 @@ def get_group_stats(project:str,groups:list,version:str,metric_names:list,mode:s
         project_metrics[group] = metrics
     return project_metrics
 
-def group_scenarios(scenarios:list):
+def group_scenarios(scenarios:list,group_factor):
     """
     Group a list of dataframes by a column and return a df with the means over that column
     """
     df = pd.concat(scenarios)
-    df.groupby([df.index,'framework', 'round configuration'], as_index=False).agg({'metric': 'mean'})
+    df = df.groupby([df.index,'framework', group_factor], as_index=False).agg({'metric': 'mean'})
     return df
+
+
+
 
 def get_stats_for_usecase(groups,version = None,mode="balanced",rounds=None):
     """
@@ -195,7 +203,7 @@ def create_dfs_for_fl_metric(rounds_metrics,metric_name:str):
     return df
 
 
-def seaborn_plot (x,metric_name,hue,data,palette,title,dodge=True,configuration_name="Number of Rounds"):
+def seaborn_plot (x,metric_name,hue,data,palette,title,data_path,dodge=True,configuration_name="Number of Rounds", plot_type="box",scale=None):
     """
     Plots a seaborn boxplot to easy exchange plottype
     :param x: x axis data
@@ -205,13 +213,27 @@ def seaborn_plot (x,metric_name,hue,data,palette,title,dodge=True,configuration_
     :param palette: color palette
     :param title: title of the plot
     :param dodge: dodge parameter
+    :param configuration_name: name of the configuration
+    :param save_fig_ext: extension for saving the figure
+    :param data_path: path to the data
     :return:
     """
-    ax = sns.barplot(x=x, y="metric", hue=hue,
-                data=data, palette=palette, dodge=dodge)
+    match plot_type:
+        case "box":
+            ax = sns.boxplot(x=x, y="metric", hue=hue,
+                 data=data, palette=palette, dodge=dodge)
+        case "bar":
+            ax = sns.barplot(x=x, y="metric", hue=hue,
+            data=data, palette=palette, dodge=dodge)
+        case "box_points":
+            ax = sns.boxplot(x=x, y="metric", hue=hue,
+                 data=data, palette=palette, dodge=dodge)
+            sns.stripplot(data=data,x=x, y="metric", hue=hue,dodge=True)
     ax.set_title(title)
     # set y axis title to metric name
     plt.ylabel(metric_name)
+    if scale is not None:
+        plt.ylim(scale[0],scale[1])
     # set x axis title to group name
     plt.xlabel(configuration_name)
     if configuration_name == "Percentage of chosen class":
@@ -222,14 +244,19 @@ def seaborn_plot (x,metric_name,hue,data,palette,title,dodge=True,configuration_
         x_ticks = [(int(float(x)) *5 + start_value) for x in data[x].unique() if x != "central"]
         ax.set_xticklabels(x_ticks)
 
+    plt.savefig(data_path+metric_name + "_" +title + plot_type+".png")
     plt.show()
 
-def plot_heatmap(df,framework,standard_deviation=False,unweighted=False,scale=None):
+
+def plot_heatmap(df,framework,metric_name,data_path,standard_deviation=False,unweighted=False,scale=None):
     """
     Plots a heatmap for the given df which contains all data for one metric
     :param df: df with all data for one metric
     :param framework: framework name
     :param standard_deviation: if true, the standard deviation is plotted instead of the mean
+    :param unweighted: if true, the unweighted usecase is plotted
+    :param scale: scale for the heatmap
+    :param data_path: path to the data
     :return: returns scale so it can be used for latter plots
     """
 
@@ -237,7 +264,13 @@ def plot_heatmap(df,framework,standard_deviation=False,unweighted=False,scale=No
     if unweighted:
         df["group"] = df["group"].astype(float)
     df["group"] = df["group"].astype(int)
-
+    if standard_deviation:
+        type_of= "stdv"
+        title = "Standard deviation of " + metric_name + " for " + framework
+    else:
+        title = "Mean of " + metric_name + " for " + framework
+        type_of = "mean"
+    plt.title(title)
     if standard_deviation:
         df = df.pivot_table(index="group",columns="round configuration",values= "metric",aggfunc="std")
     else:
@@ -256,32 +289,55 @@ def plot_heatmap(df,framework,standard_deviation=False,unweighted=False,scale=No
         x_ticks = [(int(float(x)) *5 + start_value) for x in df.index if x != "central"]
         ax.set_yticklabels(x_ticks)
     plt.ylabel(y_title)
+    plt.savefig(f"{data_path}{metric_name}_{framework}_{type_of}.png")
     plt.show()
     return scale
 
-def plot_swarmplots(df,metric_name:str,configuration_name:str):
+
+def calc_scale(df,mode):
+    if mode != "system":
+        max_value = 1.0
+        min_value = min(df["metric"].min() - 0.1,0)
+    else:
+        max_value = df["metric"].max() + 0.7 * df["metric"].max()
+        min_value = min(df["metric"].min() - 0.7 * df["metric"].min(),0)
+    return (min_value,max_value)
+def plot_swarmplots(df,metric_name:str,configuration_name:str,data_path:str,plot_type:str,scale=None):
     """
-    Plots swarmplots for the given df which contains all data for onem metric
+    Plots swarmplots for the given df which contains all data for one metric
     :param df: df with all data for one metric
+    :param metric_name: metric name
+    :param configuration_name: configuration name
+    :param data_path: path to the data
     :metric_name: name of metric to plot
     """
     for index,round_num in enumerate(ROUNDS):
         round_df = df[df["round configuration"] == "central"]
         round_df = pd.concat([round_df,df[df["round configuration"] == round_num]],ignore_index=True)
         seaborn_plot("group", metric_name, "framework", round_df, "Set2",
-                     f"Round configuration {round_num}",configuration_name=configuration_name)
+                     f"Round configuration {round_num}",configuration_name=configuration_name,plot_type=plot_type,
+                     data_path=data_path,scale=scale)
         plt.show()
     seaborn_plot("group", metric_name, "framework", df, "Set2", f"Round configuration summarized",
-                 configuration_name=configuration_name)
-    seaborn_plot("round configuration", metric_name, "framework", df, "Set2", f"Group summarized")
+                 configuration_name=configuration_name,plot_type=plot_type,data_path=data_path,scale=scale)
+    seaborn_plot("round configuration", metric_name, "framework", df, "Set2", f"Group summarized",plot_type=plot_type,data_path=data_path,scale=scale)
     for group in df["group"].unique():
         if group == "central":
             continue
         group_df = df[df["group"] == "central"]
         group_df = pd.concat([group_df,df[df["group"] == group]],ignore_index=True)
-        seaborn_plot("round configuration", metric_name, "framework", group_df, "Set2", f"Group {group}")
+        seaborn_plot("round configuration", metric_name, "framework", group_df, "Set2", f"Group {group}",plot_type=plot_type,data_path=data_path,scale=scale)
 
 
+def recalculate_round_times_for_number_of_rounds(df):
+    """
+    Recalculates the round times for the given df so it is comparable for different number of rounds
+    and the central model
+    :param df: df with all data for round time
+    :return: df with recalculated round times
+    """
+    df["metric"] = df["metric"] * df["round configuration"].astype(int)
+    return df
 
 def get_central_metrics(mode:str,metric_names:list):
     """
@@ -360,6 +416,7 @@ def get_memory_metrics(group, history, metric):
         memory_metrics[f"mean_{metric}"] = memory.mean() * number_of_clients
         memory_metrics[f"max_{metric}"] = memory.max() * number_of_clients
     return memory_metrics
+
 def get_metrics_from_run(run:wandb.run,metric_names:list,group,mode:str):
     """
     Get the metrics from a run

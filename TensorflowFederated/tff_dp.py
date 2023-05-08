@@ -76,11 +76,11 @@ aggregator = tff.aggregators.DifferentiallyPrivateFactory(tfp.DistributedSkellam
 # Build federated learning process
 # Uses customized classes that measure train time of clients and write that to a file
 if args.dp_mode == "global":
-    aggregator = tff.learning.model_update_aggregator.dp_aggregator(noise_multiplier=args.noise,clients_per_round=3,zeroing=False)
+    aggregator = tff.learning.model_update_aggregator.dp_aggregator(noise_multiplier=args.noise,clients_per_round=3,zeroing=True)
     optmizer = configs.get("optimizer")
     momentum = 0.9
 else:
-    aggregator = tff.learning.robust_aggregator(zeroing=False, clipping=False, debug_measurements_fn=tff.learning.add_debug_measurements)
+    aggregator = tff.learning.robust_aggregator(zeroing=True, clipping=False, debug_measurements_fn=tff.learning.add_debug_measurements)
     optimizer = tfp.DPKerasAdamOptimizer(l2_norm_clip=1.0,noise_multiplier=args.noise)
     momentum = 0.0
 

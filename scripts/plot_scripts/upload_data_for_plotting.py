@@ -11,7 +11,7 @@ if configs.get("usecase") == 1:
 else:
     version = "essential_seeds_42"
 
-for mode in ["balanced","system"]:
+for mode in ["unweighted"]:
     central_loss = {}
     rounds =None
     if mode == "unweighted":
@@ -32,10 +32,11 @@ for mode in ["balanced","system"]:
         loss_metrics = get_loss_stats(groups=groups,mode=mode,version=version)
         loss_metrics.update(central_loss)
         mongodb.update_benchmark_data(data=loss_metrics, name=f"Loss_data_usecase_{configs.get('usecase')}_{mode}")
-    scenario_metrics = get_stats_for_usecase(groups,mode=mode,version=version,rounds=rounds)
-    mongodb.update_benchmark_data(data=scenario_metrics,name=f"scenario_metrics_{configs.get('usecase')}_{mode}")
-    mongodb.update_benchmark_data(data=central,name=f"central_metrics_{configs.get('usecase')}_{mode}")
-    data = mongodb.get_data_by_name(f"Loss_data_usecase_{configs.get('usecase')}_{mode}")
+    # scenario_metrics = get_stats_for_usecase(groups,mode=mode,version=version,rounds=rounds)
+    # mongodb.update_benchmark_data(data=scenario_metrics,name=f"scenario_metrics_{configs.get('usecase')}_{mode}")
+    # mongodb.update_benchmark_data(data=central,name=f"central_metrics_{configs.get('usecase')}_{mode}")
+    #data = mongodb.get_data_by_name(f"Loss_data_usecase_{configs.get('usecase')}_{mode}")
+
 
 
 
