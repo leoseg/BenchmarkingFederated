@@ -27,7 +27,7 @@ def get_loss_stats(groups:list,version:str,mode:str):
         runs = api.runs(f"{ENTITY}/{project}",filters={"group": group})
         losses = []
         for run in runs:
-            if (run.config.get("version") == version or run.config.get("version") == "unbalanced_with_global_evaluation") and run.name != "no_crossfold":
+            if run.config.get("version") == version or run.config.get("version") == "unbalanced_with_global_evaluation_1804" and run.name != "no_crossfold":
                 history = run.history()
                 if mode == "unweighted":
                     loss = history.get("loss_global")
@@ -218,6 +218,8 @@ def seaborn_plot (x,metric_name,hue,data,palette,title,data_path,dodge=True,conf
     :param data_path: path to the data
     :return:
     """
+    sns_palette = sns.color_palette("Set2")
+    palette = {"tff":sns_palette[1],"central":sns_palette[0],"flwr":sns_palette[2]}
     match plot_type:
         case "box":
             ax = sns.boxplot(x=x, y="metric", hue=hue,

@@ -44,7 +44,7 @@ class MongoDBHandler:
             secrets = yaml.safe_load(file)
             return secrets["mongodb_adress"]
 
-    def get_data_by_name(self, name) ->list:
+    def get_data_by_name(self, name, calc_total_memory=False) ->list:
         """
         Get data from a document by its name.
 
@@ -54,6 +54,11 @@ class MongoDBHandler:
         :rtype: dict or None
         """
         document = self.collection.find_one({"name": name})
+        if calc_total_memory:
+            for count, round in enumerate(document["data"]):
+                for key, value in round.items():
+                    if "total_memory_server" in value.keys() and "total_memory_client" in value.keys():
+                        document["data"][count][key]["total_memory"] = [(x + y)/2 for x,y in zip(value["total_memory_server"] ,value["total_memory_client"])]
         return document["data"] if document else None
 
 #
