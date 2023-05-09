@@ -6,7 +6,7 @@ import pandas as pd
 
 
 mongodb = MongoDBHandler()
-for mode in ["unweighted"]:
+for mode in ["unweighted","balanced","system"]:
     plot_path = configs.get("plot_path") + mode + "/"
     unweighted = False
     match mode:
@@ -60,8 +60,8 @@ for mode in ["unweighted"]:
             configuration_name = "Percentage of chosen class"
         else:
             configuration_name = "Number of clients"
-        for plot_type in ["box","bar"] :
-            plot_swarmplots(df,metric,configuration_name,data_path=plot_path,plot_type=plot_type,scale=None)
+        for plot_type in ["bar"] :
+            plot_swarmplots(df,metric_name,configuration_name,data_path=plot_path,plot_type=plot_type,scale=None)
     # if mode in ["balanced"]:
     # loss_metrics = mongodb.get_data_by_name(f"Loss_data_usecase_{configs.get('usecase')}_{mode}")
     # loss_df = create_loss_df(loss_metrics)
