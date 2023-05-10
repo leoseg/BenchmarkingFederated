@@ -8,7 +8,7 @@ NUM_ROUNDS=$3
 WANDB_API_KEY=$4
 REPEATS=$5
 SYSTEM_ONLY=$6
-MODE=$6
+MODE=$7
 DATA_NAME=$(basename "$DATA_PATH" .csv)
 echo "Starting tff experiment with num clients ${NUM_CLIENTS} num rounds ${NUM_ROUNDS} and data ${DATA_NAME} and ${REPEATS} repeats"
 # Creates partitions and saves the row indices of each partition to file so it can be read from clients

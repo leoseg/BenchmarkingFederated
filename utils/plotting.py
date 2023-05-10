@@ -268,9 +268,9 @@ def plot_heatmap(df,framework,metric_name,data_path,standard_deviation=False,unw
     df["group"] = df["group"].astype(int)
     if standard_deviation:
         type_of= "stdv"
-        title = "Standard deviation of " + metric_name + " for " + framework
+        title = "Standard deviation of " + metric_name + " over all repeats of " + framework
     else:
-        title = "Mean of " + metric_name + " for " + framework
+        title = "Mean " + metric_name + " over all repeats of " + framework
         type_of = "mean"
     plt.title(title)
     if standard_deviation:
@@ -320,9 +320,9 @@ def plot_swarmplots(df,metric_name:str,configuration_name:str,data_path:str,plot
                      f"Round configuration {round_num}",configuration_name=configuration_name,plot_type=plot_type,
                      data_path=data_path,scale=scale)
         plt.show()
-    seaborn_plot("group", metric_name, "framework", df, "Set2", f"Round configuration summarized",
+    seaborn_plot("group", metric_name, "framework", df, "Set2", f"Group configs over all round configs",
                  configuration_name=configuration_name,plot_type=plot_type,data_path=data_path,scale=scale)
-    seaborn_plot("round configuration", metric_name, "framework", df, "Set2", f"Group summarized",plot_type=plot_type,data_path=data_path,scale=scale)
+    seaborn_plot("round configuration", metric_name, "framework", df, "Set2", f"Round configs over all groups",plot_type=plot_type,data_path=data_path,scale=scale)
     for group in df["group"].unique():
         if group == "central":
             continue

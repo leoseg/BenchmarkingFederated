@@ -76,7 +76,6 @@ def model_fn():
         loss=configs.get("loss"),
         metrics=metrics)
 
-aggregator = tff.aggregators.DifferentiallyPrivateFactory(tfp.DistributedSkellamSumQuery(1.0,1.0,noise)).create(element_type)
 # Build federated learning process
 # Uses customized classes that measure train time of clients and write that to a file
 if args.dp_mode == "global":
