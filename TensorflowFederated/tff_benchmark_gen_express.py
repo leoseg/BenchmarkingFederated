@@ -143,6 +143,7 @@ def train_loop(num_rounds=1, num_clients=1):
         # If not system metrics gets weights from averaged model and uses that for evaluation on clients
         # then log to wandb
         state = result.state
+        train_metrics = result.metrics
         print("weights after round {round} are:")
         print(trainer.get_model_weights(state).trainable)
         if not args.system_metrics:
@@ -150,6 +151,7 @@ def train_loop(num_rounds=1, num_clients=1):
             evaluation_state = evaluation_process.set_model_weights(evaluation_state, model_weights)
             evaluation_output = evaluation_process.next(evaluation_state, eval_data)
             wandb.log(evaluation_output.metrics["client_work"]["eval"]["current_round_metrics"],step=round)
+            wandb.log({"training_loss": train_metrics["loss"]}, step=round)
 
         if args.system_metrics:
             round_time = end-begin

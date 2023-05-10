@@ -40,8 +40,12 @@ parser.add_argument(
 parser.add_argument(
     "--dp_mode",type=str,help="dp_mode",default="global"
 )
+parser.add_argument(
+    "--system_metrics",type=bool,help="flag for system metrics",default=False
+)
 # print help if no argument is specified
 args = parser.parse_args()
+noise = float(args.noise)
 os.environ["TF_CPP_MIN_LOG_LEVEL"] = "3"
 element_spec = (
     tf.TensorSpec(shape=(None, configs["input_dim"]), dtype=tf.float64, name=None),
@@ -72,21 +76,30 @@ def model_fn():
         loss=configs.get("loss"),
         metrics=metrics)
 
-aggregator = tff.aggregators.DifferentiallyPrivateFactory(tfp.DistributedSkellamSumQuery(1.0,1.0,args.noise)).create(element_type)
+aggregator = tff.aggregators.DifferentiallyPrivateFactory(tfp.DistributedSkellamSumQuery(1.0,1.0,noise)).create(element_type)
 # Build federated learning process
 # Uses customized classes that measure train time of clients and write that to a file
 if args.dp_mode == "global":
-    aggregator = tff.learning.model_update_aggregator.dp_aggregator(noise_multiplier=args.noise,clients_per_round=3,zeroing=True)
+    aggregator =  tff.aggregators.differential_privacy.DifferentiallyPrivateFactory.gaussian_adaptive(
+      noise, 10)
     optmizer = configs.get("optimizer")
     momentum = 0.9
 else:
-    aggregator = tff.learning.robust_aggregator(zeroing=True, clipping=False, debug_measurements_fn=tff.learning.add_debug_measurements)
-    optimizer = tfp.DPKerasAdamOptimizer(l2_norm_clip=1.0,noise_multiplier=args.noise)
-    momentum = 0.0
+    aggregator = tff.learning.robust_aggregator(zeroing=False, clipping=True, debug_measurements_fn=tff.learning.add_debug_measurements)
+    # query = tfp.QuantileAdaptiveClipSumQuery(
+    #     initial_l2_norm_clip=1.0,
+    #     noise_multiplier=noise,
+    #     target_unclipped_quantile=0.5,
+    #     learning_rate=0.2,
+    #     clipped_count_stddev=None,
+    #     expected_num_records=clients_per_round,
+    #     geometric_update=True)
+    optimizer = tfp.DPKerasAdamOptimizer(l2_norm_clip=1.0,noise_multiplier=noise)
+    momentum = 0.9
 
 trainer = build_unweighted_fed_avg(
     model_fn,
-    client_optimizer_fn=lambda: configs.get("optimizer"),
+    client_optimizer_fn=lambda: optimizer,
     server_optimizer_fn=lambda: tf.keras.optimizers.SGD(learning_rate=1.0,momentum=momentum),
     model_aggregator=aggregator)
 # Build federated evaluation process
@@ -94,15 +107,25 @@ evaluation_process = tff.learning.algorithms.build_fed_eval(model_fn=model_fn)
 data_name = args.data_path.split("/")[-1].split(".")[0]
 
 
-project_name = f"benchmark_rounds_{args.num_rounds}_{data_name}_dp_metrics"
-project_name = f"usecase_{configs['usecase']}_" + project_name
-group = f"tff_{args.noise}"
+if args.system_metrics:
+    mode = "system"
+    num_clients = 1
+else:
+    mode = "model"
+    num_clients = 10
+project_name = f"dpusecase_{configs['usecase']}_benchmark_rounds_{args.num_rounds}_{data_name}_{mode}_metrics"
+group = f"{args.dp_mode}_{noise}"
 print("Training initialized")
 wandb.init(project=project_name, group=group, name=f"run_{args.run_repeat}",config=configs)
 with open("partitions_list", "rb") as file:
     partitions_list = pickle.load(file)
 wandb.log({"partitions_list": partitions_list})
-
+if args.dp_mode == "global":
+    privacy_guarantee = tfp.compute_dp_sgd_privacy(10, configs.get("batch_size"),
+                                                   noise, args.num_rounds,
+                                                   delta=0.05)
+else:
+    privacy_guarantee = tfp.compute_dp_sgd_privacy(configs.get("num_examples_10"),configs.get("batch_size"),noise,configs.get("epochs")/args.num_rounds,delta=configs.get("delta"))
 def train_loop(num_rounds=1, num_clients=1):
     """
     Train loop function for FL
@@ -110,8 +133,6 @@ def train_loop(num_rounds=1, num_clients=1):
     :param num_clients: number of clients for FL
     :return:
     """
-    if args.unweighted_percentage >= 0:
-        X_test, y_test = load_test_data_for_evaluation(args.run_repeat)
     evaluation_state = evaluation_process.initialize()
     state = trainer.initialize()
     print("inital weights are:")
@@ -138,12 +159,18 @@ def train_loop(num_rounds=1, num_clients=1):
         # If not system metrics gets weights from averaged model and uses that for evaluation on clients
         # then log to wandb
         state = result.state
-        print("weights after round {round} are:")
-        print(trainer.get_model_weights(state).trainable)
-        model_weights = trainer.get_model_weights(state)
-        evaluation_state = evaluation_process.set_model_weights(evaluation_state, model_weights)
-        evaluation_output = evaluation_process.next(evaluation_state, eval_data)
-        wandb.log(evaluation_output.metrics["client_work"]["eval"]["current_round_metrics"],step=round)
+        train_metrics = result.metrics
+        if not args.system_metrics:
+            model_weights = trainer.get_model_weights(state)
+            evaluation_state = evaluation_process.set_model_weights(evaluation_state, model_weights)
+            evaluation_output = evaluation_process.next(evaluation_state, eval_data)
+            wandb.log({"training_loss": train_metrics["loss"]}, step=round)
+            wandb.log(evaluation_output.metrics["client_work"]["eval"]["current_round_metrics"],step=round)
+
+        if args.system_metrics:
+            round_time = end-begin
+            wandb.log({"round_time":tf.get_static_value(round_time)},step=round)
+            wandb.log(get_time_logs(tff_time_logging_directory,True),step=round)
 
 
 

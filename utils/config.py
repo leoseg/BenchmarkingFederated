@@ -65,7 +65,9 @@ elif os.environ["USECASE"] == str(4):
         number_of_classes=5,
         random_seed_set=True,
         version=version,
-        data_directory="../Dataset2/"
+        data_directory="../Dataset2/",
+        num_examples_10=554,
+        delta=0.0005
     )
 elif os.environ["USECASE"] == str(3):
     configs = dict(
@@ -93,7 +95,9 @@ elif os.environ["USECASE"] == str(3):
         input_dim=1426,
         random_seed_set=True,
         version=version,
-        data_directory="../Dataset2/"
+        data_directory="../Dataset2/",
+        num_examples_10=554,
+        delta=0.0005
     )
 elif os.environ["USECASE"] == str(2):
     configs = dict(
@@ -120,7 +124,9 @@ elif os.environ["USECASE"] == str(2):
         input_dim=12708,
         random_seed_set=True,
         version=version,
-        data_directory="../DataGenExpression/"
+        data_directory="../DataGenExpression/",
+        num_examples_10=961,
+        delta=0.0005
     )
 else:
     configs = dict(
@@ -151,5 +157,7 @@ else:
         number_of_classes =1,
         random_seed_set = True,
         version=version,
-        data_directory="../DataGenExpression/"
+        data_directory="../DataGenExpression/",
+        num_examples_10 = 961,
+        delta = 0.0005
     )

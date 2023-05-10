@@ -30,8 +30,8 @@ for mode in ["unweighted","balanced","system"]:
         case "system":
             metric1 = "total_memory"
             metric1_name = "Memory usage"
-            metric2 = "round_time"
-            metric2_name = "Training time"
+            metric2 = "client_time"
+            metric2_name = "Client_training time"
     for metric,metric_name in zip([metric1,metric2],[metric1_name,metric2_name]):
         scenario_metrics = mongodb.get_data_by_name(f"scenario_metrics_{configs.get('usecase')}_{mode}",True)
         df = create_dfs_for_fl_metric(rounds_metrics=scenario_metrics,metric_name=metric)
