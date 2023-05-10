@@ -1,6 +1,7 @@
 import os
 
-from utils.plotting import  get_stats_for_usecase,get_central_metrics,get_loss_stats, create_loss_df,create_loss_line_plot
+from utils.plotting import create_loss_line_plot
+from data_uploading_utils import get_loss_stats, create_loss_df, get_stats_for_usecase, get_central_metrics
 from config import configs
 from utils.db_utils import MongoDBHandler
 

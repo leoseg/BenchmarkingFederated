@@ -1,5 +1,6 @@
-from utils.plotting import plot_swarmplots, create_dfs_for_fl_metric, transform_to_df, plot_heatmap, \
-    create_loss_df, group_scenarios, create_loss_line_plot, calc_scale
+from utils.plotting import plot_swarmplots, plot_heatmap, \
+    create_loss_line_plot, calc_scale
+from data_uploading_utils import create_loss_df, group_scenarios, transform_to_df, create_dfs_for_fl_metric
 from config import configs
 from utils.db_utils import MongoDBHandler
 import pandas as pd
