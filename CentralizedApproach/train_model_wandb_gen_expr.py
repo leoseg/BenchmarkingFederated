@@ -64,7 +64,7 @@ model.compile(optimizer=configs.get("optimizer"),
               loss=configs.get("loss"),
               metrics=configs.get("metrics"))
 
-model.fit(X_train, y_train, epochs=configs.get("epochs"), batch_size=configs.get("batch_size"), validation_freq=configs["valid_freq"], validation_split=0.2,callbacks=[wandb_callback])
+history = model.fit(X_train, y_train, epochs=configs.get("epochs"), batch_size=configs.get("batch_size"), validation_freq=configs["valid_freq"], validation_split=0.2,callbacks=[wandb_callback])
 score = model.evaluate(X_test, y_test, verbose = 0,return_dict=True)
 
 for key,value in score.items():

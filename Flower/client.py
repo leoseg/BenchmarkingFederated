@@ -72,13 +72,14 @@ class Client(fl.client.NumPyClient):
         tf.print(
             f"preprocessed dataset entry {0} from client {args.client_index} is {list(preprocessed_ds.as_numpy_iterator())[0]}")
         begin = tf.timestamp()
-        model.fit(preprocessed_ds)
+        history = model.fit(preprocessed_ds)
         end = tf.timestamp()
+        train_loss = history.history["loss"][-1]
         # If system metrics write client time to file so the server can log it
         if args.system_metrics:
             tf.print("Client training time",output_stream=f"file://{flw_time_logging_directory}")
             tf.print(end-begin,output_stream=f"file://{flw_time_logging_directory}")
-        return model.get_weights(), len(list(train_ds)), {}
+        return model.get_weights(), len(list(train_ds)), {"train_loss":train_loss}
 
     def evaluate(self, parameters, config):
         model.set_weights(parameters)

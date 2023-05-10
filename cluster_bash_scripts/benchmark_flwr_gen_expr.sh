@@ -35,7 +35,7 @@ fi
 # Loops trough round and number of clients configuration
 for rounds in "${round_config[@]}";
 do
-  for client_num in {3,5,10}
+  for client_num in {3,5,10,50}
   do
     bash flwr_balanced_benchmark.sh $DATA_PATH $client_num $rounds $WANDB_API_KEY $NUM_REPEATS $SYSTEM_ONLY
   done

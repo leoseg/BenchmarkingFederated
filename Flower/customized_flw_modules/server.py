@@ -138,7 +138,7 @@ class Server:
             # Train model and replace previous global model
             res_fit = self.fit_round(server_round=current_round, timeout=timeout)
             if res_fit:
-                parameters_prime, _, _ = res_fit  # fit_metrics_aggregated
+                parameters_prime, metrics_train, _ = res_fit  # fit_metrics_aggregated
                 if parameters_prime:
                     self.parameters = parameters_prime
             end = tf.timestamp()
@@ -169,6 +169,7 @@ class Server:
 
             # Evaluate model on a sample of available clients
             if not self.system_metrics:
+                wandb.log(metrics_train,step=current_round)
                 res_fed = self.evaluate_round(server_round=current_round, timeout=timeout)
                 if res_fed:
                     loss_fed, evaluate_metrics_fed, _ = res_fed
