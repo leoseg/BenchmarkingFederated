@@ -53,7 +53,7 @@ def seaborn_plot (x,metric_name,hue,data,palette,title,data_path,dodge=True,conf
             ax = sns.boxplot(x=x, y="metric", hue=hue,
                  data=data, palette=palette, dodge=dodge)
             sns.stripplot(data=data,x=x, y="metric", hue=hue,dodge=True)
-    ax.set_title(title)
+    #ax.set_title(title)
     # set y axis title to metric name
     plt.ylabel(metric_name)
     if scale is not None:
@@ -94,7 +94,8 @@ def plot_heatmap(df,framework,metric_name,data_path,standard_deviation=False,unw
     else:
         title = "Mean " + metric_name + " over all repeats of " + framework
         type_of = "mean"
-    plt.title(title)
+
+    #plt.title(title)
     if standard_deviation:
         df = df.pivot_table(index="group",columns="round configuration",values= "metric",aggfunc="std")
     else:
@@ -104,6 +105,7 @@ def plot_heatmap(df,framework,metric_name,data_path,standard_deviation=False,unw
         scale = [df.min().min(),df.max().max()]
     ax = sns.heatmap(df,cmap="rocket_r",vmin=scale[0],vmax=scale[1])
     y_title = "Number of clients"
+    x_title = "Number of rounds trained"
     if unweighted:
         y_title = "Percentage of chosen class"
         if configs.get("usecase") == 1 or configs.get("usecase") == 2:
@@ -113,6 +115,7 @@ def plot_heatmap(df,framework,metric_name,data_path,standard_deviation=False,unw
         x_ticks = [(int(float(x)) *5 + start_value) for x in df.index if x != "central"]
         ax.set_yticklabels(x_ticks)
     plt.ylabel(y_title)
+    plt.xlabel(x_title)
     plt.savefig(f"{data_path}{metric_name}_{framework}_{type_of}.png")
     plt.show()
     return scale

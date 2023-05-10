@@ -84,7 +84,7 @@ if args.dp_mode == "global":
     optmizer = configs.get("optimizer")
     momentum = 0.9
 else:
-    aggregator = tff.learning.robust_aggregator(zeroing=False, clipping=True, debug_measurements_fn=tff.learning.add_debug_measurements)
+    aggregator = tff.learning.robust_aggregator(zeroing=False, clipping=True,weighted=False)
     # query = tfp.QuantileAdaptiveClipSumQuery(
     #     initial_l2_norm_clip=1.0,
     #     noise_multiplier=noise,
