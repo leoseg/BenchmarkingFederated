@@ -39,6 +39,10 @@ if [ $SYSTEM_ONLY != "2" ]; then
   do
     echo "Start repeat system metrics ${repeat} num clients ${NUM_CLIENTS} num rounds ${NUM_ROUNDS} and data ${DATA_NAME}"
     rm -f timelogs/flw_logs_time.txt
+
+    echo "Start client"
+    python client.py --client_index 1 --data_path $DATA_PATH --run_repeat $repeat --system_metrics true &
+    client_id=$!
     echo "Creating server"
     python server.py --data_path $DATA_PATH --run_repeat $repeat --num_clients $NUM_CLIENTS --num_rounds $NUM_ROUNDS --system_metrics true &
     server_id=$!
@@ -53,9 +57,6 @@ if [ $SYSTEM_ONLY != "2" ]; then
     # Bounds the CPU with 'cpu_num_1' to the server process
     taskset -c -pa $cpu_num_1 $server_id
     #sleep 3
-    echo "Start client"
-    python client.py --client_index 1 --data_path $DATA_PATH --run_repeat $repeat --system_metrics true &
-    client_id=$!
     # Bind client process to cpu num 2
     taskset -c -pa $cpu_num_2 $client_id
     client_time_logs="timelogs/flwr_client_${DATA_NAME}_${NUM_CLIENTS}_${NUM_ROUNDS}_repeat_${repeat}.txt"
