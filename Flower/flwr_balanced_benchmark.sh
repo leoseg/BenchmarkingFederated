@@ -43,6 +43,7 @@ if [ $SYSTEM_ONLY != "2" ]; then
     echo "Start client"
     python client.py --client_index 1 --data_path $DATA_PATH --run_repeat $repeat --system_metrics true &
     client_id=$!
+    sleep 3
     echo "Creating server"
     python server.py --data_path $DATA_PATH --run_repeat $repeat --num_clients $NUM_CLIENTS --num_rounds $NUM_ROUNDS --system_metrics true &
     server_id=$!
