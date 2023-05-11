@@ -39,13 +39,12 @@ if [ $SYSTEM_ONLY != "2" ]; then
   do
     echo "Start repeat system metrics ${repeat} num clients ${NUM_CLIENTS} num rounds ${NUM_ROUNDS} and data ${DATA_NAME}"
     rm -f timelogs/flw_logs_time.txt
-
+    echo "Creating server"
+    python server.py --data_path $DATA_PATH --run_repeat $repeat --num_clients $NUM_CLIENTS --num_rounds $NUM_ROUNDS --system_metrics true &
+    sleep 25
     echo "Start client"
     python client.py --client_index 1 --data_path $DATA_PATH --run_repeat $repeat --system_metrics true &
     client_id=$!
-    sleep 25
-    echo "Creating server"
-    python server.py --data_path $DATA_PATH --run_repeat $repeat --num_clients $NUM_CLIENTS --num_rounds $NUM_ROUNDS --system_metrics true &
     server_id=$!
     # Reads in all cpu available as string
     read cpu_available <<< $(taskset -pc $server_id | awk '{print $NF}')
