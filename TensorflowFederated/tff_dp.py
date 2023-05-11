@@ -4,7 +4,7 @@ import pickle
 
 import numpy as np
 from keras.utils import set_random_seed
-
+import time
 import tensorflow_privacy as tfp
 import grpc
 import tensorflow as tf
@@ -115,7 +115,16 @@ else:
 project_name = f"dpusecase_{configs['usecase']}_benchmark_rounds_{args.num_rounds}_{data_name}_{mode}_metrics"
 group = f"{args.dp_mode}_{noise}"
 print("Training initialized")
-wandb.init(project=project_name, group=group, name=f"run_{args.run_repeat}",config=configs)
+DELAY_SECONDS = 5  # Delay between each retry attempt
+
+while True:
+    try:
+        wandb.init(project=project_name, group=group, name=f"run_{args.run_repeat}",config=configs)
+        print("Wandb initialized successfully")
+        break
+    except ConnectionRefusedError:
+        print(f"Connection refused. Retrying in {DELAY_SECONDS} seconds...")
+        time.sleep(DELAY_SECONDS)
 with open("partitions_list", "rb") as file:
     partitions_list = pickle.load(file)
 wandb.log({"partitions_list": partitions_list})
