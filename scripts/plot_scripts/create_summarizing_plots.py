@@ -51,12 +51,12 @@ for mode in ["unweighted","balanced","system"]:
         #scale =  calc_scale(df,mode)
         df_pivot = df.pivot_table(index="group", columns="round configuration", values="metric", aggfunc="mean")
         scale = [df_pivot.min().min(), df_pivot.max().max()]
-        plot_heatmap(df,"tff",standard_deviation=False,unweighted=unweighted,metric_name=metric_name,data_path=plot_path,scale=scale)
-        plot_heatmap(df,"flwr",unweighted=unweighted,scale=scale,metric_name=metric_name,data_path=plot_path)
+        plot_heatmap(df,"TFF",standard_deviation=False,unweighted=unweighted,metric_name=metric_name,data_path=plot_path,scale=scale)
+        plot_heatmap(df,"FLWR",unweighted=unweighted,scale=scale,metric_name=metric_name,data_path=plot_path)
         df_pivot = df.pivot_table(index="group", columns="round configuration", values="metric", aggfunc="std")
         scale = [df_pivot.min().min(), df_pivot.max().max()]
-        plot_heatmap(df,"tff",standard_deviation=True,unweighted=unweighted,metric_name=metric_name,data_path=plot_path,scale=scale)
-        plot_heatmap(df,"flwr",standard_deviation=True,unweighted=unweighted,scale=scale,metric_name=metric_name,data_path=plot_path)
+        plot_heatmap(df,"TFF",standard_deviation=True,unweighted=unweighted,metric_name=metric_name,data_path=plot_path,scale=scale)
+        plot_heatmap(df,"FLWR",standard_deviation=True,unweighted=unweighted,scale=scale,metric_name=metric_name,data_path=plot_path)
         if mode == "unweighted":
             configuration_name = "Percentage of chosen class"
         else:

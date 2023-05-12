@@ -41,7 +41,7 @@ def seaborn_plot (x,metric_name,hue,data,palette,title,data_path,dodge=True,conf
     :return:
     """
     sns_palette = sns.color_palette("Set2")
-    palette = {"tff":sns_palette[1],"central":sns_palette[0],"flwr":sns_palette[2]}
+    palette = {"TFF":sns_palette[1],"Centralized":sns_palette[0],"FLWR":sns_palette[2]}
     match plot_type:
         case "box":
             ax = sns.boxplot(x=x, y="metric", hue=hue,

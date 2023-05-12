@@ -161,7 +161,7 @@ def load_data(data_path: str, rows_to_keep= None):
     return  df
 
 
-def df_train_test_dataset(df: pd.DataFrame, kfold_num:int=0, random_state=0, label=configs["label"], scale=True):
+def df_train_test_dataset(df: pd.DataFrame, kfold_num:int=0, random_state=0, label=configs["label"], scale=True,unweighted=False):
     """
     Loads gen data from given path and splits is into train and test dataset
     :param data_path: path to gen data file
@@ -169,7 +169,11 @@ def df_train_test_dataset(df: pd.DataFrame, kfold_num:int=0, random_state=0, lab
     :param kfold_num: used to choose which fold to use for test and train
     :return:
     """
-    kfold = StratifiedKFold(n_splits=configs.get("n_splits"), shuffle=True, random_state=random_state)
+    if unweighted:
+        n_splits = 10
+    else:
+        n_splits = configs.get("n_splits")
+    kfold = StratifiedKFold(n_splits=n_splits, shuffle=True, random_state=random_state)
     X, Y = create_X_y_from_gen_df(df, False,label)
     #X_train, X_test, Y_train, Y_test = train_test_split(X, Y, test_size=0.2, random_state=random_state,stratify=Y)
     # if scale:
@@ -226,7 +230,13 @@ def create_unbalanced_splits(df:pd.DataFrame,label_name:str,unweight_step:int):
     classes = df[label_name].unique()
     class_percentages = df[label_name].value_counts(normalize=True)
     num_classes = len(classes)
-    partition_size = floor(min([ class_size * len(df) for class_size in class_percentages])-350)
+    if configs.get("usecase") == 1 or configs.get("usecsae") == 2:
+        minus_value = 800
+        test_sample_size = 1000
+    else:
+        test_sample_size = 500
+        minus_value = 150
+    partition_size = floor(min([ class_size * len(df) for class_size in class_percentages])-minus_value)
     partitions_dict = defaultdict(list)
     clients = [i for i in range(num_classes)]
     start_percentage = 1.0/ num_classes
@@ -240,7 +250,6 @@ def create_unbalanced_splits(df:pd.DataFrame,label_name:str,unweight_step:int):
     remaining_df = df.drop(downsampled_df.index)
     for chosen_class in classes:
         chosen_class_indices = downsampled_df[downsampled_df[label_name] == chosen_class].sample(chosen_class_samples,random_state=69).index.tolist()
-
         if other_classes_percentage == 0.0:
             other_classes_indices = []
         else:
@@ -260,7 +269,7 @@ def create_unbalanced_splits(df:pd.DataFrame,label_name:str,unweight_step:int):
                 partitions_dict["class "+str(class_name)].append(other_classes_samples)
 
     for count,i in enumerate(range(69,69+10)):
-        test_df = remaining_df.groupby(label_name,group_keys=False).apply(lambda x: x.sample(floor(700/num_classes),random_state=i))
+        test_df = remaining_df.groupby(label_name,group_keys=False).apply(lambda x: x.sample(floor(test_sample_size/num_classes),random_state=i))
         test_df.to_csv(configs["data_directory"]+ "unweighted_test_df_"+str(count)+".csv",index=False)
     return pd.DataFrame(partitions_dict,index=clients),partitions_list
 

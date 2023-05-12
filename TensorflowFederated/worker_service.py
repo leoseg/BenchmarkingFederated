@@ -21,6 +21,7 @@ flags.DEFINE_integer("client_index",None,"index for client to load data partitio
 flags.DEFINE_string("data_path",configs.get("data_path"),"Defines path to data")
 flags.DEFINE_integer("run_repeat",1,"number of run with same config")
 flags.DEFINE_integer("random_state",1,"random state for train test split")
+flags.DEFINE_bool("unweighted",False,"flag for unweighted federated averaging")
 
 
 def main(argv) -> None:
@@ -47,7 +48,8 @@ def main(argv) -> None:
         kfold_num=random_state,
         random_state=run_repeat,
         label=configs.get("label"),
-        scale=configs.get("scale")
+        scale=configs.get("scale"),
+        unweighted=FLAGS.unweighted
     )
     # Sets executor for local calculations
     def ex_fn(device: tf.config.LogicalDevice) -> tff.framework.DataExecutor:

@@ -29,7 +29,9 @@ parser.add_argument(
 parser.add_argument(
     "--random_state",type=int,help="flag for setting the random state for train test", default=1
 )
-
+parser.add_argument(
+    "--unweighted",type=bool,help="flag for setting if data is unweighted", default=False
+)
 # print help if no argument is specified
 args = parser.parse_args()
 with open("partitions_list","rb") as file:
@@ -46,7 +48,7 @@ else:
 df = load_data(datapath,rows_to_keep)
 log_df_info(df, configs["label"])
 df = preprocess_data(df)
-train_ds,test_ds = df_train_test_dataset(df, kfold_num=args.random_state, random_state=args.run_repeat,label=configs.get("label"),scale=configs.get("scale"))
+train_ds,test_ds = df_train_test_dataset(df, kfold_num=args.random_state, random_state=args.run_repeat,label=configs.get("label"),scale=configs.get("scale"),unweighted=args.unweighted)
 print("Loading data backend dataset of client has num of examples",train_ds.cardinality())
 # Loads and compile model
 model = get_model(input_dim=configs.get("input_dim"), num_nodes= configs.get("num_nodes"), dropout_rate=configs.get("dropout_rate"), l1_v= configs.get("l1_v"), l2_v=configs.get("l2_v"))

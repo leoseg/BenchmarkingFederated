@@ -47,10 +47,10 @@ def create_loss_df(metrics_dict):
     for key,value in metrics_dict.items():
         if key.startswith("usecase"):
             group = "central"
-            framework = "central"
+            framework = "Centralized"
         else:
             group = key.split("_")[1]
-            framework = key.split("_")[0]
+            framework = key.split("_")[0].upper()
         rows = []
         for i in range(len(value)):
             rows.append({"round":i+1,"loss":value[i],"group":group,"framework":framework})
@@ -151,6 +151,10 @@ def transform_to_df(metrics:dict,metric_name,framework,group,round_configuration
     :return: df with the metrics for one roundconfiguration and one metric
     """
     rows = []
+    if framework in ["tff","flwr"]:
+        framework = framework.upper()
+    if framework == "central":
+        framework = "Centralized"
     for i in range(len(metrics[metric_name])):
         row = {
             "framework": framework,

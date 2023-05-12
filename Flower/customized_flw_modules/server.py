@@ -19,6 +19,7 @@ import pickle
 import timeit
 from logging import DEBUG, INFO
 from typing import Dict, List, Optional, Tuple, Union
+import time
 
 import numpy as np
 import tensorflow as tf
@@ -126,7 +127,15 @@ class Server:
             group = f"flwr_{self.unweighted}"
         else:
             group = f"flwr_{self.num_clients}"
-        wandb.init(project=project_name, group=group, name=f"run_{self.run_repeat}",config=configs)
+        DELAY_SECONDS = 5  # Delay between each retry attempt
+        while True:
+            try:
+                wandb.init(project=project_name, group=group, name=f"run_{self.run_repeat}",config=configs)
+                print("Wandb initialized successfully")
+                break
+            except ConnectionRefusedError:
+                print(f"Connection refused. Retrying in {DELAY_SECONDS} seconds...")
+                time.sleep(DELAY_SECONDS)
         with open("partitions_list", "rb") as file:
             partitions_list = pickle.load(file)
         wandb.log({"partitions_list":partitions_list})

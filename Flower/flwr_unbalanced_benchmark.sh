@@ -24,7 +24,7 @@ do
   do
     echo "Start client ${i}"
     client_index=$(($i -1))
-    python client.py --client_index $client_index --data_path $DATA_PATH --run_repeat $repeat &
+    python client.py --client_index $client_index --data_path $DATA_PATH --run_repeat $repeat --unweighted true &
   done
   wait
   echo "Repeat model metrics ${repeat} num clients ${NUM_CLIENTS} num rounds ${NUM_ROUNDS} and data ${DATA_NAME} complete"

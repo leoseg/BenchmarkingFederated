@@ -1,10 +1,7 @@
 import collections
 import concurrent.futures
 import pickle
-
-import numpy as np
-from keras.utils import set_random_seed
-
+import time
 from TensorflowFederated.testing_prototyping.tff_config import *
 import grpc
 import tensorflow as tf
@@ -67,9 +64,9 @@ def model_fn():
     model = get_model(input_dim=configs.get("input_dim"), num_nodes= configs.get("num_nodes"), dropout_rate=configs.get("dropout_rate"), l1_v= configs.get("l1_v"), l2_v=configs.get("l2_v"))
     # Chooses metrics depending on usecase
     if configs["usecase"] ==3 or configs["usecase"] == 4:
-        metrics = [SparseCategoricalAccuracy(),SparseAUC(name="auc"),SparseAUC(curve="PR",name="prauc")]
+        metrics = [SparseCategoricalAccuracy(),SparseAUC(name="auc"),SparseAUC(name="auc_macro",multi_label=True),SparseAUC(curve="PR",name="prauc")]
     else:
-        metrics = [BinaryAccuracy(),AUC(),Precision(),Recall(),AUC(curve="PR",name="prauc")]
+        metrics = [BinaryAccuracy(),AUC(),Precision(),Recall(),AUC(curve="PR",name="prauc"),AUC(multi_label=True,name="auc_macro")]
     return tff.learning.from_keras_model(
         model,
         input_spec=element_spec,
@@ -103,7 +100,17 @@ if unweighted >= 0.0:
 else:
     group = f"tff_{args.num_clients}"
 print("Training initialized")
-wandb.init(project=project_name, group=group, name=f"run_{args.run_repeat}",config=configs)
+
+DELAY_SECONDS = 5  # Delay between each retry attempt
+
+while True:
+    try:
+        wandb.init(project=project_name, group=group, name=f"run_{args.run_repeat}",config=configs)
+        print("Wandb initialized successfully")
+        break
+    except ConnectionRefusedError:
+        print(f"Connection refused. Retrying in {DELAY_SECONDS} seconds...")
+        time.sleep(DELAY_SECONDS)
 with open("partitions_list", "rb") as file:
     partitions_list = pickle.load(file)
 wandb.log({"partitions_list": partitions_list})
@@ -175,7 +182,7 @@ executor = concurrent.futures.ThreadPoolExecutor()
 # Creates channels for each client for communication
 for i in range(1,num_clients+1):
     channels.append(grpc.insecure_channel(f'{ip_address}:{port_num+i}',options=[ ('grpc.max_send_message_length', 25586421),
-        ('grpc.max_receive_message_length',25586421), ("grpc.max_metadata_size",25586421)]),)
+        ('grpc.max_receive_message_lengpip install --upgrade pipth',25586421), ("grpc.max_metadata_size",25586421)]),)
 
 # Sets remote execution
 tff.backends.native.set_remote_python_execution_context(channels,thread_pool_executor=executor)
