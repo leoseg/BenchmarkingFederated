@@ -110,7 +110,7 @@ def get_stats_for_usecase(groups,version = None,mode="balanced",rounds=None):
         version = configs.get("version")
     if mode == "system":
         metrics_prefix ="system"
-        version = None
+        version = "version_1005"
         metrics_names = ["memory_client","memory_server","round_time","client_time"]
     else:
         metrics_names = [element.name for element in configs.get("metrics")]
@@ -161,7 +161,7 @@ def transform_to_df(metrics:dict,metric_name,framework,group,round_configuration
             "group": group,
             "round configuration": round_configuration
         }
-        metric_value = metrics[metric_name][i] if "time" not in metric_name else metrics[metric_name][i] * round_num
+        metric_value = metrics[metric_name][i]
         row["metric"] = metric_value
         rows.append(row)
     df = pd.DataFrame(data=rows, columns=["framework", "group", "metric", "round configuration"])
@@ -244,7 +244,7 @@ def get_system_metrics(history, metric_names, group):
                 if metric == "client_time":
                     # if the metric is client_time, get the first_round_time
                     metrics["first_round_time"] = time.iloc[0]
-                if metric == "client" or metric == "round_time":
+                if metric == "client_time" or metric == "round_time":
                     metrics["total_"+metric] = time.sum()
     if "client_time" in metrics.keys() and "round_time" in metrics.keys():
         # if both client_time and round_time are in the metric_names, get the time_diff

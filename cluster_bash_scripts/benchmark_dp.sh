@@ -21,26 +21,19 @@ pip3 install --upgrade pip
 pip install -e utils
 pip3 install -r requirements.txt
 cd TensorflowFederated || exit
-# Choose rounds configuration depending on usecase
-if [ $3 =  "1" ] ||  [ $3 = "3" ] || [ $3 = "4" ]; then
-   round_config=(1 5)
-elif [  $3 = "2" ]; then
-   round_config=(1 4)
-fi
-noises=(0.0 0.5 0.75 1.0)
+#if [ $3 =  "1" ] ||  [ $3 = "3" ] || [ $3 = "4" ]; then
+#   round_config=(1)
+#elif [  $3 = "2" ]; then
+#   round_config=(1 4)
+#fi
+clients_config=(3 5 10 50)
+noises=(0.0 0.25 0.5 0.75 1.0 1.25)
 # Loops trough round and number of clients configuration
-for rounds in "${round_config[@]}";
+for clients in "${clients_config[@]}";
 do
-  for noise in "${noises[@]}"
+  for noise in "${noises[@]}";
   do
-    bash tff_dp.sh $DATA_PATH $noise $rounds $WANDB_API_KEY $NUM_REPEATS $SYSTEM_ONLY "local"
+    bash tff_dp.sh $DATA_PATH $noise $clients $WANDB_API_KEY $NUM_REPEATS $SYSTEM_ONLY
   done
 done
 
-for rounds in "${round_config[@]}";
-do
-  for noise in "${noises[@]}"
-  do
-    bash tff_dp.sh $DATA_PATH $noise $rounds $WANDB_API_KEY $NUM_REPEATS $SYSTEM_ONLY "global"
-  done
-done

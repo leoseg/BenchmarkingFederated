@@ -10,6 +10,7 @@ import grpc
 import tensorflow as tf
 import tensorflow_federated as tff
 from customized_tff_modules.fed_avg_with_time import build_weighted_fed_avg, build_unweighted_fed_avg
+from dp_utils import calculate_delta
 from evaluation_utils import evaluate_model, load_test_data_for_evaluation
 from utils.system_utils import get_time_logs
 from utils.models import get_model
@@ -26,7 +27,7 @@ parser = argparse.ArgumentParser(
         formatter_class=argparse.RawDescriptionHelpFormatter,
     )
 parser.add_argument(
-    "--num_rounds",type=int,help="number of fl rounds",default=2
+    "--num_clients",type=int,help="number of fl rounds",default=3
 )
 parser.add_argument(
     "--noise",type=float,help="dp_noise",default=0.0
@@ -36,9 +37,6 @@ parser.add_argument(
 )
 parser.add_argument(
     "--run_repeat",type=int,help="number of run with same config",default=0
-)
-parser.add_argument(
-    "--dp_mode",type=str,help="dp_mode",default="global"
 )
 parser.add_argument(
     "--system_metrics",type=bool,help="flag for system metrics",default=False
@@ -75,26 +73,13 @@ def model_fn():
         input_spec=element_spec,
         loss=configs.get("loss"),
         metrics=metrics)
-
 # Build federated learning process
 # Uses customized classes that measure train time of clients and write that to a file
-if args.dp_mode == "global":
-    aggregator =  tff.aggregators.differential_privacy.DifferentiallyPrivateFactory.gaussian_adaptive(
-      noise, 10)
-    optmizer = configs.get("optimizer")
-    momentum = 0.9
-else:
-    aggregator = tff.learning.robust_aggregator(zeroing=False, clipping=True,weighted=False)
-    # query = tfp.QuantileAdaptiveClipSumQuery(
-    #     initial_l2_norm_clip=1.0,
-    #     noise_multiplier=noise,
-    #     target_unclipped_quantile=0.5,
-    #     learning_rate=0.2,
-    #     clipped_count_stddev=None,
-    #     expected_num_records=clients_per_round,
-    #     geometric_update=True)
-    optimizer = tfp.DPKerasAdamOptimizer(l2_norm_clip=1.0,noise_multiplier=noise)
-    momentum = 0.9
+
+aggregator = tff.learning.robust_aggregator(zeroing=False, clipping=False,weighted=False)
+optimizer = tfp.DPKerasAdamOptimizer(l2_norm_clip=1.0,noise_multiplier=noise)
+#momentum = 0.9
+momentum = 0.0
 
 trainer = build_unweighted_fed_avg(
     model_fn,
@@ -111,9 +96,9 @@ if args.system_metrics:
     num_clients = 1
 else:
     mode = "model"
-    num_clients = 10
-project_name = f"dpusecase_{configs['usecase']}_benchmark_rounds_{args.num_rounds}_{data_name}_{mode}_metrics"
-group = f"{args.dp_mode}_{noise}"
+    num_clients = args.num_clients
+project_name = f"dpusecase_{configs['usecase']}_benchmark_rounds_{data_name}_{mode}_metrics"
+group = f"{args.num_clients}_{noise}"
 print("Training initialized")
 DELAY_SECONDS = 5  # Delay between each retry attempt
 
@@ -128,12 +113,8 @@ while True:
 with open("partitions_list", "rb") as file:
     partitions_list = pickle.load(file)
 wandb.log({"partitions_list": partitions_list})
-if args.dp_mode == "global":
-    privacy_guarantee = tfp.compute_dp_sgd_privacy(10, configs.get("batch_size"),
-                                                   noise, args.num_rounds,
-                                                   delta=0.05)
-else:
-    privacy_guarantee = tfp.compute_dp_sgd_privacy(configs.get("num_examples_10"),configs.get("batch_size"),noise,configs.get("epochs")/args.num_rounds,delta=configs.get("delta"))
+num_examples_per_client = int(len(partitions_list[0])*0.8)
+privacy_guarantee = tfp.compute_dp_sgd_privacy(num_examples_per_client,configs.get("batch_size"),noise,configs.get("epochs"),delta=calculate_delta(num_examples_per_client))
 def train_loop(num_rounds=1, num_clients=1):
     """
     Train loop function for FL

@@ -4,11 +4,11 @@ export PYTHONPATH="${PYTHONPATH}:../."
 export TF_CPP_MIN_LOG_LEVEL=3
 DATA_PATH=$1
 NOISE=$2
-NUM_ROUNDS=$3
+NUM_CLIENTS=$3
 WANDB_API_KEY=$4
 REPEATS=$5
 SYSTEM_ONLY=$6
-MODE=$7
+NUM_ROUNDS=1
 DATA_NAME=$(basename "$DATA_PATH" .csv)
 echo "Starting tff experiment with num clients ${NUM_CLIENTS} num rounds ${NUM_ROUNDS} and data ${DATA_NAME} and ${REPEATS} repeats"
 # Creates partitions and saves the row indices of each partition to file so it can be read from clients
@@ -28,7 +28,7 @@ if [ $SYSTEM_ONLY != "1" ]; then
     done
     sleep 6
     echo "Start training for repeat ${repeat}"
-    python tff_dp.py --noise $NOISE --num_rounds $NUM_ROUNDS --data_path $DATA_PATH --run_repeat $repeat --dp_mode $MODE
+    python tff_dp.py --noise $NOISE --num_rounds $NUM_ROUNDS --data_path $DATA_PATH --run_repeat $repeat --num_clients $NUM_CLIENTS
     pkill worker_service
     echo "Repeat model metrics ${repeat} num clients ${NUM_CLIENTS} num rounds ${NUM_ROUNDS} and data ${DATA_NAME} complete"
     echo "<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<"
@@ -55,21 +55,21 @@ if [ $SYSTEM_ONLY != "2" ]; then
     # Bounds the CPU with 'cpu_num_1' to the client process
     taskset -c -pa $cpu_num_1 $worker_id
     echo "Start training"
-    python tff_dp.py --noise $NOISE --num_rounds $NUM_ROUNDS --data_path $DATA_PATH --run_repeat $repeat --system_metrics true --dp_mode $MODE &
+    python tff_dp.py --noise $NOISE --num_rounds $NUM_ROUNDS --data_path $DATA_PATH --run_repeat $repeat --system_metrics true  --num_clients $NUM_CLIENTS &
     train_id=$!
     # Bind server process "train.py" to cpu num 2
     taskset -c -pa $cpu_num_2 $train_id
-    worker_time_logs="timelogs/tff_worker_${DATA_NAME}_10_${NUM_ROUNDS}_repeat_${repeat}.txt"
-    train_time_logs="timelogs/tff_train_${DATA_NAME}_10_${NUM_ROUNDS}_repeat_${repeat}.txt"
+    worker_time_logs="timelogs/tff_worker_${DATA_NAME}_10_${NUM_CLIENTS}_repeat_${repeat}.txt"
+    train_time_logs="timelogs/tff_train_${DATA_NAME}_10_${NUM_CLIENTS}_repeat_${repeat}.txt"
     # Record memory from client and server process and log to file
     psrecord $worker_id --log $worker_time_logs --interval 0.5 &
     psrecord $train_id --log $train_time_logs --interval 0.5
     pkill worker_service
-    project_name="dpusecase_${USECASE}_benchmark_rounds_${NUM_ROUNDS}_${DATA_NAME}_system_metrics"
+    project_name="dpusecase_${USECASE}_benchmark_clients_${DATA_NAME}_system_metrics"
     run_name="run_${repeat}"
     # Read files logged from psutil to wandb
-    python ../scripts/mem_data_to_wandb.py --logs_path $worker_time_logs --project_name $project_name --run_name $run_name --group_name "${MODE}_${NOISE}"  --memory_type "client"
-    python ../scripts/mem_data_to_wandb.py --logs_path $train_time_logs --project_name $project_name  --run_name $run_name --group_name "${MODE}_${NOISE}"   --memory_type "server"
+    python ../scripts/mem_data_to_wandb.py --logs_path $worker_time_logs --project_name $project_name --run_name $run_name --group_name "${NUM_CLIENTS}_${NOISE}"  --memory_type "client"
+    python ../scripts/mem_data_to_wandb.py --logs_path $train_time_logs --project_name $project_name  --run_name $run_name --group_name "${NUM_CLIENTS}_${NOISE}"   --memory_type "server"
     echo "Repeat system metrics ${repeat} num clients 10 num rounds ${NUM_ROUNDS} and data ${DATA_NAME} complete"
     echo "<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<"
   done

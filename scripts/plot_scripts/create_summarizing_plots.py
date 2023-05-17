@@ -1,5 +1,5 @@
 from utils.plotting import plot_swarmplots, plot_heatmap, \
-    create_loss_line_plot, calc_scale
+    create_loss_line_plot, calc_scale, create_time_diff
 from data_uploading_utils import create_loss_df, group_scenarios, transform_to_df, create_dfs_for_fl_metric
 from config import configs
 from utils.db_utils import MongoDBHandler
@@ -7,9 +7,10 @@ import pandas as pd
 
 
 mongodb = MongoDBHandler()
-for mode in ["unweighted","balanced","system"]:
+for mode in ["system"]:
     plot_path = configs.get("plot_path") + mode + "/"
     unweighted = False
+    metrics_tuples = []
     match mode:
         case "unweighted":
             if configs.get("usecase") == 1 or configs.get("usecase") == 2:
@@ -20,6 +21,8 @@ for mode in ["unweighted","balanced","system"]:
             metric1_name = "Accuracy"
             metric2_name = "AUC"
             unweighted = True
+            metrics_tuples.append((metric1,metric1_name))
+            metrics_tuples.append((metric2,metric2_name))
         case "balanced":
             if configs.get("usecase") == 1 or configs.get("usecase") == 2:
                 metric1 = "binary_accuracy"
@@ -28,21 +31,45 @@ for mode in ["unweighted","balanced","system"]:
             metric2 = "auc"
             metric1_name = "Accuracy"
             metric2_name = "AUC"
+            metrics_tuples.append((metric1, metric1_name))
+            metrics_tuples.append((metric2, metric2_name))
         case "system":
-            metric1 = "total_memory"
-            metric1_name = "Memory usage in MB"
-            metric2 = "round_time"
-            metric2_name = "Training time in seconds"
-    for metric,metric_name in zip([metric1,metric2],[metric1_name,metric2_name]):
+            metric1 = "time_diff"
+            metric1_name = "Training time difference round time - client time in seconds"
+            metric2 = "time_diff_relation"
+            metric2_name = "Relation training time rounds to client time"
+            # metric1 = "total_memory"
+            # metric1_name = "Memory usage in MB"
+            # metric2 = "total_round_time"
+            # metric2_name = "Training time in seconds"
+            # metric3 = "total_per_client_memory_client"
+            # metric3_name = "Memory per client in MB"
+            # metric4 = "total_client_time"
+            # metric4_name = "Training time in seconds per client"
+            metrics_tuples.append((metric1, metric1_name))
+            metrics_tuples.append((metric2, metric2_name))
+            # metrics_tuples.append((metric3,metric3_name))
+            # metrics_tuples.append((metric4,metric4_name))
+
+    for metric,metric_name in metrics_tuples:
         scenario_metrics = mongodb.get_data_by_name(f"scenario_metrics_{configs.get('usecase')}_{mode}",True)
-        df = create_dfs_for_fl_metric(rounds_metrics=scenario_metrics,metric_name=metric)
-        if mode != "unweighted":
+        if metric == "time_diff":
+            df1 = create_dfs_for_fl_metric(rounds_metrics=scenario_metrics,metric_name="total_round_time")
+            df2 = create_dfs_for_fl_metric(rounds_metrics=scenario_metrics,metric_name="total_client_time")
+            df = create_time_diff(df1,df2)
+        elif metric == "time_diff_relation":
+            df1 = create_dfs_for_fl_metric(rounds_metrics=scenario_metrics, metric_name="total_round_time")
+            df2 = create_dfs_for_fl_metric(rounds_metrics=scenario_metrics, metric_name="total_client_time")
+            df = create_time_diff(df1, df2, relation=True)
+        else:
+            df = create_dfs_for_fl_metric(rounds_metrics=scenario_metrics,metric_name=metric)
+        if mode != "unweighted" and metric != "time_diff" and metric != "time_diff_relation":
             central= mongodb.get_data_by_name(f"central_metrics_{configs.get('usecase')}_{mode}")
             if mode == "balanced":
                 central = { key.split("eval_",1)[1] : central[key] for key in central.keys()}
-            if metric == "round_time":
+            if metric == "round_time" or metric == "total_client_time" or metric == "total_round_time":
                 central_metric = "training_time"
-            elif metric == "total_memory":
+            elif metric == "total_memory" or metric == "total_per_client_memory_client":
                 central_metric = "total_memory_central"
             else:
                 central_metric = metric

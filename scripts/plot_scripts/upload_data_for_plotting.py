@@ -12,7 +12,7 @@ if configs.get("usecase") == 1:
 else:
     version = "essential_seeds_42"
 
-for mode in ["unweighted"]:
+for mode in ["system"]:
     central_loss = {}
     rounds =None
     if mode == "unweighted":

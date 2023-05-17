@@ -97,13 +97,14 @@ def plot_heatmap(df,framework,metric_name,data_path,standard_deviation=False,unw
 
     #plt.title(title)
     if standard_deviation:
-        df = df.pivot_table(index="group",columns="round configuration",values= "metric",aggfunc="std")
+        df = df.pivot_table(index="group",columns="round configuration",values= "metric",aggfunc="std",margins=True)
     else:
-        df = df.pivot_table(index="group",columns="round configuration",values= "metric")
+        df = df.pivot_table(index="group",columns="round configuration",values= "metric",margins=True)
+
    # df = df.pivot("group", "round configuration", "metric")
     if scale is None:
         scale = [df.min().min(),df.max().max()]
-    ax = sns.heatmap(df,cmap="rocket_r",vmin=scale[0],vmax=scale[1])
+    ax = sns.heatmap(df,cmap="rocket_r",vmin=scale[0],vmax=scale[1],annot=True)
     y_title = "Number of clients"
     x_title = "Number of rounds trained"
     if unweighted:
@@ -112,8 +113,9 @@ def plot_heatmap(df,framework,metric_name,data_path,standard_deviation=False,unw
             start_value = 50
         else:
             start_value = 20
-        x_ticks = [(int(float(x)) *5 + start_value) for x in df.index if x != "central"]
-        ax.set_yticklabels(x_ticks)
+        y_ticks = [(int(float(x)) *5 + start_value) for x in df.index if x != "central" and x != "All"]
+        y_ticks.append("All")
+        ax.set_yticklabels(y_ticks)
     plt.ylabel(y_title)
     plt.xlabel(x_title)
     plt.savefig(f"{data_path}{metric_name}_{framework}_{type_of}.png")
@@ -158,4 +160,20 @@ def plot_swarmplots(df,metric_name:str,configuration_name:str,data_path:str,plot
 
 
 
+def create_time_diff(df1, df2, relation=False):
+    """
+    Creates a df with the time difference between df1 and df2
+    :param df1: df with round time
+    :param df2: df with client time
+    :param relation: if true, return the factor round time is longer than client time
+    :return:
+    """
+    if relation:
+        df1["metric"] = df1["metric"] / df2["metric"]
+        return df1
+    round_time = df1["metric"]
+    df1["metric"] = df1["metric"] - df2["metric"]
+
+    df1["metric"] = df1["metric"]/df1["round configuration"]
+    return df1
 
