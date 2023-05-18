@@ -41,11 +41,17 @@ if [ $SYSTEM_ONLY != "2" ]; then
     rm -f timelogs/flw_logs_time.txt
     echo "Creating server"
     python server.py --data_path $DATA_PATH --run_repeat $repeat --num_clients $NUM_CLIENTS --num_rounds $NUM_ROUNDS --system_metrics true &
+    server_id=$!
     sleep 25
     echo "Start client"
     python client.py --client_index 1 --data_path $DATA_PATH --run_repeat $repeat --system_metrics true &
     client_id=$!
-    server_id=$!
+    for ((i=1;i<=$NUM_CLIENTS;i++))
+    do
+      echo "Start client ${i}"
+      client_index=$(($i -1))
+      python client.py --client_index $client_index --data_path $DATA_PATH --run_repeat $repeat &
+    done
     # Reads in all cpu available as string
     read cpu_available <<< $(taskset -pc $server_id | awk '{print $NF}')
     # Converts that string into an array

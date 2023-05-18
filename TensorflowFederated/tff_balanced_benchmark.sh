@@ -43,6 +43,13 @@ if [ $SYSTEM_ONLY != "2" ]; then
     echo "Creating single worker service"
     python worker_service.py --port 8001 --num_rounds $NUM_ROUNDS --client_index 1 --data_path $DATA_PATH --run_repeat $repeat &
     worker_id=$!
+    for ((i=2;i<=$NUM_CLIENTS;i++))
+    do
+      port=$((8000 + $i))
+      echo "Creating worker ${i} with port ${port}"
+      client_index=$(($i -1))
+      python worker_service.py --port $port --num_rounds $NUM_ROUNDS --client_index $client_index --data_path $DATA_PATH --run_repeat $repeat &
+    done
     # Reads in all cpu available as string
     read cpu_available <<< $(taskset -pc $worker_id| awk '{print $NF}')
     # Converts that string into an array

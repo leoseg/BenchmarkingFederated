@@ -43,10 +43,8 @@ def fit_config(server_round: int):
         "server_round": server_round
     }
     return config
-if args.system_metrics:
-    num_clients = 1
-else:
-    num_clients = args.num_clients
+
+num_clients = args.num_clients
 model = get_model(input_dim=configs.get("input_dim"), num_nodes=configs.get("num_nodes"),
                   dropout_rate=configs.get("dropout_rate"), l1_v=configs.get("l1_v"), l2_v=configs.get("l2_v"))
 model.compile(configs.get("optimizer"), configs.get("loss"), metrics=configs.get("metrics"))

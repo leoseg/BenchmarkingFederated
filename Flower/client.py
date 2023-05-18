@@ -78,7 +78,7 @@ class Client(fl.client.NumPyClient):
         end = tf.timestamp()
         train_loss = history.history["loss"][-1]
         # If system metrics write client time to file so the server can log it
-        if args.system_metrics:
+        if args.system_metrics and args.client_index == 0:
             tf.print("Client training time",output_stream=f"file://{flw_time_logging_directory}")
             tf.print(end-begin,output_stream=f"file://{flw_time_logging_directory}")
         return model.get_weights(), len(list(train_ds)), {"train_loss":train_loss}

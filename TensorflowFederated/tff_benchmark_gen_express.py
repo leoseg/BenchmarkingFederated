@@ -85,7 +85,7 @@ evaluation_process = tff.learning.algorithms.build_fed_eval(model_fn=model_fn)
 data_name = args.data_path.split("/")[-1].split(".")[0]
 if args.system_metrics == True:
     metrics_type = "system"
-    num_clients = 1
+    num_clients = args.num_clients
 else:
     metrics_type = "model"
     num_clients = args.num_clients
