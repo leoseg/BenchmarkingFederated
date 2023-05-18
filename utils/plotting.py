@@ -11,7 +11,12 @@ else:
 
 
 def create_loss_line_plot(df,plot_path:str):
-
+    """
+    Creates a lineplot for the loss
+    :param df: df with loss values
+    :param plot_path: path to save plot
+    :return:
+    """
     ax = sns.lineplot(df, x="round", y="loss", hue="framework")
     plt.xlabel("Round(FL)/Epoch(central)")
     num_rounds = 10

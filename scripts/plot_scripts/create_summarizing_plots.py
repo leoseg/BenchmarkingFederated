@@ -4,7 +4,9 @@ from data_uploading_utils import create_loss_df, group_scenarios, transform_to_d
 from config import configs
 from utils.db_utils import MongoDBHandler
 import pandas as pd
-
+"""
+Plotting script for which plots all heatmaps and barplots for one usecase
+"""
 
 mongodb = MongoDBHandler()
 for mode in ["system"]:

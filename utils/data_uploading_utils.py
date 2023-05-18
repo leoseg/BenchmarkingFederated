@@ -6,6 +6,13 @@ from plotting import ENTITY, ROUNDS
 
 
 def get_loss_stats(groups:list,version:str,mode:str):
+    """
+    Get the loss stats for the given groups and version
+    :param groups: groups to get the stats for
+    :param version: version to get the stats for
+    :param mode: mode to get the stats for
+    :return:
+    """
     data_path = configs.get("data_path").split("/")[-1].split(".")[0]
     usecase = configs.get("usecase")
     project_prefix = "usecase"
@@ -97,6 +104,7 @@ def get_stats_for_usecase(groups,version = None,mode="balanced",rounds=None):
     :param mode: mode of the project can be "unweighted" or "system" or "balanced"
     :param groups: groups to get the mean of the metrics for
     :param version: version of the runs
+    :param rounds: rounds to get the metrics for
     :return: list of dictionaries with the mean of the metrics for each group for each round
     """
     usecase = configs.get("usecase")
@@ -139,7 +147,7 @@ def transform_scenario_metrics_to_df(metrics:dict,metric_name:str,round_num):
     return df
 
 
-def transform_to_df(metrics:dict,metric_name,framework,group,round_configuration,round_num=1):
+def transform_to_df(metrics:dict,metric_name,framework,group,round_configuration):
     """
     Transform the metrics for one roundconfiguration and one metric to a pandas dataframe for plotting
     :param metrics: metrics for one roundconfiguration
@@ -147,7 +155,6 @@ def transform_to_df(metrics:dict,metric_name,framework,group,round_configuration
     :param framework: framework of the run
     :param group: group of the run
     :param round_configuration: roundconfiguration of the run
-    :param round_num: number of rounds used for multiplying time metrics
     :return: df with the metrics for one roundconfiguration and one metric
     """
     rows = []

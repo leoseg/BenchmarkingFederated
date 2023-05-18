@@ -1,4 +1,5 @@
 import os
+import tensorflow as tf
 from metrics import AUC as SparseAUC
 from keras.metrics import AUC,Precision,Recall,BinaryAccuracy,CategoricalCrossentropy,SparseCategoricalAccuracy
 from keras.optimizers import Adam,SGD
@@ -19,6 +20,7 @@ if os.environ["USECASE"] == "test":
         epochs=100,
         optimizer=Adam(),
         loss=BinaryCrossentropy(),
+        dp_loss=BinaryCrossentropy(reduction=tf.keras.losses.Reduction.NONE),
         metrics=[BinaryAccuracy(), AUC(name="auc"), Precision(name="precision"), Recall(name="recall")],
         earlystopping_patience=5,
         num_nodes=1024,
@@ -42,6 +44,7 @@ elif os.environ["USECASE"] == str(4):
         random_state_partitions =69,
         valid_freq = 10,
         usecase = 4,
+        dp_loss=SparseCategoricalCrossentropy(reduction=tf.keras.losses.Reduction.NONE,from_logits=True),
         batch_size = 512,
         epochs = 30,
         optimizer = Adam(),
@@ -67,7 +70,9 @@ elif os.environ["USECASE"] == str(4):
         version=version,
         data_directory="../Dataset2/",
         num_examples_10=554,
-        delta=0.0005
+        delta=0.0005,
+        dp_epochs  =100,
+        noises= [1.5,2.5, 3.5 , 4.5 , 5.5 ]
     )
 elif os.environ["USECASE"] == str(3):
     configs = dict(
@@ -82,6 +87,7 @@ elif os.environ["USECASE"] == str(3):
         unweighted_groups=["tff_0.0", "tff_4.0", "tff_8.0", "tff_10.0", "tff_12.0", "tff_14.0", "tff_16.0",
                            "flwr_0.0", "flwr_4.0", "flwr_8.0", "flwr_10.0", "flwr_12.0", "flwr_14.0", "flwr_16.0"],
         loss=SparseCategoricalCrossentropy(),
+        dp_loss=SparseCategoricalCrossentropy(reduction=tf.keras.losses.Reduction.NONE),
         metrics=[SparseCategoricalAccuracy(),SparseAUC(name="auc"),SparseAUC(curve="PR",name="prauc"),SparseAUC(multi_label=True,name="auc_macro")],
         l2_v=1.0,
         n_splits=n_splits,
@@ -97,7 +103,8 @@ elif os.environ["USECASE"] == str(3):
         version=version,
         data_directory="../Dataset2/",
         num_examples_10=554,
-        delta=0.0005
+        delta=0.0005,
+        noises = [1.5 , 2.0, 2.5, 3.0, 3.5]
     )
 elif os.environ["USECASE"] == str(2):
     configs = dict(
@@ -112,6 +119,7 @@ elif os.environ["USECASE"] == str(2):
                              "flwr_0.0","flwr_2.0","flwr_4.0","flwr_6.0","flwr_8.0","flwr_9.0","flwr_10.0"],
         optimizer=SGD(),
         loss=BinaryCrossentropy(),
+        dp_loss=BinaryCrossentropy(reduction=tf.keras.losses.Reduction.NONE),
         metrics=[BinaryAccuracy(), AUC(name="auc"), Precision(name="precision"), Recall(name="recall"), AUC(curve="PR", name="prauc"),AUC(multi_label=True,name="auc_macro")],
         l2_v=0.001,
         n_splits=n_splits,
@@ -126,7 +134,8 @@ elif os.environ["USECASE"] == str(2):
         version=version,
         data_directory="../DataGenExpression/",
         num_examples_10=961,
-        delta=0.0005
+        delta=0.0005,
+        noises = [1.5, 2.5, 3.5, 4.0, 5.0]
     )
 else:
     configs = dict(
@@ -157,7 +166,9 @@ else:
         number_of_classes =1,
         random_seed_set = True,
         version=version,
+        dp_loss=BinaryCrossentropy(reduction="none"),
         data_directory="../DataGenExpression/",
         num_examples_10 = 961,
-        delta = 0.0005
+        delta = 0.0005,
+        noises = [2.0, 3.0, 4.0, 5.0, 6.0]
     )

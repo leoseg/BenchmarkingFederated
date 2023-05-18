@@ -77,7 +77,7 @@ def model_fn():
 # Uses customized classes that measure train time of clients and write that to a file
 
 aggregator = tff.learning.robust_aggregator(zeroing=False, clipping=False,weighted=False)
-optimizer = tfp.DPKerasAdamOptimizer(l2_norm_clip=1.0,noise_multiplier=noise)
+optimizer = tfp.DPKerasAdamOptimizer(l2_norm_clip=1.0,noise_multiplier=noise,num_microbatches=1)
 #momentum = 0.9
 momentum = 0.0
 

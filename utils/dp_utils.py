@@ -27,6 +27,11 @@ def calculate_delta(num_examples: int) -> float:
 
 
 def calculate_epsilon_for_usecases(noise_multiplier):
+    """
+    This function calculates the epsilon for the usecases 1, 2, 3 and 4.
+    :param noise_multiplier: noise multiplier to use for calculation
+    :return:
+    """
     usecase_data = {
         1: {
             "batch_size": 512,
@@ -41,7 +46,7 @@ def calculate_epsilon_for_usecases(noise_multiplier):
         3: {
             "batch_size": 512,
             "num_examples_list": [1848, 5544],#, 110],
-            "epochs": 10,
+            "epochs": 100,
         },
         4: {
             "batch_size": 512,
@@ -56,9 +61,10 @@ def calculate_epsilon_for_usecases(noise_multiplier):
             delta = calculate_delta(num_examples)
             if data["batch_size"] > num_examples:
                 data["batch_size"] = num_examples
-            print(compute_dp_sgd_privacy.compute_dp_sgd_privacy(n=num_examples, batch_size=data["batch_size"],
+
+            print(compute_dp_sgd_privacy.compute_dp_sgd_privacy_statement(number_of_examples=num_examples, batch_size=data["batch_size"],
                                                                 noise_multiplier=noise_multiplier,
-                                                                epochs=data["epochs"], delta=delta))
+                                                                num_epochs=data["epochs"], delta=delta))
 
 
 if __name__ == '__main__':

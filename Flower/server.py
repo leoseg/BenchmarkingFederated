@@ -6,7 +6,7 @@ from flwr.common import NDArrays, Scalar
 from flwr.server import SimpleClientManager
 from flwr.server import start_server
 import argparse
-from Flower.flwr_utils import evaluate_metrics_aggregation_fn, get_evaluate_fn
+from Flower.flwr_utils import evaluate_metrics_aggregation_fn
 from config import configs
 from Flower.customized_flw_modules.server import Server
 from evaluation_utils import load_test_data_for_evaluation, evaluate_model

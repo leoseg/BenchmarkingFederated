@@ -21,13 +21,19 @@ pip3 install --upgrade pip
 pip install -e utils
 pip3 install -r requirements.txt
 cd TensorflowFederated || exit
-#if [ $3 =  "1" ] ||  [ $3 = "3" ] || [ $3 = "4" ]; then
-#   round_config=(1)
-#elif [  $3 = "2" ]; then
-#   round_config=(1 4)
-#fi
-clients_config=(3 5 10 50)
-noises=(0.0 0.25 0.5 0.75 1.0 1.25)
+clients_config=(3)
+if [ "$USECASE" -eq "4" ]
+then
+    noises=(2.5 3.5 4.5 5.5 6.0)
+elif [ "$USECASE" -eq "3" ]
+then
+    noises=(1.5 2.0 2.5 3.0 3.5)
+elif [ "$USECASE" -eq "2" ]
+then
+    noises=(1.5 2.5 3.5 4.0 5.0)
+else
+    noises=(2.0 3.0 4.0 5.0 6.0)
+fi
 # Loops trough round and number of clients configuration
 for clients in "${clients_config[@]}";
 do
