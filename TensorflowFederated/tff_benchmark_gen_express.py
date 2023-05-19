@@ -163,7 +163,7 @@ def train_loop(num_rounds=1, num_clients=1):
         if args.system_metrics:
             round_time = end-begin
             wandb.log({"round_time":tf.get_static_value(round_time)},step=round)
-            wandb.log(get_time_logs(tff_time_logging_directory,True),step=round)
+            #wandb.log(get_time_logs(tff_time_logging_directory,True),step=round)
         if args.unweighted_percentage >= 0:
             weights = trainer.get_model_weights(state)
             # Save model weights

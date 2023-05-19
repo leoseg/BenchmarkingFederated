@@ -154,7 +154,7 @@ class Server:
             # Logs system metrics to wandb if flag is set
             if self.system_metrics:
                 wandb.log({"round_time":tf.get_static_value(end - begin)},step=current_round)
-                wandb.log(get_time_logs(flw_time_logging_directory, True),step=current_round)
+                #wandb.log(get_time_logs(flw_time_logging_directory, True),step=current_round)
             # Evaluate model using strategy implementation
             if not self.system_metrics and self.unweighted>=0.0:
                 res_cen = self.strategy.evaluate(current_round, parameters=self.parameters)
