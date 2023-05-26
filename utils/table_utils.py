@@ -199,9 +199,61 @@ def transform_df_to_landscape_table(df,headers,caption, central_df=None):
     central_df_string =""
     if central_df is not None:
         central_df_string = central_df.to_latex(index=False, header=["Central model value"], escape=False)
-    df_string = "\\begin{landscape}\n \\begin{table}\n \caption{"+caption+ "}\n \\begin{tiny}\n " + df_string + central_df_string+"\n\end{tiny}\n\end{table}\n\end{landscape}"
-    with open("landscape_table.txt", "w") as f:
-        f.write(df_string)
+    return "\\begin{landscape}\n \\begin{table}\n \caption{"+caption+ "}\n \\begin{tiny}\n " + df_string + central_df_string+"\n\end{tiny}\n\end{table}\n\end{landscape}"
+    # with open("landscape_table.txt", "w") as f:
+    #     f.write(df_string)
 
+def get_usecase_name(usecase:int):
+    """
+    Returns the name of the usecase
+    :param usecase: usecase number
+    :return: name of the usecase
+    """
+    match usecase:
+        case 1:
+            return "BloodDL"
+        case 2:
+            return "BloodLog"
+        case 3:
+            return "BrainCellLog"
+        case 4:
+            return "BrainCellDL"
 
+def get_mode_name(mode:str):
+    """
+    Returns the name of the mode
+    :param mode: mode
+    :return: name of the mode
+    """
+    match mode:
+
+        case "balanced":
+            return "Benchmark model performance for number of clients"
+        case "unweighted":
+            return "Benchmark model performance for class imbalance"
+        case "system":
+            return "Benchmark computational resources"
+def get_metrics_for_mode(mode):
+    """
+    Returns the metrics for a given mode
+    :param mode: mode to return metrics for
+    :return: list of metrics
+    """
+    match mode:
+        case "balanced":
+            return [
+                ("eval_auc", "AUC"),
+                ("eval_accuracy", "Accuracy"),
+            ]
+        case "unbalanced":
+            return [
+                ("global_auc", "AUC"),
+                ("global_accuracy", "Accuracy"),
+            ]
+        case "system":
+            return [
+                ("total_memory", "Total memory usage in MB"),
+                ("total_round_time", "Training time in seconds of all rounds"),
+                ("total_per_client_memory_client", "Memory per client in MB"),
+                ("total_client_time", "Training time in seconds per client")]
 

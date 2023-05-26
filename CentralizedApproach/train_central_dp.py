@@ -1,7 +1,7 @@
 from keras.losses import CategoricalCrossentropy
 import tensorflow as tf
 from utils.data_utils import load_data, create_X_y_from_gen_df, load_gen_data_as_train_test_split,preprocess_data
-from utils.models import get_model
+from utils.dp_models import get_model
 from sklearn.model_selection import StratifiedKFold, train_test_split
 import wandb
 from wandb.keras import WandbCallback
@@ -50,7 +50,7 @@ num_nodes = args.num_nodes
 dropout_rate = args.dropout_rate
 l1_v = args.l1_v
 project_name = "central_dp_metrics"
-for noise in configs.get("noises"):
+for noise in [10.0]:
     group_name=f"usecase_{configs['usecase']}_noise_{noise}"
 
     # Trains the model with a train, validation, test split
@@ -72,7 +72,7 @@ for noise in configs.get("noises"):
                   loss=configs.get("dp_loss"),
                   metrics=configs.get("metrics"))
 
-    history = model.fit(X_train, y_train, epochs=300, batch_size=configs.get("batch_size"), validation_freq=configs["valid_freq"], validation_split=0.1,callbacks=[wandb_callback])
+    history = model.fit(X_train, y_train, epochs=configs.get("epochs"), batch_size=configs.get("batch_size"), validation_freq=configs["valid_freq"], validation_split=0.1,callbacks=[wandb_callback])
     score = model.evaluate(X_test, y_test, verbose = 0,return_dict=True)
 
 
@@ -99,12 +99,12 @@ for noise in configs.get("noises"):
             scaler = StandardScaler()
             X_train = scaler.fit_transform(X_train)
             X_test = scaler.transform(X_test)
-        optimizer = tfp.DPKerasAdamOptimizer(l2_norm_clip=1.0, noise_multiplier=noise,num_microbatches=1)
+        optimizer = tfp.DPKerasAdamOptimizer(l2_norm_clip=1.0, noise_multiplier=noise)
         model = get_model(input_dim=X_train.shape[1], num_nodes=num_nodes,dropout_rate=dropout_rate, l1_v=l1_v, l2_v=configs.get("l2_v"))
         model.compile(optimizer,
-                      loss=configs.get("loss"),
+                      loss=configs.get("dp_loss"),
                       metrics=configs.get("metrics"))
-        model.fit(X_train, Y[train], epochs=100,batch_size=configs.get("batch_size"),callbacks=[wandb_callback])
+        model.fit(X_train, Y[train], epochs=configs.get("epochs"),batch_size=configs.get("batch_size"),callbacks=[wandb_callback])
 
         #evaluate
         score = model.evaluate(X_test, Y[test], verbose = 0,return_dict=True)
