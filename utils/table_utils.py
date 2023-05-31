@@ -199,7 +199,7 @@ def transform_df_to_landscape_table(df,headers,caption, central_df=None):
     central_df_string =""
     if central_df is not None:
         central_df_string = central_df.to_latex(index=False, header=["Central model value"], escape=False)
-    return "\\begin{landscape}\n \\begin{table}\n \caption{"+caption+ "}\n \\begin{tiny}\n " + df_string + central_df_string+"\n\end{tiny}\n\end{table}\n\end{landscape}"
+    return "\\begin{table}\n \caption{"+caption+ "}\n \\begin{tiny}\n " + df_string + central_df_string+"\n\end{tiny}\n\end{table}\n"
     # with open("landscape_table.txt", "w") as f:
     #     f.write(df_string)
 
@@ -233,7 +233,7 @@ def get_mode_name(mode:str):
             return "Benchmark model performance for class imbalance"
         case "system":
             return "Benchmark computational resources"
-def get_metrics_for_mode(mode):
+def get_metrics_for_mode(mode,usecase):
     """
     Returns the metrics for a given mode
     :param mode: mode to return metrics for
@@ -241,14 +241,22 @@ def get_metrics_for_mode(mode):
     """
     match mode:
         case "balanced":
+            if usecase == 1 or  usecase == 2:
+                metric1 = "binary_accuracy"
+            else:
+                metric1 = "sparse_categorical_accuracy"
             return [
-                ("eval_auc", "AUC"),
-                ("eval_accuracy", "Accuracy"),
+                ("auc", "AUC"),
+                (metric1, "Accuracy"),
             ]
-        case "unbalanced":
+        case "unweighted":
+            if usecase == 1 or usecase == 2:
+                metric1 = "binary_accuracy_global"
+            else:
+                metric1 = "sparse_categorical_accuracy_global"
             return [
-                ("global_auc", "AUC"),
-                ("global_accuracy", "Accuracy"),
+                ("auc_global", "AUC"),
+                (metric1, "Accuracy"),
             ]
         case "system":
             return [
@@ -257,3 +265,19 @@ def get_metrics_for_mode(mode):
                 ("total_per_client_memory_client", "Memory per client in MB"),
                 ("total_client_time", "Training time in seconds per client")]
 
+
+
+
+def convert_val(val):
+    """
+    Converts a value to a string with the correct number of significant digits
+    :param val: value to convert
+    :return: string with correct number of significant digits
+    """
+    parts = val.split(' ± ')
+
+    # Convert each part to float, round to nearest integer, convert back to string
+    parts = [str(int(round(float(part)))) for part in parts]
+
+    # Concatenate the parts back together
+    return ' ± '.join(parts)

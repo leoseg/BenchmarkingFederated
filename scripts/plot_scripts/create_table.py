@@ -1,17 +1,17 @@
 import pandas as pd
 
 from table_utils import transform_df_to_latex, create_summarize_dataframe_from_metrics, transform_central_metric_to_df, \
-    transform_df_to_landscape_table, get_usecase_name, get_metrics_for_mode, get_mode_name
+    transform_df_to_landscape_table, get_usecase_name, get_metrics_for_mode, get_mode_name, convert_val
 from db_utils import MongoDBHandler
 
-headers = ["Nr. Clients","1 Rounds TFF", " 1 Rounds Flwr","3 Rounds TFF", "Round 3 Flwr","5 Rounds TFF", "5 Rounds Flwr","10 Rounds TFF", "10 Rounds Flwr", "Rounds Summary TFF", "Rounds Summary Flwr"]
+headers = ["Nr. Clients","1 Rounds TFF", " 1 Rounds Flwr","3 Rounds TFF", "3 Rounds Flwr","5 Rounds TFF", "5 Rounds Flwr","10 Rounds TFF", "10 Rounds Flwr", "Rounds Summary TFF", "Rounds Summary Flwr"]
 mongodb = MongoDBHandler()
 appendixstr = ""
-for usecase in [1, 2, 3, 4]:
-    appendixstr += f"\\section{{Usecase {usecase}}}\\"
+for usecase in [1,2,3,4]:
+    appendixstr += f"\chapter{{Usecase {usecase}}}\n"
     for mode in ["system","balanced","unweighted"]:
 
-        appendixstr += f"\\subsection{{{get_mode_name(mode)}}}\\"
+        appendixstr += f"\section{{{get_mode_name(mode)}}}\n"
         if mode == "unweighted":
             if usecase in [1,2]:
                 groups =["tff_0.0","tff_2.0","tff_4.0","tff_6.0","tff_8.0","tff_9.0","tff_10.0",
@@ -22,7 +22,9 @@ for usecase in [1, 2, 3, 4]:
         else:
             groups = ["tff_3","flwr_3","tff_5","flwr_5","tff_10","flwr_10","tff_50","flwr_50"]
         data = mongodb.get_data_by_name(f"scenario_metrics_{usecase}_{mode}",calc_total_memory=True)
-        for metric,metric_name in get_metrics_for_mode(mode):
+        appendixstr += "\\begin{landscape}\n "
+        for metric,metric_name in get_metrics_for_mode(mode,usecase):
+
             df = create_summarize_dataframe_from_metrics(data=data,metric_name=metric,rounds=[1,3,5,10],groups=groups)
             if mode == "unweighted":
                 central_df = None
@@ -37,7 +39,12 @@ for usecase in [1, 2, 3, 4]:
                 else:
                     central_metric = metric
                 central_df = transform_central_metric_to_df(central, metric_name=central_metric)
-            appendixstr += transform_df_to_landscape_table(df,headers, f"{metric_name} for usecase {get_usecase_name(usecase)}",central_df=central_df)
-            appendixstr += "\\newpage"
+            if "memory" in metric:
+                cols = [col for col in df.columns if col != 'group']
+                for col in cols:
+                    df[col] = df[col].apply(convert_val)
+            appendixstr += transform_df_to_landscape_table(df,headers, f"{metric_name} for {get_usecase_name(usecase)}",central_df=central_df)
+        appendixstr += "\end{landscape}"
+        appendixstr += "\\newpage"
 with open("table.txt", "w") as f:
     f.write(appendixstr)

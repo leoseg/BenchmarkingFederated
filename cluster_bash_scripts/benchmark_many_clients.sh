@@ -2,7 +2,7 @@
 #SBATCH -J tff_bal
 #SBATCH --time=2-00:00:00
 #SBATCH --partition=clara
-#SBATCH --cpus-per-task=31
+#SBATCH --cpus-per-task=60
 #SBATCH --mem=200G
 module load Python/3.10.4-GCCcore-11.3.0
 export PYTHONPATH="${PYTHONPATH}:../."
