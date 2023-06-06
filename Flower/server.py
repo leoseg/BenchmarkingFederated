@@ -34,6 +34,9 @@ parser.add_argument(
 parser.add_argument(
     "--unweighted_percentage",type=float,help="flag that show that data is that much unweighted",default=-1.0
 )
+parser.add_argument(
+    "--network_metrics",type=bool,help="flag for network metrics",default=False
+)
 # print help if no argument is specified
 args = parser.parse_args()
 def fit_config(server_round: int):
@@ -92,7 +95,8 @@ start_server(
         strategy=strat,
         run_repeat=args.run_repeat,
         system_metrics=args.system_metrics,
-        unweighted=args.unweighted_percentage
+        unweighted=args.unweighted_percentage,
+        network_metrics=args.network_metrics
     ),
     config=fl.server.ServerConfig(num_rounds=args.num_rounds)
 )

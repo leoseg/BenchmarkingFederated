@@ -9,7 +9,7 @@ Plotting script for which plots all heatmaps and barplots for one usecase
 """
 
 mongodb = MongoDBHandler()
-for mode in ["system"]:
+for mode in ["balanced","unweighted"]:
     plot_path = configs.get("plot_path") + mode + "/"
     unweighted = False
     metrics_tuples = []

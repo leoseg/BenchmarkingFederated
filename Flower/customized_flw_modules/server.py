@@ -64,7 +64,7 @@ class Server:
     """Flower server."""
 
     def __init__(
-        self, unweighted:bool,system_metrics:bool, run_repeat:int,num_clients:int,data_path:str, client_manager: ClientManager, strategy: Optional[Strategy] = None
+        self, network_metrics:bool, unweighted:bool,system_metrics:bool, run_repeat:int,num_clients:int,data_path:str, client_manager: ClientManager, strategy: Optional[Strategy] = None
     ) -> None:
         self._client_manager: ClientManager = client_manager
         self.parameters: Parameters = Parameters(
@@ -75,6 +75,7 @@ class Server:
         self.run_repeat = run_repeat
         self.num_clients = num_clients
         self.data_path = data_path
+        self.network_metrics = network_metrics
         self.strategy: Strategy = strategy if strategy is not None else FedAvg()
         self.max_workers: Optional[int] = None
 
@@ -115,7 +116,7 @@ class Server:
         log(INFO, "FL starting")
         start_time = timeit.default_timer()
         data_name = self.data_path.split("/")[-1].split(".")[0]
-        if self.system_metrics:
+        if self.system_metrics or self.network_metrics:
             metrics_type = "system"
         else:
             metrics_type ="model"
@@ -128,17 +129,18 @@ class Server:
         else:
             group = f"flwr_{self.num_clients}"
         DELAY_SECONDS = 5  # Delay between each retry attempt
-        while True:
-            try:
-                wandb.init(project=project_name, group=group, name=f"run_{self.run_repeat}",config=configs)
-                print("Wandb initialized successfully")
-                break
-            except ConnectionRefusedError:
-                print(f"Connection refused. Retrying in {DELAY_SECONDS} seconds...")
-                time.sleep(DELAY_SECONDS)
-        with open("partitions_list", "rb") as file:
-            partitions_list = pickle.load(file)
-        wandb.log({"partitions_list":partitions_list})
+        if not self.network_metrics:
+            while True:
+                try:
+                    wandb.init(project=project_name, group=group, name=f"run_{self.run_repeat}",config=configs)
+                    print("Wandb initialized successfully")
+                    break
+                except ConnectionRefusedError:
+                    print(f"Connection refused. Retrying in {DELAY_SECONDS} seconds...")
+                    time.sleep(DELAY_SECONDS)
+            with open("partitions_list", "rb") as file:
+                partitions_list = pickle.load(file)
+            wandb.log({"partitions_list":partitions_list})
         # If unweighted step is set reads number of samples per class per clients and log to wandb
         # if self.unweighted >= 0.0:
         #     wandb.log({f"class_num_table_{int(self.unweighted)}":pd.read_csv(f"partitions_dict_{int(self.unweighted)}.csv")})
@@ -177,7 +179,7 @@ class Server:
                     )
 
             # Evaluate model on a sample of available clients
-            if not self.system_metrics:
+            if not self.system_metrics and not self.network_metrics:
                 wandb.log(metrics_train,step=current_round)
                 res_fed = self.evaluate_round(server_round=current_round, timeout=timeout)
                 if res_fed:

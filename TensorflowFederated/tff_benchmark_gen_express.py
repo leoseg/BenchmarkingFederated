@@ -40,6 +40,9 @@ parser.add_argument(
 parser.add_argument(
     "--unweighted_percentage",type=float,help="flag that show that data is that much unweighted",default=-1.0
 )
+parser.add_argument(
+    "--network_metrics",type=bool,help="flag for network metrics",default=False
+)
 # print help if no argument is specified
 args = parser.parse_args()
 unweighted = args.unweighted_percentage
@@ -64,9 +67,9 @@ def model_fn():
     model = get_model(input_dim=configs.get("input_dim"), num_nodes= configs.get("num_nodes"), dropout_rate=configs.get("dropout_rate"), l1_v= configs.get("l1_v"), l2_v=configs.get("l2_v"))
     # Chooses metrics depending on usecase
     if configs["usecase"] ==3 or configs["usecase"] == 4:
-        metrics = [SparseCategoricalAccuracy(),SparseAUC(name="auc"),SparseAUC(name="auc_macro",multi_label=True),SparseAUC(curve="PR",name="prauc")]
+        metrics = [SparseCategoricalAccuracy(),SparseAUC(name="auc"),SparseAUC(curve="PR",name="prauc")]
     else:
-        metrics = [BinaryAccuracy(),AUC(),Precision(),Recall(),AUC(curve="PR",name="prauc"),AUC(multi_label=True,name="auc_macro")]
+        metrics = [BinaryAccuracy(),AUC(),Precision(),Recall(),AUC(curve="PR",name="prauc")]
     return tff.learning.from_keras_model(
         model,
         input_spec=element_spec,
@@ -83,7 +86,7 @@ trainer = build_weighted_fed_avg(
 # Build federated evaluation process
 evaluation_process = tff.learning.algorithms.build_fed_eval(model_fn=model_fn)
 data_name = args.data_path.split("/")[-1].split(".")[0]
-if args.system_metrics == True:
+if args.system_metrics == True or args.network_metrics == True:
     metrics_type = "system"
     num_clients = args.num_clients
 else:
@@ -103,17 +106,18 @@ print("Training initialized")
 
 DELAY_SECONDS = 5  # Delay between each retry attempt
 
-while True:
-    try:
-        wandb.init(project=project_name, group=group, name=f"run_{args.run_repeat}",config=configs)
-        print("Wandb initialized successfully")
-        break
-    except ConnectionRefusedError:
-        print(f"Connection refused. Retrying in {DELAY_SECONDS} seconds...")
-        time.sleep(DELAY_SECONDS)
-with open("partitions_list", "rb") as file:
-    partitions_list = pickle.load(file)
-wandb.log({"partitions_list": partitions_list})
+if not args.network_metrics:
+    while True:
+        try:
+            wandb.init(project=project_name, group=group, name=f"run_{args.run_repeat}",config=configs)
+            print("Wandb initialized successfully")
+            break
+        except ConnectionRefusedError:
+            print(f"Connection refused. Retrying in {DELAY_SECONDS} seconds...")
+            time.sleep(DELAY_SECONDS)
+    with open("partitions_list", "rb") as file:
+        partitions_list = pickle.load(file)
+    wandb.log({"partitions_list": partitions_list})
 
 def train_loop(num_rounds=1, num_clients=1):
     """
@@ -153,7 +157,7 @@ def train_loop(num_rounds=1, num_clients=1):
         train_metrics = result.metrics
         print("weights after round {round} are:")
         print(trainer.get_model_weights(state).trainable)
-        if not args.system_metrics:
+        if not args.system_metrics and not args.network_metrics:
             model_weights = trainer.get_model_weights(state)
             evaluation_state = evaluation_process.set_model_weights(evaluation_state, model_weights)
             evaluation_output = evaluation_process.next(evaluation_state, eval_data)

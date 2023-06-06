@@ -7,7 +7,7 @@ from keras.losses import BinaryCrossentropy,SparseCategoricalCrossentropy
 tff_time_logging_directory = "timelogs/tff_logs_time.txt"
 flw_time_logging_directory = "timelogs/flw_logs_time.txt"
 SEED = 42
-version = "version_1805_fixxed"
+version = "version_1005"
 n_splits = 5
 DATA_PATH = ""
 if os.environ["USECASE"] == "test":
@@ -49,7 +49,7 @@ elif os.environ["USECASE"] == str(4):
         epochs = 30,
         optimizer = Adam(),
         loss=SparseCategoricalCrossentropy(),
-        metrics=[SparseCategoricalAccuracy(), SparseAUC(name="auc"), SparseAUC(curve="PR", name="prauc"),SparseAUC(multi_label=True,name="auc_macro")],
+        metrics=[SparseCategoricalAccuracy(), SparseAUC(name="auc"), SparseAUC(curve="PR", name="prauc")],
         earlystopping_patience = 5,
         groups=["tff_3", "tff_5", "tff_10","tff_50", "flwr_3", "flwr_5", "flwr_10","flwr_50"],
         unweighted_groups=["tff_0.0", "tff_4.0", "tff_8.0", "tff_10.0", "tff_12.0", "tff_14.0","tff_16.0",
@@ -88,7 +88,7 @@ elif os.environ["USECASE"] == str(3):
                            "flwr_0.0", "flwr_4.0", "flwr_8.0", "flwr_10.0", "flwr_12.0", "flwr_14.0", "flwr_16.0"],
         loss=SparseCategoricalCrossentropy(),
         dp_loss=SparseCategoricalCrossentropy(reduction=tf.keras.losses.Reduction.NONE),
-        metrics=[SparseCategoricalAccuracy(),SparseAUC(name="auc"),SparseAUC(curve="PR",name="prauc"),SparseAUC(multi_label=True,name="auc_macro")],
+        metrics=[SparseCategoricalAccuracy(),SparseAUC(name="auc"),SparseAUC(curve="PR",name="prauc")],
         l2_v=1.0,
         n_splits=n_splits,
         shuffle=10000,

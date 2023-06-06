@@ -142,7 +142,7 @@ def transform_scenario_metrics_to_df(metrics:dict,metric_name:str,round_num):
     """
     dfs= []
     for groupname,metrics in metrics.items():
-            dfs.append(transform_to_df(metrics,metric_name,groupname.split("_")[0],groupname.split("_")[1],round_num, round_num))
+            dfs.append(transform_to_df(metrics,metric_name,groupname.split("_")[0],groupname.split("_")[1],round_num))
     df = pd.concat(dfs)
     return df
 

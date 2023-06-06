@@ -61,6 +61,8 @@ def seaborn_plot (x,metric_name,hue,data,palette,title,data_path,dodge=True,conf
     #ax.set_title(title)
     # set y axis title to metric name
     plt.ylabel(metric_name)
+    if metric_name == "AUC":
+        plt.axhline(0.5, color='red', linestyle='--')
     if scale is not None:
         plt.ylim(scale[0],scale[1])
     # set x axis title to group name
