@@ -119,7 +119,7 @@ def get_stats_for_usecase(groups,version = None,mode="balanced",rounds=None):
     if mode == "system":
         metrics_prefix ="system"
         version = "version_1005"
-        metrics_names = ["memory_client","memory_server","round_time","client_time"]
+        metrics_names = ["memory_client","memory_server","round_time","client_time","sent","received"]
     else:
         metrics_names = [element.name for element in configs.get("metrics")]
         metrics_names.append("loss")
@@ -253,6 +253,9 @@ def get_system_metrics(history, metric_names, group):
                     metrics["first_round_time"] = time.iloc[0]
                 if metric == "client_time" or metric == "round_time":
                     metrics["total_"+metric] = time.sum()
+        elif metric in ["sent","recieved"]:
+            number_of_clients = int(group.split("_")[-1])
+            metrics[metric] = history.get(metric)[-1] * number_of_clients
     if "client_time" in metrics.keys() and "round_time" in metrics.keys():
         # if both client_time and round_time are in the metric_names, get the time_diff
         metrics["time_diff"] = metrics["round_time"] - metrics["client_time"]

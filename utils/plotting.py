@@ -2,7 +2,7 @@ import pandas as pd
 import seaborn as sns
 from config import configs
 import matplotlib.pyplot as plt
-
+import matplotlib.patches as mpatches
 ENTITY = "Scads"
 if configs.get("usecase") == 2:
     ROUNDS = [1,2,4,8]
@@ -30,7 +30,7 @@ def create_loss_line_plot(df,plot_path:str):
     plt.show()
 
 
-def seaborn_plot (x,metric_name,hue,data,palette,title,data_path,dodge=True,configuration_name="Number of Rounds", plot_type="box",scale=None):
+def seaborn_plot (x,metric_name,hue,data,palette,title,data_path,dodge=True,configuration_name="Number of Rounds", plot_type="box",scale=None,data2=None):
     """
     Plots a seaborn boxplot to easy exchange plottype
     :param x: x axis data
@@ -54,6 +54,16 @@ def seaborn_plot (x,metric_name,hue,data,palette,title,data_path,dodge=True,conf
         case "bar":
             ax = sns.barplot(x=x, y="metric", hue=hue,
             data=data, palette=palette, dodge=dodge)
+            if data2:
+                # bottom bar
+                palette2 = {"TFF": sns_palette[3], "FLWR": sns_palette[4]}
+                ax2 = sns.barplot(x=x, y="metric", hue=hue,
+                data=data2, palette=palette2, dodge=dodge)
+                top_bar_tff = mpatches.Patch(color= sns_palette[1], label='TFF Sent')
+                bottom_bar_tff = mpatches.Patch(color=sns_palette[3], label='TFF Received')
+                top_bar_flwr = mpatches.Patch(color=sns_palette[2], label='FLWR Sent')
+                bottom_bar_flwr = mpatches.Patch(color=sns_palette[4], label='FLWR Received')
+                plt.legend(handles=[top_bar_tff,bottom_bar_tff,top_bar_flwr,bottom_bar_flwr])
         case "box_points":
             ax = sns.boxplot(x=x, y="metric", hue=hue,
                  data=data, palette=palette, dodge=dodge)
@@ -138,7 +148,7 @@ def calc_scale(df,mode):
         max_value = df["metric"].max() + 0.7 * df["metric"].max()
         min_value = min(df["metric"].min() - 0.7 * df["metric"].min(),0)
     return (min_value,max_value)
-def plot_swarmplots(df,metric_name:str,configuration_name:str,data_path:str,plot_type:str,scale=None):
+def plot_swarmplots(df,metric_name:str,configuration_name:str,data_path:str,plot_type:str,scale=None,data2=None):
     """
     Plots swarmplots for the given df which contains all data for one metric
     :param df: df with all data for one metric
@@ -152,17 +162,18 @@ def plot_swarmplots(df,metric_name:str,configuration_name:str,data_path:str,plot
         round_df = pd.concat([round_df,df[df["round configuration"] == round_num]],ignore_index=True)
         seaborn_plot("group", metric_name, "framework", round_df, "Set2",
                      f"Round configuration {round_num}",configuration_name=configuration_name,plot_type=plot_type,
-                     data_path=data_path,scale=scale)
+                     data_path=data_path,scale=scale,data2=data2)
         plt.show()
     seaborn_plot("group", metric_name, "framework", df, "Set2", f"Group configs over all round configs",
-                 configuration_name=configuration_name,plot_type=plot_type,data_path=data_path,scale=scale)
-    seaborn_plot("round configuration", metric_name, "framework", df, "Set2", f"Round configs over all groups",plot_type=plot_type,data_path=data_path,scale=scale)
+                 configuration_name=configuration_name,plot_type=plot_type,data_path=data_path,scale=scale,data2=data2)
+    seaborn_plot("round configuration", metric_name, "framework", df, "Set2", f"Round configs over all groups",plot_type=plot_type,data_path=data_path,scale=scale,data2=data2)
     for group in df["group"].unique():
         if group == "central":
             continue
         group_df = df[df["group"] == "central"]
         group_df = pd.concat([group_df,df[df["group"] == group]],ignore_index=True)
-        seaborn_plot("round configuration", metric_name, "framework", group_df, "Set2", f"Group {group}",plot_type=plot_type,data_path=data_path,scale=scale)
+        seaborn_plot("round configuration", metric_name, "framework", group_df, "Set2", f"Group {group}",plot_type=plot_type,data_path=data_path,scale=scale,data2=data2)
+
 
 
 

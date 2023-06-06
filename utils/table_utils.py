@@ -263,7 +263,9 @@ def get_metrics_for_mode(mode,usecase):
                 ("total_memory", "Total memory usage in MB"),
                 ("total_round_time", "Training time in seconds of all rounds"),
                 ("total_per_client_memory_client", "Memory per client in MB"),
-                ("total_client_time", "Training time in seconds per client")]
+                ("total_client_time", "Training time in seconds per client"),
+                ("sent","Kilobytes sent from client"),
+                ("received","Kilobytes received by client"),]
 
 
 

@@ -9,7 +9,7 @@ Plotting script for which plots all heatmaps and barplots for one usecase
 """
 
 mongodb = MongoDBHandler()
-for mode in ["balanced","unweighted"]:
+for mode in ["system"]:
     plot_path = configs.get("plot_path") + mode + "/"
     unweighted = False
     metrics_tuples = []
@@ -36,10 +36,10 @@ for mode in ["balanced","unweighted"]:
             metrics_tuples.append((metric1, metric1_name))
             metrics_tuples.append((metric2, metric2_name))
         case "system":
-            metric1 = "time_diff"
-            metric1_name = "Training time difference round time - client time in seconds"
-            metric2 = "time_diff_relation"
-            metric2_name = "Relation training time rounds to client time"
+            metric1 = "sent"
+            metric1_name = "Kilobytes send from clients"
+            # metric2 = "received"
+            # metric2_name = "Kilobytes received at clients"
             # metric1 = "total_memory"
             # metric1_name = "Memory usage in MB"
             # metric2 = "total_round_time"
@@ -54,6 +54,12 @@ for mode in ["balanced","unweighted"]:
             # metrics_tuples.append((metric4,metric4_name))
 
     for metric,metric_name in metrics_tuples:
+        if metric == "sent":
+            scenario_metrics = mongodb.get_data_by_name(f"scenario_metrics_{configs.get('usecase')}_{mode}",True)
+            df1 = create_dfs_for_fl_metric(rounds_metrics=scenario_metrics,metric_name="sent")
+            df2 = create_dfs_for_fl_metric(rounds_metrics=scenario_metrics,metric_name="received")
+            plot_swarmplots(df1,metric_name="Kilobytes send/received at clients",data_path=plot_path,plot_type="bar",scale=None,data2=df2,configuration_name="Number of clients")
+            continue
         scenario_metrics = mongodb.get_data_by_name(f"scenario_metrics_{configs.get('usecase')}_{mode}",True)
         if metric == "time_diff":
             df1 = create_dfs_for_fl_metric(rounds_metrics=scenario_metrics,metric_name="total_round_time")

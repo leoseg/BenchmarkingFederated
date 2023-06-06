@@ -25,10 +25,6 @@ for mode in ["system"]:
         central = get_central_metrics(mode=mode, metric_names=[ "eval_"+element.name  for element in configs.get("metrics")])
         if mode != "system":
             central_loss= get_loss_stats(groups=[f"usecase_{configs.get('usecase')}"],mode="central",version="loss_tracking_central")
-    if mode == "extreme":
-        rounds = [30,100]
-        central = None
-        version = "extreme"
     if mode != "system":
         loss_metrics = get_loss_stats(groups=groups,mode=mode,version=version)
         loss_metrics.update(central_loss)
