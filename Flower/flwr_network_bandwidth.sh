@@ -24,7 +24,7 @@ do
       tshark -i any -T fields -e frame.len "tcp port 8150" > tshark_packets.txt &
       tshark_pid2=$!
       echo "Creating server"
-      python server.py --run_repeat $repeat --num_clients 1 --num_rounds $rounds --network_metrics true &
+      python server.py --run_repeat $repeat --num_clients 2 --num_rounds $rounds --network_metrics true &
       sleep 25
       echo "Start client"
       python client.py --client_index 1 --run_repeat $repeat
