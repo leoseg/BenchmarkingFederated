@@ -6,14 +6,14 @@ USECASE=$3
 
 export USECASE=$USECASE
 if [ $3 =  "1" ] ||  [ $3 = "3" ] || [ $3 = "4" ]; then
-   round_config=(5 10)
+   round_config=(1 2 5 10)
 elif [  $3 = "2" ]; then
-   round_config=(1 2)
+   round_config=(1 2 4 8)
 fi
 # Loops trough round and number of clients configuration
 for rounds in "${round_config[@]}";
 do
-  for client_num in {3,5}
+  for client_num in {3,5,10,50}
   do
     for (( repeat = 0; repeat < $REPEATS; repeat++ ))
     do
