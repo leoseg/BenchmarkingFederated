@@ -7,6 +7,8 @@ import tensorflow as tf
 from utils.config import configs
 from utils.config import flw_time_logging_directory
 import pickle
+import sys
+from pympler import asizeof
 
 parser = argparse.ArgumentParser(
         prog="client.py",
@@ -64,15 +66,15 @@ class Client(fl.client.NumPyClient):
                  f"Train dataset has size {train_ds.cardinality()}",
                  f"Test dataset has size {test_ds.cardinality()}")
         #for i in range(0,5):
-        tf.print(f"train dataset entry {0} from client {args.client_index} is {list(train_ds.as_numpy_iterator())[0]}")
-        tf.print(f"test dataset entry {0} from client {args.client_index} is {list(test_ds.as_numpy_iterator())[0]}")
+        # tf.print(f"train dataset entry {0} from client {args.client_index} is {list(train_ds.as_numpy_iterator())[0]}")
+        # tf.print(f"test dataset entry {0} from client {args.client_index} is {list(test_ds.as_numpy_iterator())[0]}")
         model.set_weights(parameters)
         if args.client_index == 0:
             tf.print(f"Model weights before training {model.get_weights()}")
         preprocessed_ds = preprocess(train_ds,epochs=config["local_epochs"],seed = config["server_round"])
         print(f"epochs are {config['local_epochs']}")
-        tf.print(
-            f"preprocessed dataset entry {0} from client {args.client_index} is {list(preprocessed_ds.as_numpy_iterator())[0]}")
+        # tf.print(
+        #     f"preprocessed dataset entry {0} from client {args.client_index} is {list(preprocessed_ds.as_numpy_iterator())[0]}")
         begin = tf.timestamp()
         history = model.fit(preprocessed_ds)
         end = tf.timestamp()

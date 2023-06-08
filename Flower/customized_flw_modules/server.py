@@ -280,6 +280,7 @@ class Server:
         )
         log(INFO,"Client instructions gotten")
         # Collect `fit` results from all clients participating in this round
+
         results, failures = fit_clients(
             client_instructions=client_instructions,
             max_workers=self.max_workers,

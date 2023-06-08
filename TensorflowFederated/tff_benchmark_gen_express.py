@@ -88,7 +88,7 @@ evaluation_process = tff.learning.algorithms.build_fed_eval(model_fn=model_fn)
 data_name = args.data_path.split("/")[-1].split(".")[0]
 if args.system_metrics == True or args.network_metrics == True:
     metrics_type = "system"
-    num_clients = args.num_clients
+    num_clients = 1
 else:
     metrics_type = "model"
     num_clients = args.num_clients
@@ -130,8 +130,8 @@ def train_loop(num_rounds=1, num_clients=1):
         X_test, y_test = load_test_data_for_evaluation(args.run_repeat)
     evaluation_state = evaluation_process.initialize()
     state = trainer.initialize()
-    print("inital weights are:")
-    print(trainer.get_model_weights(state).trainable)
+    # print("inital weights are:")
+    # print(trainer.get_model_weights(state).trainable)
     # round_data_uris = [f'uri://{i}' for i in range(num_clients)]
     # round_train_data = tff.framework.CreateDataDescriptor(
     #     arg_uris=round_data_uris, arg_type=dataset_type)
@@ -155,8 +155,8 @@ def train_loop(num_rounds=1, num_clients=1):
         # then log to wandb
         state = result.state
         train_metrics = result.metrics
-        print("weights after round {round} are:")
-        print(trainer.get_model_weights(state).trainable)
+        # print("weights after round {round} are:")
+        # print(trainer.get_model_weights(state).trainable)
         if not args.system_metrics and not args.network_metrics:
             model_weights = trainer.get_model_weights(state)
             evaluation_state = evaluation_process.set_model_weights(evaluation_state, model_weights)
@@ -186,7 +186,7 @@ executor = concurrent.futures.ThreadPoolExecutor()
 # Creates channels for each client for communication
 for i in range(1,num_clients+1):
     channels.append(grpc.insecure_channel(f'{ip_address}:{port_num+i}',options=[ ('grpc.max_send_message_length', 25586421),
-        ('grpc.max_receive_message_lengpip install --upgrade pipth',25586421), ("grpc.max_metadata_size",25586421)]),)
+        ('grpc.max_receive_message_length',25586421), ("grpc.max_metadata_size",25586421)]),)
 
 # Sets remote execution
 tff.backends.native.set_remote_python_execution_context(channels,thread_pool_executor=executor)

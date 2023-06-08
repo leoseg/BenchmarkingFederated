@@ -19,14 +19,16 @@ do
     do
       echo "Start repeat system metrics ${repeat} num clients ${client_num} num rounds ${rounds}"
       rm -f timelogs/tff_logs_time.txt
-      tshark -q -z conv,tcp -f "tcp port 8001" -i any > tshark_output.txt &
+      tshark -q -z conv,tcp -f "tcp port 8001" -i any -B 20 > tshark_output.txt &
       tshark_pid=$!
-      tshark -i any -T fields -e frame.len "tcp port 8001" > tshark_packets.txt &
+      tshark -i any -T fields -e frame.len "tcp port 8001" -B 20 > tshark_packets.txt &
       tshark_pid2=$!
       echo "Creating single worker service"
       python worker_service.py --port 8001 --num_rounds $rounds --client_index 1 --run_repeat $repeat &
       echo "Start training"
       python tff_benchmark_gen_express.py --num_clients $client_num --num_rounds $rounds --run_repeat $repeat --network_metrics true
+#      serverpid=$!
+#      wait $serverpid
       pkill worker_service
       kill $tshark_pid
       kill $tshark_pid2

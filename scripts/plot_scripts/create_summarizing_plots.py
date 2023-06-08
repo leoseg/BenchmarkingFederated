@@ -37,7 +37,7 @@ for mode in ["system"]:
             metrics_tuples.append((metric2, metric2_name))
         case "system":
             metric1 = "sent"
-            metric1_name = "Kilobytes send from clients"
+            metric1_name = "Mb send from clients"
             # metric2 = "received"
             # metric2_name = "Kilobytes received at clients"
             # metric1 = "total_memory"
@@ -58,7 +58,7 @@ for mode in ["system"]:
             scenario_metrics = mongodb.get_data_by_name(f"scenario_metrics_{configs.get('usecase')}_{mode}",True)
             df1 = create_dfs_for_fl_metric(rounds_metrics=scenario_metrics,metric_name="sent")
             df2 = create_dfs_for_fl_metric(rounds_metrics=scenario_metrics,metric_name="received")
-            plot_swarmplots(df1,metric_name="Kilobytes send/received at clients",data_path=plot_path,plot_type="bar",scale=None,data2=df2,configuration_name="Number of clients")
+            plot_swarmplots(df1,metric_name="Mb send/received at clients",data_path=plot_path,plot_type="bar",scale=None,data2=df2,configuration_name="Number of clients")
             continue
         scenario_metrics = mongodb.get_data_by_name(f"scenario_metrics_{configs.get('usecase')}_{mode}",True)
         if metric == "time_diff":
