@@ -82,7 +82,7 @@ def get_group_stats(project:str,groups:list,version:str,metric_names:list,mode:s
         runs = api.runs(f"{ENTITY}/{project}",filters={"group": group})
         metrics_dicts = []
         for run in runs:
-            if run.config.get("version") == version or version is None:
+            if (run.config.get("version") == version or version is None) and run.state != "failed":
                 metrics_dicts.append(get_metrics_from_run(run, metric_names,group,mode))
         metrics  = put_metrics_together(metrics_dicts)
         project_metrics[group] = metrics
@@ -222,7 +222,7 @@ def get_central_metrics(mode:str,metric_names:list):
     runs = api.runs(f"{ENTITY}/{project}",filters={"group": group})
     metrics_dicts = []
     for run in runs:
-        if run.name != "no_crossfold" and run.config.get("version") == version:
+        if run.name != "no_crossfold" and run.config.get("version") == version and run.state != "failed":
             metrics_dicts.append(get_metrics_from_run(run,metric_names,group,mode))
     metrics = put_metrics_together(metrics_dicts)
     return metrics
@@ -237,7 +237,7 @@ def get_system_metrics(history, metric_names, group):
     :return: dictionary with the metrics
     """
     metrics = {}
-    for metric in metric_names:
+    for metric in set(metric_names).intersection(history.keys()):
         if metric in ["memory_client","memory_server","memory_central"]:
             # if the metric is a memory metric, get the sum, mean and max of the metric
             memory_metrics = get_memory_metrics(group, history, metric)
@@ -253,9 +253,11 @@ def get_system_metrics(history, metric_names, group):
                     metrics["first_round_time"] = time.iloc[0]
                 if metric == "client_time" or metric == "round_time":
                     metrics["total_"+metric] = time.sum()
-        elif metric in ["sent","recieved"]:
-            number_of_clients = int(group.split("_")[-1])
-            metrics[metric] = history.get(metric)[-1] * number_of_clients
+        elif metric in ["sent","received"]:
+            metric_value = float(history.get(metric)[0])
+            if metric_value is not None:
+                number_of_clients = int(group.split("_")[-1])
+                metrics[metric] =  metric_value * number_of_clients
     if "client_time" in metrics.keys() and "round_time" in metrics.keys():
         # if both client_time and round_time are in the metric_names, get the time_diff
         metrics["time_diff"] = metrics["round_time"] - metrics["client_time"]

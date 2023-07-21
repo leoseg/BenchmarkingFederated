@@ -6,6 +6,7 @@ from wandb.keras import WandbCallback
 from utils.config import configs
 import argparse
 from sklearn.preprocessing import StandardScaler
+from pympler import asizeof
 #Script that trains the model with given input configs, one time with a train, validation test split and one time with a stratified kfold
 parser = argparse.ArgumentParser(
         prog="train_model_wandb_gen_expr.py",

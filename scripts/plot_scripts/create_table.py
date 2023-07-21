@@ -24,9 +24,13 @@ for usecase in [1,2,3,4]:
         data = mongodb.get_data_by_name(f"scenario_metrics_{usecase}_{mode}",calc_total_memory=True)
         appendixstr += "\\begin{landscape}\n "
         for metric,metric_name in get_metrics_for_mode(mode,usecase):
-
-            df = create_summarize_dataframe_from_metrics(data=data,metric_name=metric,rounds=[1,3,5,10],groups=groups)
-            if mode == "unweighted":
+            if metric in ["sent","received"]:
+                data2 = mongodb.get_data_by_name(f"scenario_metrics_{usecase}_system_network", calc_total_memory=True)
+                df = create_summarize_dataframe_from_metrics(data=data2,metric_name=metric,rounds=[1,3,5,10],groups=groups)
+                central_df = None
+            else:
+                df = create_summarize_dataframe_from_metrics(data=data,metric_name=metric,rounds=[1,3,5,10],groups=groups)
+            if mode == "unweighted" or metric in ["sent","received"]:
                 central_df = None
             else:
                 central = mongodb.get_data_by_name(f"central_metrics_{usecase}_{mode}")

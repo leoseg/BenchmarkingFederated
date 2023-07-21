@@ -39,7 +39,7 @@ if os.environ["USECASE"] == "test":
     )
 elif os.environ["USECASE"] == str(4):
     configs = dict(
-        plot_path = "../../plots/scenario4/",
+        plot_path = "../../MA/pictures/scenario4/",
         activation="softmax",
         random_state_partitions =69,
         valid_freq = 10,
@@ -76,7 +76,7 @@ elif os.environ["USECASE"] == str(4):
     )
 elif os.environ["USECASE"] == str(3):
     configs = dict(
-        plot_path="../../plots/scenario3/",
+        plot_path="../../MA/pictures/scenario3/",
         activation="softmax",
         valid_freq=2,
         usecase=3,
@@ -108,7 +108,7 @@ elif os.environ["USECASE"] == str(3):
     )
 elif os.environ["USECASE"] == str(2):
     configs = dict(
-        plot_path="../../plots/scenario2/",
+        plot_path="../../MA/pictures/scenario2/",
         activation="sigmoid",
         valid_freq=2,
         usecase=2,
@@ -139,7 +139,7 @@ elif os.environ["USECASE"] == str(2):
     )
 else:
     configs = dict(
-        plot_path="../../plots/scenario1/",
+        plot_path="../../MA/pictures/scenario1/",
         activation = "sigmoid",
         random_state_partitions =69,
         valid_freq = 10,

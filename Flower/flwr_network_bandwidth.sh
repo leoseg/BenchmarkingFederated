@@ -19,9 +19,9 @@ do
     do
       echo "Start repeat system metrics ${repeat} num clients ${client_num} num rounds ${rounds}"
       rm -f timelogs/flw_logs_time.txt
-      tshark -q -z conv,tcp -f "tcp port 8150" -i any -B 20 > tshark_output.txt &
+      tshark -q -z conv,tcp -f "tcp port 8150" -i any -B 30 > tshark_output.txt &
       tshark_pid=$!
-      tshark -i any -T fields -e frame.len "tcp port 8150" -B 20 > tshark_packets.txt &
+      tshark -i any -T fields -e frame.len -f "tcp port 8150" -B 30 > tshark_packets.txt &
       tshark_pid2=$!
       echo "Creating server"
       python server.py --run_repeat $repeat --num_clients 1 --num_rounds $rounds --network_metrics true &

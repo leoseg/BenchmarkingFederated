@@ -2,6 +2,7 @@ import pandas as pd
 import seaborn as sns
 from config import configs
 import matplotlib.pyplot as plt
+import os
 import matplotlib.patches as mpatches
 ENTITY = "Scads"
 if configs.get("usecase") == 2:
@@ -9,6 +10,7 @@ if configs.get("usecase") == 2:
 else:
     ROUNDS = [1,2,5,10]
 
+plt.rcParams['axes.formatter.limits'] = [-5, 3]
 
 def create_loss_line_plot(df,plot_path:str):
     """
@@ -45,6 +47,10 @@ def seaborn_plot (x,metric_name,hue,data,palette,title,data_path,dodge=True,conf
     :param data_path: path to the data
     :return:
     """
+    sns.set(font_scale=1.7)
+    plt.subplots_adjust(bottom=0.24, left=0.17)
+
+
     sns_palette = sns.color_palette("Set2")
     palette = {"TFF":sns_palette[1],"Centralized":sns_palette[0],"FLWR":sns_palette[2]}
     match plot_type:
@@ -52,22 +58,41 @@ def seaborn_plot (x,metric_name,hue,data,palette,title,data_path,dodge=True,conf
             ax = sns.boxplot(x=x, y="metric", hue=hue,
                  data=data, palette=palette, dodge=dodge)
         case "bar":
-            ax = sns.barplot(x=x, y="metric", hue=hue,
-            data=data, palette=palette, dodge=dodge)
-            if data2:
-                # bottom bar
-                palette2 = {"TFF": sns_palette[3], "FLWR": sns_palette[4]}
-                ax2 = sns.barplot(x=x, y="metric", hue=hue,
-                data=data2, palette=palette2, dodge=dodge)
-                top_bar_tff = mpatches.Patch(color= sns_palette[1], label='TFF Sent')
-                bottom_bar_tff = mpatches.Patch(color=sns_palette[3], label='TFF Received')
+            if data2 is not None:
+                data2.reset_index(inplace=True)
+                data2.drop(columns=["index"],inplace=True)
+                data.reset_index(inplace=True)
+                data.drop(columns=["index"],inplace=True)
+                data2["metric"] = (data2["metric"] + data["metric"]).tolist()
+                sns_palette2 = sns.color_palette("Dark2")
+                palette2 = {"TFF": sns_palette2[1],"FLWR": sns_palette2[2]}
+                ax = sns.barplot(x=x, y="metric", hue=hue,data=data2,palette=palette2)
+                sns.barplot(x=x, y="metric", hue=hue,
+                                 data=data, palette=palette, dodge=dodge,ax=ax)
+                bottom_bar_tff = mpatches.Patch(color=sns_palette2[1], label='TFF Received')
+                bottom_bar_flwr = mpatches.Patch(color=sns_palette2[2], label='FLWR Received')
+                top_bar_tff = mpatches.Patch(color=sns_palette[1], label='TFF Sent')
                 top_bar_flwr = mpatches.Patch(color=sns_palette[2], label='FLWR Sent')
-                bottom_bar_flwr = mpatches.Patch(color=sns_palette[4], label='FLWR Received')
+                # for g in ax.patches:
+                #     ax.annotate(format(g.get_height(), '.1f'),
+                #                    (g.get_x() + g.get_width() / 2., g.get_height()),
+                #                    ha='center', va='center',
+                #                    xytext=(0, 9),
+                #                    textcoords='offset points')
                 plt.legend(handles=[top_bar_tff,bottom_bar_tff,top_bar_flwr,bottom_bar_flwr])
+            else:
+                ax = sns.barplot(x=x, y="metric", hue=hue,
+                                 data=data, palette=palette, dodge=dodge)
+
         case "box_points":
             ax = sns.boxplot(x=x, y="metric", hue=hue,
                  data=data, palette=palette, dodge=dodge)
             sns.stripplot(data=data,x=x, y="metric", hue=hue,dodge=True)
+    if metric_name != "Mb send and received":
+        sns.move_legend(
+            ax, "upper center",
+            bbox_to_anchor=(.5, -0.2), ncol=3, title=None, frameon=False,
+        )
     #ax.set_title(title)
     # set y axis title to metric name
     plt.ylabel(metric_name)
@@ -84,7 +109,8 @@ def seaborn_plot (x,metric_name,hue,data,palette,title,data_path,dodge=True,conf
             start_value = 20
         x_ticks = [(int(float(x)) *5 + start_value) for x in data[x].unique() if x != "central"]
         ax.set_xticklabels(x_ticks)
-
+    if not os.path.exists(data_path):
+        os.makedirs(data_path)
     plt.savefig(data_path+metric_name + "_" +title + plot_type+".png")
     plt.show()
 
@@ -135,6 +161,8 @@ def plot_heatmap(df,framework,metric_name,data_path,standard_deviation=False,unw
         ax.set_yticklabels(y_ticks)
     plt.ylabel(y_title)
     plt.xlabel(x_title)
+    if not os.path.exists(data_path):
+        os.makedirs(data_path)
     plt.savefig(f"{data_path}{metric_name}_{framework}_{type_of}.png")
     plt.show()
     return scale
@@ -157,22 +185,34 @@ def plot_swarmplots(df,metric_name:str,configuration_name:str,data_path:str,plot
     :param data_path: path to the data
     :metric_name: name of metric to plot
     """
-    for index,round_num in enumerate(ROUNDS):
-        round_df = df[df["round configuration"] == "central"]
-        round_df = pd.concat([round_df,df[df["round configuration"] == round_num]],ignore_index=True)
-        seaborn_plot("group", metric_name, "framework", round_df, "Set2",
-                     f"Round configuration {round_num}",configuration_name=configuration_name,plot_type=plot_type,
-                     data_path=data_path,scale=scale,data2=data2)
-        plt.show()
+    if metric_name == "AUC":
+        for index,round_num in enumerate(ROUNDS):
+            if round_num in [1,10]:
+                round_df = df[df["round configuration"] == "central"]
+                round_df = pd.concat([round_df,df[df["round configuration"] == round_num]],ignore_index=True)
+                if data2 is not None:
+                    round_data2 = data2[data2["round configuration"] == round_num]
+                else:
+                    round_data2 = None
+                seaborn_plot("group", metric_name, "framework", round_df, "Set2",
+                             f"Round configuration {round_num}",configuration_name=configuration_name,plot_type=plot_type,
+                             data_path=data_path,scale=scale,data2=round_data2)
+                plt.show()
     seaborn_plot("group", metric_name, "framework", df, "Set2", f"Group configs over all round configs",
                  configuration_name=configuration_name,plot_type=plot_type,data_path=data_path,scale=scale,data2=data2)
     seaborn_plot("round configuration", metric_name, "framework", df, "Set2", f"Round configs over all groups",plot_type=plot_type,data_path=data_path,scale=scale,data2=data2)
-    for group in df["group"].unique():
-        if group == "central":
-            continue
-        group_df = df[df["group"] == "central"]
-        group_df = pd.concat([group_df,df[df["group"] == group]],ignore_index=True)
-        seaborn_plot("round configuration", metric_name, "framework", group_df, "Set2", f"Group {group}",plot_type=plot_type,data_path=data_path,scale=scale,data2=data2)
+    if metric_name == "Mb send and received":
+        for group in df["group"].unique():
+
+            if group == "central":
+                continue
+            group_df = df[df["group"] == "central"]
+            group_df = pd.concat([group_df,df[df["group"] == group]],ignore_index=True)
+            if data2 is not None:
+                group_data2 = data2[data2["group"] == group]
+            else:
+                group_data2 = None
+            seaborn_plot("round configuration", metric_name, "framework", group_df, "Set2", f"Group {group}",plot_type=plot_type,data_path=data_path,scale=scale,data2=group_data2)
 
 
 

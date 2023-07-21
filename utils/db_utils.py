@@ -58,6 +58,6 @@ class MongoDBHandler:
             for count, round in enumerate(document["data"]):
                 for key, value in round.items():
                     if "total_memory_server" in value.keys() and "total_memory_client" in value.keys():
-                        document["data"][count][key]["total_memory"] = [(x + y)/2 for x,y in zip(value["total_memory_server"] ,value["total_memory_client"])]
+                        document["data"][count][key]["total_memory"] = [(x + y) for x,y in zip(value["total_memory_server"] ,value["total_memory_client"])]
         return document["data"] if document else None
 
