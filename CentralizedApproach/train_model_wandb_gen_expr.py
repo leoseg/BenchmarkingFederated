@@ -67,7 +67,12 @@ model.compile(optimizer=configs.get("optimizer"),
 
 history = model.fit(X_train, y_train, epochs=configs.get("epochs"), batch_size=configs.get("batch_size"), validation_freq=configs["valid_freq"], validation_split=0.2,callbacks=[wandb_callback])
 score = model.evaluate(X_test, y_test, verbose = 0,return_dict=True)
-
+if configs["usecase"] == 2 or configs["usecase"] == 3:
+    modeltype = "logreg"
+else:
+    modeltype = "dl"
+model.save_weights(f"{modeltype}_weights.h5")
+model.save(f"{modeltype}.h5")
 for key,value in score.items():
     wandb.log({f"eval_{key}": value})
 wandb.finish()

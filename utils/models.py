@@ -50,28 +50,28 @@ def get_seq_nn_model(input_dim:int,num_nodes: int = param_num_nodes, dropout_rat
     model.add(Dropout(0.4,seed=1))
 
     # first layer
-    model.add(Dense(num_nodes, activation='relu', kernel_initializer=tf.keras.initializers.GlorotUniform(seed=1) ,kernel_regularizer=l1_l2(l1=l1_v, l2=l2_v), input_dim=input_dim))
+    model.add(Dense(num_nodes, activation='relu', kernel_initializer=tf.keras.initializers.GlorotUniform(seed=1) ,kernel_regularizer=l1_l2(l1=l1_v, l2=l2_v)))
     model.add(Dropout(dropout_rate,seed=1))
     # second layer
-    model.add(Dense(int(num_nodes / 2), activation='relu',kernel_initializer=tf.keras.initializers.GlorotUniform(seed=1) , kernel_regularizer=l1_l2(l1=l1_v, l2=l2_v), input_dim=input_dim))
+    model.add(Dense(int(num_nodes / 2), activation='relu',kernel_initializer=tf.keras.initializers.GlorotUniform(seed=1) , kernel_regularizer=l1_l2(l1=l1_v, l2=l2_v)))
     model.add(Dropout(dropout_rate,seed=1))
     # third layer
-    model.add(Dense(int(num_nodes / 2), activation='relu', kernel_initializer=tf.keras.initializers.GlorotUniform(seed=1),kernel_regularizer=l1_l2(l1=l1_v, l2=l2_v), input_dim=input_dim))
+    model.add(Dense(int(num_nodes / 2), activation='relu', kernel_initializer=tf.keras.initializers.GlorotUniform(seed=1),kernel_regularizer=l1_l2(l1=l1_v, l2=l2_v)))
     model.add(Dropout(dropout_rate,seed=1))
     # fourth layer
-    model.add(Dense(int(num_nodes / 4), activation='relu',kernel_initializer=tf.keras.initializers.GlorotUniform(seed=1) , kernel_regularizer=l1_l2(l1=l1_v, l2=l2_v), input_dim=input_dim))
+    model.add(Dense(int(num_nodes / 4), activation='relu',kernel_initializer=tf.keras.initializers.GlorotUniform(seed=1) , kernel_regularizer=l1_l2(l1=l1_v, l2=l2_v)))
     model.add(Dropout(dropout_rate,seed=1 ))
     # fifth layer
-    model.add(Dense(int(num_nodes / 4), activation='relu',kernel_initializer=tf.keras.initializers.GlorotUniform(seed=1) , kernel_regularizer=l1_l2(l1=l1_v, l2=l2_v), input_dim=input_dim))
+    model.add(Dense(int(num_nodes / 4), activation='relu',kernel_initializer=tf.keras.initializers.GlorotUniform(seed=1) , kernel_regularizer=l1_l2(l1=l1_v, l2=l2_v)))
     model.add(Dropout(dropout_rate,seed=1 ))
     # sixth layer
-    model.add(Dense(int(num_nodes / 8), activation='relu', kernel_initializer=tf.keras.initializers.GlorotUniform(seed=1) ,kernel_regularizer=l1_l2(l1=l1_v, l2=l2_v), input_dim=input_dim))
+    model.add(Dense(int(num_nodes / 8), activation='relu', kernel_initializer=tf.keras.initializers.GlorotUniform(seed=1) ,kernel_regularizer=l1_l2(l1=l1_v, l2=l2_v)))
     model.add(Dropout(dropout_rate,seed=1))
     # seventh layer
-    model.add(Dense(int(num_nodes / 8), activation='relu',kernel_initializer=tf.keras.initializers.GlorotUniform(seed=1) , kernel_regularizer=l1_l2(l1=l1_v, l2=l2_v), input_dim=input_dim))
+    model.add(Dense(int(num_nodes / 8), activation='relu',kernel_initializer=tf.keras.initializers.GlorotUniform(seed=1) , kernel_regularizer=l1_l2(l1=l1_v, l2=l2_v)))
     model.add(Dropout(dropout_rate,seed=1))
     # eighth layer
-    model.add(Dense(int(num_nodes / 16), activation='relu', kernel_initializer=tf.keras.initializers.GlorotUniform(seed=1) ,kernel_regularizer=l1_l2(l1=l1_v, l2=l2_v), input_dim=input_dim))
+    model.add(Dense(int(num_nodes / 16), activation='relu', kernel_initializer=tf.keras.initializers.GlorotUniform(seed=1) ,kernel_regularizer=l1_l2(l1=l1_v, l2=l2_v)))
     model.add(Dropout(dropout_rate,seed=1))
 
     # output layer
