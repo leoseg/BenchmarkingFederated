@@ -1,10 +1,9 @@
 #!/bin/bash
-#SBATCH --nodes=1
 #SBATCH --job-name=flwr_bal
 #SBATCH --partition=clara
 #SBATCH --time=2-00:00:00
-#SBATCH --cpus-per-task=11
-#SBATCH --mem=50G
+#SBATCH --cpus-per-task=60
+#SBATCH --mem=100G
 #SBATCH --mail-type=begin        # send email when job begins
 #SBATCH --mail-type=end          # send email when job ends
 #SBATCH --mail-type=fail         # send email if job fails
@@ -35,7 +34,7 @@ fi
 # Loops trough round and number of clients configuration
 for rounds in "${round_config[@]}";
 do
-  for client_num in {3,5,10}
+  for client_num in {3,5,10, 50}
   do
     bash flwr_balanced_benchmark.sh $DATA_PATH $client_num $rounds $WANDB_API_KEY $NUM_REPEATS $SYSTEM_ONLY
   done

@@ -45,11 +45,6 @@ def read_system_logs(log_path:str,project_name,group_name,run_name,memory_type):
         wandb.log({"total_duration": float(lines[-1].split()[0])})
 
 
-def draw_group_plot_of_df(list_dfs,time_filter:float=None):
-    df = pd.concat(list_dfs,ignore_index=True)
-    if time_filter:
-        df = df[df["times"]< time_filter]
-    plot = sns.relplot(data=df, x="times", y="memory", kind="line",hue="num_clients")
-    return plot
+
 
 

@@ -42,6 +42,16 @@ if [ $SYSTEM_ONLY != "2" ]; then
     echo "Creating server"
     python server.py --data_path $DATA_PATH --run_repeat $repeat --num_clients $NUM_CLIENTS --num_rounds $NUM_ROUNDS --system_metrics true &
     server_id=$!
+    sleep 25
+    echo "Start client"
+    python client.py --client_index 1 --data_path $DATA_PATH --run_repeat $repeat --system_metrics true &
+    client_id=$!
+    for ((i=1;i<=$NUM_CLIENTS;i++))
+    do
+      echo "Start client ${i}"
+      client_index=$(($i -1))
+      python client.py --client_index $client_index --data_path $DATA_PATH --run_repeat $repeat &
+    done
     # Reads in all cpu available as string
     read cpu_available <<< $(taskset -pc $server_id | awk '{print $NF}')
     # Converts that string into an array
@@ -53,9 +63,6 @@ if [ $SYSTEM_ONLY != "2" ]; then
     # Bounds the CPU with 'cpu_num_1' to the server process
     taskset -c -pa $cpu_num_1 $server_id
     #sleep 3
-    echo "Start client"
-    python client.py --client_index 1 --data_path $DATA_PATH --run_repeat $repeat --system_metrics true &
-    client_id=$!
     # Bind client process to cpu num 2
     taskset -c -pa $cpu_num_2 $client_id
     client_time_logs="timelogs/flwr_client_${DATA_NAME}_${NUM_CLIENTS}_${NUM_ROUNDS}_repeat_${repeat}.txt"

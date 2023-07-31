@@ -7,3 +7,4 @@ psrecord
 wandb
 seaborn
 plotly
+tensorflow-privacy

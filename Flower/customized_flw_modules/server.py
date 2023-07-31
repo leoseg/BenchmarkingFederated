@@ -19,6 +19,7 @@ import pickle
 import timeit
 from logging import DEBUG, INFO
 from typing import Dict, List, Optional, Tuple, Union
+import time
 
 import numpy as np
 import tensorflow as tf
@@ -63,7 +64,7 @@ class Server:
     """Flower server."""
 
     def __init__(
-        self, unweighted:bool,system_metrics:bool, run_repeat:int,num_clients:int,data_path:str, client_manager: ClientManager, strategy: Optional[Strategy] = None
+        self, network_metrics:bool, unweighted:bool,system_metrics:bool, run_repeat:int,num_clients:int,data_path:str, client_manager: ClientManager, strategy: Optional[Strategy] = None
     ) -> None:
         self._client_manager: ClientManager = client_manager
         self.parameters: Parameters = Parameters(
@@ -74,6 +75,7 @@ class Server:
         self.run_repeat = run_repeat
         self.num_clients = num_clients
         self.data_path = data_path
+        self.network_metrics = network_metrics
         self.strategy: Strategy = strategy if strategy is not None else FedAvg()
         self.max_workers: Optional[int] = None
 
@@ -92,28 +94,29 @@ class Server:
     # pylint: disable=too-many-locals
     def fit(self, num_rounds: int, timeout: Optional[float]) -> History:
         """Run federated averaging for a number of rounds."""
+        #self.client_manager().wait_for(self.num_clients,600000)
         history = History()
 
         # Initialize parameters
         log(INFO, "Initializing global parameters")
         self.parameters = self._get_initial_parameters(timeout=timeout)
-        log(INFO, "Evaluating initial parameters")
-        res = self.strategy.evaluate(0, parameters=self.parameters)
-        if res is not None:
-            log(
-                INFO,
-                "initial parameters (loss, other metrics): %s, %s",
-                res[0],
-                res[1],
-            )
-            history.add_loss_centralized(server_round=0, loss=res[0])
-            history.add_metrics_centralized(server_round=0, metrics=res[1])
+        # log(INFO, "Evaluating initial parameters")
+        # res = self.strategy.evaluate(0, parameters=self.parameters)
+        # if res is not None:
+        #     log(
+        #         INFO,
+        #         "initial parameters (loss, other metrics): %s, %s",
+        #         res[0],
+        #         res[1],
+        #     )
+        #     history.add_loss_centralized(server_round=0, loss=res[0])
+        #     history.add_metrics_centralized(server_round=0, metrics=res[1])
 
         # Run federated learning for num_rounds
         log(INFO, "FL starting")
         start_time = timeit.default_timer()
         data_name = self.data_path.split("/")[-1].split(".")[0]
-        if self.system_metrics:
+        if self.system_metrics or self.network_metrics:
             metrics_type = "system"
         else:
             metrics_type ="model"
@@ -125,58 +128,73 @@ class Server:
             group = f"flwr_{self.unweighted}"
         else:
             group = f"flwr_{self.num_clients}"
-        wandb.init(project=project_name, group=group, name=f"run_{self.run_repeat}",config=configs)
-        with open("partitions_list", "rb") as file:
-            partitions_list = pickle.load(file)
-        wandb.log({"partitions_list":partitions_list})
+        DELAY_SECONDS = 5  # Delay between each retry attempt
+        if not self.network_metrics:
+            while True:
+                try:
+                    wandb.init(project=project_name, group=group, name=f"run_{self.run_repeat}",config=configs)
+                    print("Wandb initialized successfully")
+                    break
+                except ConnectionRefusedError:
+                    print(f"Connection refused. Retrying in {DELAY_SECONDS} seconds...")
+                    time.sleep(DELAY_SECONDS)
+            with open("partitions_list", "rb") as file:
+                partitions_list = pickle.load(file)
+            wandb.log({"partitions_list":partitions_list})
         # If unweighted step is set reads number of samples per class per clients and log to wandb
-        if self.unweighted >= 0.0:
-            wandb.log({f"class_num_table_{int(self.unweighted)}":pd.read_csv(f"partitions_dict_{int(self.unweighted)}.csv")})
+        # if self.unweighted >= 0.0:
+        #     wandb.log({f"class_num_table_{int(self.unweighted)}":pd.read_csv(f"partitions_dict_{int(self.unweighted)}.csv")})
         for current_round in range(1, num_rounds + 1):
             begin = tf.timestamp()
             # Train model and replace previous global model
             res_fit = self.fit_round(server_round=current_round, timeout=timeout)
             if res_fit:
-                parameters_prime, _, _ = res_fit  # fit_metrics_aggregated
+                parameters_prime, metrics_train, _ = res_fit  # fit_metrics_aggregated
                 if parameters_prime:
                     self.parameters = parameters_prime
             end = tf.timestamp()
             # Logs system metrics to wandb if flag is set
             if self.system_metrics:
                 wandb.log({"round_time":tf.get_static_value(end - begin)},step=current_round)
-                wandb.log(get_time_logs(flw_time_logging_directory, True),step=current_round)
+                #wandb.log(get_time_logs(flw_time_logging_directory, True),step=current_round)
             # Evaluate model using strategy implementation
-            res_cen = self.strategy.evaluate(current_round, parameters=self.parameters)
-            if res_cen is not None:
-                loss_cen, metrics_cen = res_cen
-                log(
-                    INFO,
-                    "fit progress: (%s, %s, %s, %s)",
-                    current_round,
-                    loss_cen,
-                    metrics_cen,
-                    timeit.default_timer() - start_time,
-                )
-                history.add_loss_centralized(server_round=current_round, loss=loss_cen)
-                history.add_metrics_centralized(
-                    server_round=current_round, metrics=metrics_cen
-                )
+            if not self.system_metrics and self.unweighted>=0.0:
+                res_cen = self.strategy.evaluate(current_round, parameters=self.parameters)
+                if res_cen is not None:
+                    loss_cen, metrics_cen = res_cen
+                    metrics_cen = {key + '_global': value for key, value in metrics_cen.items()}
+                    metrics_cen["loss_global"] = loss_cen
+                    wandb.log(metrics_cen,step=current_round)
+                    log(
+                        INFO,
+                        "fit progress: (%s, %s, %s, %s)",
+                        current_round,
+                        loss_cen,
+                        metrics_cen,
+                        timeit.default_timer() - start_time,
+                    )
+                    history.add_loss_centralized(server_round=current_round, loss=loss_cen)
+                    history.add_metrics_centralized(
+                        server_round=current_round, metrics=metrics_cen
+                    )
 
             # Evaluate model on a sample of available clients
-            res_fed = self.evaluate_round(server_round=current_round, timeout=timeout)
-            if res_fed:
-                loss_fed, evaluate_metrics_fed, _ = res_fed
-                evaluate_metrics_fed["loss"] = loss_fed
-                # Logs metrics to wandb if its not system => model performance metrics
-                if not self.system_metrics:
-                    wandb.log(evaluate_metrics_fed)
-                if loss_fed:
-                    history.add_loss_distributed(
-                        server_round=current_round, loss=loss_fed
-                    )
-                    history.add_metrics_distributed(
-                        server_round=current_round, metrics=evaluate_metrics_fed
-                    )
+            if not self.system_metrics and not self.network_metrics:
+                wandb.log(metrics_train,step=current_round)
+                res_fed = self.evaluate_round(server_round=current_round, timeout=timeout)
+                if res_fed:
+                    loss_fed, evaluate_metrics_fed, _ = res_fed
+                    evaluate_metrics_fed["loss"] = loss_fed
+                    # Logs metrics to wandb if its not system => model performance metrics
+
+                    wandb.log(evaluate_metrics_fed,step=current_round)
+                    if loss_fed:
+                        history.add_loss_distributed(
+                            server_round=current_round, loss=loss_fed
+                        )
+                        history.add_metrics_distributed(
+                            server_round=current_round, metrics=evaluate_metrics_fed
+                        )
 
         # Bookkeeping
         end_time = timeit.default_timer()
@@ -262,6 +280,7 @@ class Server:
         )
         log(INFO,"Client instructions gotten")
         # Collect `fit` results from all clients participating in this round
+
         results, failures = fit_clients(
             client_instructions=client_instructions,
             max_workers=self.max_workers,

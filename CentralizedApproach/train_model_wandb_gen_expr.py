@@ -6,6 +6,7 @@ from wandb.keras import WandbCallback
 from utils.config import configs
 import argparse
 from sklearn.preprocessing import StandardScaler
+from pympler import asizeof
 #Script that trains the model with given input configs, one time with a train, validation test split and one time with a stratified kfold
 parser = argparse.ArgumentParser(
         prog="train_model_wandb_gen_expr.py",
@@ -64,9 +65,14 @@ model.compile(optimizer=configs.get("optimizer"),
               loss=configs.get("loss"),
               metrics=configs.get("metrics"))
 
-model.fit(X_train, y_train, epochs=configs.get("epochs"), batch_size=configs.get("batch_size"), validation_freq=configs["valid_freq"], validation_split=0.2,callbacks=[wandb_callback])
+history = model.fit(X_train, y_train, epochs=configs.get("epochs"), batch_size=configs.get("batch_size"), validation_freq=configs["valid_freq"], validation_split=0.2,callbacks=[wandb_callback])
 score = model.evaluate(X_test, y_test, verbose = 0,return_dict=True)
-
+if configs["usecase"] == 2 or configs["usecase"] == 3:
+    modeltype = "logreg"
+else:
+    modeltype = "dl"
+model.save_weights(f"{modeltype}_weights.h5")
+model.save(f"{modeltype}.h5")
 for key,value in score.items():
     wandb.log({f"eval_{key}": value})
 wandb.finish()
@@ -75,23 +81,27 @@ wandb.finish()
 kfold = StratifiedKFold(n_splits=configs.get("n_splits"), shuffle=True, random_state=random_state)
 for count,(train,test) in enumerate(kfold.split(X,Y)):
     wandb.init(project=project_name, config=configs,group=group_name,job_type='train',name=f"k_fold_{count}")
+    if configs.get("usecase") != 2:
+        validation_steps = int(configs.get("epochs")/10)
+    else:
+        validation_steps = 1
     wandb_callback = WandbCallback(monitor='val_loss',
                                    log_weights=True,
                                    log_evaluation=True,
                                    save_model=False,
-                                   save_weights_only=True)
+                                   save_weights_only=True,
+                                   validation_data=(X_test, Y[test]))
     X_train = X.iloc[train]
     X_test =X.iloc[test]
     if configs.get("scale"):
         scaler = StandardScaler()
         X_train = scaler.fit_transform(X_train)
         X_test = scaler.transform(X_test)
-
     model = get_model(input_dim=X_train.shape[1], num_nodes=num_nodes,dropout_rate=dropout_rate, l1_v=l1_v, l2_v=configs.get("l2_v"))
     model.compile(optimizer=configs.get("optimizer"),
                   loss=configs.get("loss"),
                   metrics=configs.get("metrics"))
-    model.fit(X_train, Y[train], epochs=configs.get("epochs"),batch_size=configs.get("batch_size"),callbacks=[wandb_callback])
+    model.fit(X_train, Y[train], epochs=configs.get("epochs"),batch_size=configs.get("batch_size"),callbacks=[wandb_callback],validation_freq=validation_steps, validation_data=(X_test, Y[test]))
 
     #evaluate
     score = model.evaluate(X_test, Y[test], verbose = 0,return_dict=True)
