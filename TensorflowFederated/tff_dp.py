@@ -80,7 +80,7 @@ def model_fn():
 # Build federated learning process
 # Uses customized classes that measure train time of clients and write that to a file
 aggregator = tff.learning.robust_aggregator(zeroing=False, clipping=False,weighted=False)
-dp_aggregator = tff.aggregators.DifferentiallyPrivateFactory(tfp.DistributedDiscreteGaussianSumQuery(0.5,0.5)
+dp_aggregator = tff.aggregators.DifferentiallyPrivateFactory(tfp.DistributedDiscreteGaussianSumQuery(0.5,args.noise)
 ,aggregator)
 #optimizer = tfp.DPKerasAdamOptimizer(l2_norm_clip=1.0,noise_multiplier=noise,num_microbatches=1)
 optimizer = Adam()

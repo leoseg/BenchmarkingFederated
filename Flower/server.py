@@ -37,6 +37,9 @@ parser.add_argument(
 parser.add_argument(
     "--network_metrics",type=bool,help="flag for network metrics",default=False
 )
+parser.add_argument(
+    "--noise",type=float,help="dp_noise",default=0.0
+)
 # print help if no argument is specified
 args = parser.parse_args()
 def fit_config(server_round: int):
@@ -96,7 +99,8 @@ start_server(
         run_repeat=args.run_repeat,
         system_metrics=args.system_metrics,
         unweighted=args.unweighted_percentage,
-        network_metrics=args.network_metrics
+        network_metrics=args.network_metrics,
+        noise=args.noise
     ),
     config=fl.server.ServerConfig(num_rounds=args.num_rounds)
 )

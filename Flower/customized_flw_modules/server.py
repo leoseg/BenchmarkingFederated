@@ -64,7 +64,7 @@ class Server:
     """Flower server."""
 
     def __init__(
-        self, network_metrics:bool, unweighted:bool,system_metrics:bool, run_repeat:int,num_clients:int,data_path:str, client_manager: ClientManager, strategy: Optional[Strategy] = None
+        self, noise:float,network_metrics:bool, unweighted:bool,system_metrics:bool, run_repeat:int,num_clients:int,data_path:str, client_manager: ClientManager, strategy: Optional[Strategy] = None
     ) -> None:
         self._client_manager: ClientManager = client_manager
         self.parameters: Parameters = Parameters(
@@ -78,6 +78,7 @@ class Server:
         self.network_metrics = network_metrics
         self.strategy: Strategy = strategy if strategy is not None else FedAvg()
         self.max_workers: Optional[int] = None
+        self.noise = noise
 
     def set_max_workers(self, max_workers: Optional[int]) -> None:
         """Set the max_workers used by ThreadPoolExecutor."""
@@ -100,18 +101,6 @@ class Server:
         # Initialize parameters
         log(INFO, "Initializing global parameters")
         self.parameters = self._get_initial_parameters(timeout=timeout)
-        # log(INFO, "Evaluating initial parameters")
-        # res = self.strategy.evaluate(0, parameters=self.parameters)
-        # if res is not None:
-        #     log(
-        #         INFO,
-        #         "initial parameters (loss, other metrics): %s, %s",
-        #         res[0],
-        #         res[1],
-        #     )
-        #     history.add_loss_centralized(server_round=0, loss=res[0])
-        #     history.add_metrics_centralized(server_round=0, metrics=res[1])
-
         # Run federated learning for num_rounds
         log(INFO, "FL starting")
         start_time = timeit.default_timer()
@@ -126,6 +115,9 @@ class Server:
         if self.unweighted >= 0.0:
             project_name = "unweighted" + project_name
             group = f"flwr_{self.unweighted}"
+        elif self.noise >= 0.0:
+            project_name = "dp" + project_name
+            group = f"flwr_{self.noise}"
         else:
             group = f"flwr_{self.num_clients}"
         DELAY_SECONDS = 5  # Delay between each retry attempt
