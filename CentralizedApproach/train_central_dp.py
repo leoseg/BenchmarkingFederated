@@ -50,9 +50,9 @@ num_nodes = args.num_nodes
 dropout_rate = args.dropout_rate
 l1_v = args.l1_v
 project_name = "central_dp_metrics"
-for noise in [10.0]:
+for noise in [20.0]:
     group_name=f"usecase_{configs['usecase']}_noise_{noise}"
-
+    configs["noise"] = noise
     # Trains the model with a train, validation, test split
     wandb.init(project=project_name, config=configs,group=group_name,job_type='train',name=f"no_crossfold")
     wandb_callback = WandbCallback(monitor='val_loss',
