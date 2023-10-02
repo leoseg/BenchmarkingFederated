@@ -19,7 +19,7 @@ if [ $SYSTEM_ONLY != "1" ]; then
   for (( repeat = 0; repeat < $REPEATS; repeat++ ))
   do
     echo "Start repeat model metrics ${repeat} num clients ${NUM_CLIENTS} num rounds ${NUM_ROUNDS} and data ${DATA_NAME}"
-    for ((i=1;i<=10;i++))
+    for ((i=1;i<=NUM_CLIENTS;i++))
     do
       port=$((8000 + $i))
       echo "Creating worker ${i} with port ${port}"

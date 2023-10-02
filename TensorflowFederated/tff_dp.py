@@ -21,6 +21,7 @@ import argparse
 from keras.metrics import AUC,BinaryAccuracy,Recall,Precision, SparseCategoricalAccuracy
 from metrics import AUC as SparseAUC
 import os
+from keras.optimizers import Adam
 import pandas as pd
 parser = argparse.ArgumentParser(
         prog="train_gen_expr.py",
@@ -40,6 +41,9 @@ parser.add_argument(
 )
 parser.add_argument(
     "--system_metrics",type=bool,help="flag for system metrics",default=False
+)
+parser.add_argument(
+    "--num_rounds",type=int,help="number of fl rounds",default=1
 )
 # print help if no argument is specified
 args = parser.parse_args()
@@ -75,9 +79,11 @@ def model_fn():
         metrics=metrics)
 # Build federated learning process
 # Uses customized classes that measure train time of clients and write that to a file
-
 aggregator = tff.learning.robust_aggregator(zeroing=False, clipping=False,weighted=False)
-optimizer = tfp.DPKerasAdamOptimizer(l2_norm_clip=1.0,noise_multiplier=noise,num_microbatches=1)
+dp_aggregator = tff.aggregators.DifferentiallyPrivateFactory(tfp.DistributedDiscreteGaussianSumQuery(0.5,0.5)
+,aggregator)
+#optimizer = tfp.DPKerasAdamOptimizer(l2_norm_clip=1.0,noise_multiplier=noise,num_microbatches=1)
+optimizer = Adam()
 #momentum = 0.9
 momentum = 0.0
 
@@ -149,11 +155,12 @@ def train_loop(num_rounds=1, num_clients=1):
         # then log to wandb
         state = result.state
         train_metrics = result.metrics
+        print(train_metrics)
         if not args.system_metrics:
             model_weights = trainer.get_model_weights(state)
             evaluation_state = evaluation_process.set_model_weights(evaluation_state, model_weights)
             evaluation_output = evaluation_process.next(evaluation_state, eval_data)
-            wandb.log({"training_loss": train_metrics["loss"]}, step=round)
+            #wandb.log({"training_loss": train_metrics["loss"]}, step=round)
             wandb.log(evaluation_output.metrics["client_work"]["eval"]["current_round_metrics"],step=round)
 
         if args.system_metrics:

@@ -35,22 +35,22 @@ def calculate_epsilon_for_usecases(noise_multiplier):
     usecase_data = {
         1: {
             "batch_size": 512,
-            "num_examples_list": [3207, 9261],# 192],
+            "num_examples_list": [3207],#, 9261],# 192],
             "epochs": 70,
         },
         2: {
             "batch_size": 512,
-            "num_examples_list": [3207, 9261],# 192],
+            "num_examples_list": [3207],#, 9261],# 192],
             "epochs": 8,
         },
         3: {
             "batch_size": 512,
-            "num_examples_list": [1848, 5544],#, 110],
+            "num_examples_list": [1848],#, 5544],#, 110],
             "epochs": 100,
         },
         4: {
             "batch_size": 512,
-            "num_examples_list": [1848, 5544],#, 110],
+            "num_examples_list": [1848],#, 5544],#, 110],
             "epochs": 30,
         }
     }
@@ -62,9 +62,9 @@ def calculate_epsilon_for_usecases(noise_multiplier):
             if data["batch_size"] > num_examples:
                 data["batch_size"] = num_examples
 
-            print(compute_dp_sgd_privacy.compute_dp_sgd_privacy_statement(number_of_examples=num_examples, batch_size=data["batch_size"],
+            print(compute_dp_sgd_privacy.compute_dp_sgd_privacy(n=num_examples, batch_size=data["batch_size"],
                                                                 noise_multiplier=noise_multiplier,
-                                                                num_epochs=data["epochs"], delta=delta))
+                                                                epochs=data["epochs"], delta=delta))
 
 
 if __name__ == '__main__':
