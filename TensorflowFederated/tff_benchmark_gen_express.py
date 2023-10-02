@@ -86,12 +86,14 @@ trainer = build_weighted_fed_avg(
 # Build federated evaluation process
 evaluation_process = tff.learning.algorithms.build_fed_eval(model_fn=model_fn)
 data_name = args.data_path.split("/")[-1].split(".")[0]
+num_clients = args.num_clients
 if args.system_metrics == True or args.network_metrics == True:
     metrics_type = "system"
-    num_clients = 1
+    if args.network_metrics:
+        num_clients=1
 else:
     metrics_type = "model"
-    num_clients = args.num_clients
+
 
 
 project_name = f"benchmark_rounds_{args.num_rounds}_{data_name}_{metrics_type}_metrics"
