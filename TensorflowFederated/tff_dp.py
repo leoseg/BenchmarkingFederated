@@ -9,12 +9,15 @@ import tensorflow_privacy as tfp
 import grpc
 import tensorflow as tf
 import tensorflow_federated as tff
+
+import dp_utils
 from customized_tff_modules.fed_avg_with_time import build_weighted_fed_avg, build_unweighted_fed_avg
 from dp_utils import calculate_delta
 from evaluation_utils import evaluate_model, load_test_data_for_evaluation
 from utils.system_utils import get_time_logs
 from utils.models import get_model
 import wandb
+
 from utils.config import configs
 from utils.config import tff_time_logging_directory
 import argparse
@@ -79,9 +82,15 @@ def model_fn():
         metrics=metrics)
 # Build federated learning process
 # Uses customized classes that measure train time of clients and write that to a file
-aggregator = tff.learning.robust_aggregator(zeroing=False, clipping=False,weighted=False)
-dp_aggregator = tff.aggregators.DifferentiallyPrivateFactory(tfp.DistributedDiscreteGaussianSumQuery(0.5,args.noise)
-,aggregator)
+dp_aggregator = tff.learning.ddp_secure_aggregator(noise_multiplier=1.0,expected_clients_per_round=args.num_clients)
+# aggregator = tff.learning.robust_aggregator(zeroing=False, clipping=False,weighted=False)
+# print(model_fn().trainable_variables)
+# query = dp_utils.create_compression_sum_query(
+#     1.0,
+#     tfp.DistributedDiscreteGaussianSumQuery(0.5,args.noise),
+# model_fn().trainable_variables)
+# dp_aggregator = tff.aggregators.DifferentiallyPrivateFactory(query
+# ,aggregator)
 #optimizer = tfp.DPKerasAdamOptimizer(l2_norm_clip=1.0,noise_multiplier=noise,num_microbatches=1)
 optimizer = Adam()
 #momentum = 0.9
@@ -91,7 +100,7 @@ trainer = build_unweighted_fed_avg(
     model_fn,
     client_optimizer_fn=lambda: optimizer,
     server_optimizer_fn=lambda: tf.keras.optimizers.SGD(learning_rate=1.0,momentum=momentum),
-    model_aggregator=aggregator)
+    model_aggregator=dp_aggregator)
 # Build federated evaluation process
 evaluation_process = tff.learning.algorithms.build_fed_eval(model_fn=model_fn)
 data_name = args.data_path.split("/")[-1].split(".")[0]

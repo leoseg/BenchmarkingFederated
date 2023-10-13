@@ -61,14 +61,11 @@ model = get_model(input_dim=configs.get("input_dim"), num_nodes= configs.get("nu
 optimizer = configs.get("optimizer")
 optimizer = Adam(clipnorm=1.0)
 if args.noise:
-    dp_query = tfp.DistributedDiscreteGaussianSumQuery(0.1,args.noise)
-    global_state = dp_query.initial_global_state()
-    #sample_state = dp_query.initial_sample_state()
-    params = dp_query.derive_sample_params(global_state=global_state)
-model.compile(optimizer, configs.get("loss"), metrics=configs.get("metrics"))
-if args.noise:
-    dp_query = tfp.DistributedDiscreteGaussianSumQuery(0.5, args.noise)
+    dp_query = tfp.DistributedDiscreteGaussianSumQuery(1.0,args.noise)
     params = dp_query.derive_sample_params(dp_query.initial_global_state())
+model.compile(optimizer, configs.get("loss"), metrics=configs.get("metrics"))
+
+
 # Define Flower client
 class Client(fl.client.NumPyClient):
     def get_parameters(self, config):
@@ -86,9 +83,20 @@ class Client(fl.client.NumPyClient):
         begin = tf.timestamp()
         history = model.fit(preprocessed_ds)
         if args.noise:
-            weights = model.get_weights()
-            new_sample_state = dp_query.accumulate_record(params,global_state,record=weights)
-            model.set_weights(dp_query.get_noised_result(sample_state=new_sample_state,global_state=global_state))
+            record = model.get_weights()
+            record_as_list = tf.nest.flatten(record)
+            record_as_float_list = [tf.cast(x, tf.float32) for x in record_as_list]
+            dependencies = [
+                tf.compat.v1.assert_less_equal(
+                    tf.linalg.global_norm(record_as_float_list),
+                    params.l2_norm_bound,
+                    message=f'Global L2 norm exceeds {params.l2_norm_bound}.')
+            ]
+            with tf.control_dependencies(dependencies):
+                result = tf.cond(
+                    tf.equal(params.local_stddev, 0), lambda: record,
+                    lambda: dp_query._add_local_noise(record, params.local_stddev))
+                model.set_weights(result)
         end = tf.timestamp()
         train_loss = history.history["loss"][-1]
         # If system metrics write client time to file so the server can log it
