@@ -82,6 +82,7 @@ elif os.environ["USECASE"] == str(3):
         usecase=3,
         batch_size=512,
         epochs=10,
+        global_norm = 3.5,
         optimizer=Adam(),
         groups=["tff_3", "tff_5", "tff_10","tff_50", "flwr_3", "flwr_5", "flwr_10","flwr_50"],
         unweighted_groups=["tff_0.0", "tff_4.0", "tff_8.0", "tff_10.0", "tff_12.0", "tff_14.0", "tff_16.0",

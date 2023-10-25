@@ -1,10 +1,12 @@
 import math
 import sys
+from typing import List
 
+import keras.callbacks
+import numpy as np
 from tensorflow_privacy.privacy.analysis import compute_dp_sgd_privacy
-from scipy import optimize
+import tensorflow as tf
 
-import compression_query
 
 BETA =  math.exp(-0.5) # from paper
 BITS = 20
@@ -88,6 +90,27 @@ def calculate_epsilon_for_usecases(noise_multiplier):
             print(compute_dp_sgd_privacy.compute_dp_sgd_privacy(n=num_examples, batch_size=data["batch_size"],
                                                                 noise_multiplier=noise_multiplier,
                                                                 epochs=data["epochs"], delta=delta))
+
+
+class GlobalNorm(keras.callbacks.Callback):
+
+    median_global_norm = 0
+
+    batch_global_norms = []
+
+    def on_train_begin(self, logs=None):
+        self.batch_global_norms = []
+        self.median_global_norm = 0
+    def on_train_batch_end(self, batch, logs=None):
+        weights = self.model.get_weights()
+        flatten_weights = tf.nest.flatten(weights)
+        global_norm = tf.linalg.global_norm(flatten_weights)
+        self.batch_global_norms.append(global_norm)
+
+    def on_train_end(self, logs=None):
+        self.median_global_norm = np.median(np.asarray(self.batch_global_norms))
+
+
 
 
 if __name__ == '__main__':

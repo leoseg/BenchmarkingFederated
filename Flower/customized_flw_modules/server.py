@@ -117,7 +117,7 @@ class Server:
             group = f"flwr_{self.unweighted}"
         elif self.noise >= 0.0:
             project_name = "dp" + project_name
-            group = f"flwr_{self.noise}"
+            group = f"flwr_{self.num_clients}_{self.noise}"
         else:
             group = f"flwr_{self.num_clients}"
         DELAY_SECONDS = 5  # Delay between each retry attempt

@@ -2,18 +2,13 @@ import collections
 import concurrent.futures
 import pickle
 
-import numpy as np
-from keras.utils import set_random_seed
 import time
-import tensorflow_privacy as tfp
+from dp.dp_query import GaussianSumQuery,LocalGaussianSumQuery
 import grpc
 import tensorflow as tf
 import tensorflow_federated as tff
 
-import dp_utils
-from customized_tff_modules.fed_avg_with_time import build_weighted_fed_avg, build_unweighted_fed_avg
-from dp_utils import calculate_delta
-from evaluation_utils import evaluate_model, load_test_data_for_evaluation
+from customized_tff_modules.fed_avg_with_time import build_unweighted_fed_avg
 from utils.system_utils import get_time_logs
 from utils.models import get_model
 import wandb
@@ -25,9 +20,9 @@ from keras.metrics import AUC,BinaryAccuracy,Recall,Precision, SparseCategorical
 from metrics import AUC as SparseAUC
 import os
 from keras.optimizers import Adam
-import pandas as pd
+
 parser = argparse.ArgumentParser(
-        prog="train_gen_expr.py",
+        prog="tff_dp.py",
         formatter_class=argparse.RawDescriptionHelpFormatter,
     )
 parser.add_argument(
@@ -82,25 +77,26 @@ def model_fn():
         metrics=metrics)
 # Build federated learning process
 # Uses customized classes that measure train time of clients and write that to a file
-dp_aggregator = tff.learning.ddp_secure_aggregator(noise_multiplier=1.0,expected_clients_per_round=args.num_clients)
-# aggregator = tff.learning.robust_aggregator(zeroing=False, clipping=False,weighted=False)
-# print(model_fn().trainable_variables)
-# query = dp_utils.create_compression_sum_query(
-#     1.0,
-#     tfp.DistributedDiscreteGaussianSumQuery(0.5,args.noise),
-# model_fn().trainable_variables)
-# dp_aggregator = tff.aggregators.DifferentiallyPrivateFactory(query
-# ,aggregator)
+# aggregator = tff.learning.ddp_secure_aggregator(noise_multiplier=1.0,expected_clients_per_round=1000)
+aggregator = tff.learning.robust_aggregator(zeroing=False, clipping=False,weighted=False)
+# # print(model_fn().trainable_variables)
+# # query = dp_utils.create_compression_sum_query(
+# #     1.0,
+# #     tfp.DistributedDiscreteGaussianSumQuery(0.5,args.noise),
+# # model_fn().trainable_variables)
+query = GaussianSumQuery(0.1,100000000.0)
+
+aggregator = tff.aggregators.DifferentiallyPrivateFactory(LocalGaussianSumQuery(10.0, args.noise),aggregator)
 #optimizer = tfp.DPKerasAdamOptimizer(l2_norm_clip=1.0,noise_multiplier=noise,num_microbatches=1)
 optimizer = Adam()
 #momentum = 0.9
 momentum = 0.0
-
+print(aggregator)
 trainer = build_unweighted_fed_avg(
     model_fn,
     client_optimizer_fn=lambda: optimizer,
     server_optimizer_fn=lambda: tf.keras.optimizers.SGD(learning_rate=1.0,momentum=momentum),
-    model_aggregator=dp_aggregator)
+    model_aggregator=aggregator)
 # Build federated evaluation process
 evaluation_process = tff.learning.algorithms.build_fed_eval(model_fn=model_fn)
 data_name = args.data_path.split("/")[-1].split(".")[0]
@@ -112,8 +108,8 @@ if args.system_metrics:
 else:
     mode = "model"
     num_clients = args.num_clients
-project_name = f"dpusecase_{configs['usecase']}_benchmark_rounds_{data_name}_{mode}_metrics"
-group = f"{args.num_clients}_{noise}"
+project_name = f"dpusecase_{configs['usecase']}_benchmark_rounds_{args.num_rounds}_{data_name}_{mode}_metrics"
+group = f"tff_{args.num_clients}_{noise}"
 print("Training initialized")
 DELAY_SECONDS = 5  # Delay between each retry attempt
 
@@ -129,7 +125,7 @@ with open("partitions_list", "rb") as file:
     partitions_list = pickle.load(file)
 wandb.log({"partitions_list": partitions_list})
 num_examples_per_client = int(len(partitions_list[0])*0.8)
-privacy_guarantee = tfp.compute_dp_sgd_privacy(num_examples_per_client,configs.get("batch_size"),noise,configs.get("epochs"),delta=calculate_delta(num_examples_per_client))
+#privacy_guarantee = tfp.compute_dp_sgd_privacy(num_examples_per_client,configs.get("batch_size"),noise,configs.get("epochs"),delta=calculate_delta(num_examples_per_client))
 def train_loop(num_rounds=1, num_clients=1):
     """
     Train loop function for FL
