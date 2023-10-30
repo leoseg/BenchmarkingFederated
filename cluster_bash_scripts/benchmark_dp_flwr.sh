@@ -20,7 +20,7 @@ python3 -c 'import sys; print(sys.version_info[:])'
 pip3 install --upgrade pip
 pip install -e utils
 pip3 install -r requirements.txt
-cd TensorflowFederated || exit
+cd Flower || exit
 clients_config=(3)
 rounds_config=(1 2 5 10)
 #if [ "$USECASE" -eq "4" ]
