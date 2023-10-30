@@ -154,6 +154,9 @@ def compose_learning_process(
 
     @federated_computation.federated_computation()
     def init_fn():
+        """
+        Initializes the learning process.
+        """
         initial_model_weights = intrinsics.federated_eval(
             initial_model_weights_fn, placements.SERVER
         )
@@ -169,13 +172,16 @@ def compose_learning_process(
 
     @tensorflow_federated.tf_computation()
     def timestamp():
+        """
+        Returns the current timestamp.
+        """
         return tf.timestamp()
 
     @federated_computation.federated_computation(
         init_fn.type_signature.result, client_data_type
     )
     def next_fn(state, client_data):
-        # Compose processes.
+        """Compose processes for FL"""
         times = collections.OrderedDict()
         times["distribution_time_begin"] = timestamp()
         distributor_output = model_weights_distributor.next(
@@ -233,16 +239,25 @@ def compose_learning_process(
 
     @tensorflow_computation.tf_computation(state_parameter_type)
     def get_model_weights_fn(state):
+        """
+        Returns the model weights from the state.
+        """
         return state.global_model_weights
 
     @tensorflow_computation.tf_computation(
         state_parameter_type, state_parameter_type.global_model_weights
     )
     def set_model_weights_fn(state, model_weights):
+        """
+        Sets the model weights in the state.
+        """
         return attr.evolve(state, global_model_weights=model_weights)
 
     @tensorflow_computation.tf_computation(state_parameter_type)
     def get_hparams_fn(state):
+        """
+        Returns the hyperparameters from the state.
+        """
         client_work_hparams = client_work.get_hparams(state.client_work)
         finalizer_hparams = model_finalizer.get_hparams(state.finalizer)
         return collections.OrderedDict(
@@ -253,6 +268,9 @@ def compose_learning_process(
 
     @tensorflow_computation.tf_computation(state_parameter_type, hparams_type)
     def set_hparams_fn(state, hparams):
+        """
+        Sets the hyperparameters in the state.
+        """
         updated_client_work_state = client_work.set_hparams(
             state.client_work, hparams["client_work"]
         )

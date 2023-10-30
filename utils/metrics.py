@@ -492,6 +492,9 @@ class AUC(base_metric.Metric):
             )
 
     def reset_state(self):
+        """
+        Resets state
+        """
         if self._built:
             confusion_matrix_variables = (
                 self.true_positives,
@@ -515,6 +518,9 @@ class AUC(base_metric.Metric):
                 )
 
     def get_config(self):
+        """
+        Gets metric config
+        """
         if is_tensor_or_variable(self.label_weights):
             label_weights = backend.eval(self.label_weights)
         else:
