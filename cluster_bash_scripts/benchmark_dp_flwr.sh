@@ -1,5 +1,5 @@
 #!/bin/bash
-#SBATCH -J tff_bal
+#SBATCH -J tff_dp
 #SBATCH --time=2-00:00:00
 #SBATCH --ntasks=1
 #SBATCH --partition=clara
