@@ -44,4 +44,3 @@ do
     bash tff_dp.sh $DATA_PATH $noise 5 $WANDB_API_KEY $NUM_REPEATS $SYSTEM_ONLY $num_rounds
   done
 done
-

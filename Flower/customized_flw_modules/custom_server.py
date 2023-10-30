@@ -33,7 +33,7 @@ from flwr.common import (
     Parameters,
     ReconnectIns,
     Scalar,
-    parameters_to_ndarrays
+    parameters_to_ndarrays,
 )
 from flwr.common.logger import log
 from flwr.common.typing import GetParametersIns
@@ -46,6 +46,7 @@ from utils.system_utils import get_time_logs
 from utils.config import flw_time_logging_directory
 from utils.config import configs
 import pandas as pd
+
 FitResultsAndFailures = Tuple[
     List[Tuple[ClientProxy, FitRes]],
     List[Union[Tuple[ClientProxy, FitRes], BaseException]],
@@ -64,7 +65,16 @@ class Server:
     """Flower server."""
 
     def __init__(
-        self, noise:float,network_metrics:bool, unweighted:bool,system_metrics:bool, run_repeat:int,num_clients:int,data_path:str, client_manager: ClientManager, strategy: Optional[Strategy] = None
+        self,
+        noise: float,
+        network_metrics: bool,
+        unweighted: bool,
+        system_metrics: bool,
+        run_repeat: int,
+        num_clients: int,
+        data_path: str,
+        client_manager: ClientManager,
+        strategy: Optional[Strategy] = None,
     ) -> None:
         self._client_manager: ClientManager = client_manager
         self.parameters: Parameters = Parameters(
@@ -95,7 +105,7 @@ class Server:
     # pylint: disable=too-many-locals
     def fit(self, num_rounds: int, timeout: Optional[float]) -> History:
         """Run federated averaging for a number of rounds."""
-        #self.client_manager().wait_for(self.num_clients,600000)
+        # self.client_manager().wait_for(self.num_clients,600000)
         history = History()
 
         # Initialize parameters
@@ -108,9 +118,11 @@ class Server:
         if self.system_metrics or self.network_metrics:
             metrics_type = "system"
         else:
-            metrics_type ="model"
+            metrics_type = "model"
 
-        project_name = f"benchmark_rounds_{num_rounds}_{data_name}_{metrics_type}_metrics"
+        project_name = (
+            f"benchmark_rounds_{num_rounds}_{data_name}_{metrics_type}_metrics"
+        )
         project_name = f"usecase_{configs['usecase']}_" + project_name
         if self.unweighted >= 0.0:
             project_name = "unweighted" + project_name
@@ -124,7 +136,12 @@ class Server:
         if not self.network_metrics:
             while True:
                 try:
-                    wandb.init(project=project_name, group=group, name=f"run_{self.run_repeat}",config=configs)
+                    wandb.init(
+                        project=project_name,
+                        group=group,
+                        name=f"run_{self.run_repeat}",
+                        config=configs,
+                    )
                     print("Wandb initialized successfully")
                     break
                 except ConnectionRefusedError:
@@ -132,7 +149,7 @@ class Server:
                     time.sleep(DELAY_SECONDS)
             with open("partitions_list", "rb") as file:
                 partitions_list = pickle.load(file)
-            wandb.log({"partitions_list":partitions_list})
+            wandb.log({"partitions_list": partitions_list})
         # If unweighted step is set reads number of samples per class per clients and log to wandb
         # if self.unweighted >= 0.0:
         #     wandb.log({f"class_num_table_{int(self.unweighted)}":pd.read_csv(f"partitions_dict_{int(self.unweighted)}.csv")})
@@ -147,16 +164,22 @@ class Server:
             end = tf.timestamp()
             # Logs system metrics to wandb if flag is set
             if self.system_metrics:
-                wandb.log({"round_time":tf.get_static_value(end - begin)},step=current_round)
-                #wandb.log(get_time_logs(flw_time_logging_directory, True),step=current_round)
+                wandb.log(
+                    {"round_time": tf.get_static_value(end - begin)}, step=current_round
+                )
+                # wandb.log(get_time_logs(flw_time_logging_directory, True),step=current_round)
             # Evaluate model using strategy implementation
-            if not self.system_metrics and self.unweighted>=0.0:
-                res_cen = self.strategy.evaluate(current_round, parameters=self.parameters)
+            if not self.system_metrics and self.unweighted >= 0.0:
+                res_cen = self.strategy.evaluate(
+                    current_round, parameters=self.parameters
+                )
                 if res_cen is not None:
                     loss_cen, metrics_cen = res_cen
-                    metrics_cen = {key + '_global': value for key, value in metrics_cen.items()}
+                    metrics_cen = {
+                        key + "_global": value for key, value in metrics_cen.items()
+                    }
                     metrics_cen["loss_global"] = loss_cen
-                    wandb.log(metrics_cen,step=current_round)
+                    wandb.log(metrics_cen, step=current_round)
                     log(
                         INFO,
                         "fit progress: (%s, %s, %s, %s)",
@@ -165,21 +188,25 @@ class Server:
                         metrics_cen,
                         timeit.default_timer() - start_time,
                     )
-                    history.add_loss_centralized(server_round=current_round, loss=loss_cen)
+                    history.add_loss_centralized(
+                        server_round=current_round, loss=loss_cen
+                    )
                     history.add_metrics_centralized(
                         server_round=current_round, metrics=metrics_cen
                     )
 
             # Evaluate model on a sample of available clients
             if not self.system_metrics and not self.network_metrics:
-                wandb.log(metrics_train,step=current_round)
-                res_fed = self.evaluate_round(server_round=current_round, timeout=timeout)
+                wandb.log(metrics_train, step=current_round)
+                res_fed = self.evaluate_round(
+                    server_round=current_round, timeout=timeout
+                )
                 if res_fed:
                     loss_fed, evaluate_metrics_fed, _ = res_fed
                     evaluate_metrics_fed["loss"] = loss_fed
                     # Logs metrics to wandb if its not system => model performance metrics
 
-                    wandb.log(evaluate_metrics_fed,step=current_round)
+                    wandb.log(evaluate_metrics_fed, step=current_round)
                     if loss_fed:
                         history.add_loss_distributed(
                             server_round=current_round, loss=loss_fed
@@ -253,7 +280,7 @@ class Server:
         """Perform a single round of federated averaging."""
 
         # Get clients and their respective instructions from strategy
-        log(INFO,"Getting client instructions")
+        log(INFO, "Getting client instructions")
         client_instructions = self.strategy.configure_fit(
             server_round=server_round,
             parameters=self.parameters,
@@ -270,7 +297,7 @@ class Server:
             len(client_instructions),
             self._client_manager.num_available(),
         )
-        log(INFO,"Client instructions gotten")
+        log(INFO, "Client instructions gotten")
         # Collect `fit` results from all clients participating in this round
 
         results, failures = fit_clients(
@@ -291,7 +318,6 @@ class Server:
             Optional[Parameters],
             Dict[str, Scalar],
         ] = self.strategy.aggregate_fit(server_round, results, failures)
-
 
         parameters_aggregated, metrics_aggregated = aggregated_result
         return parameters_aggregated, metrics_aggregated, (results, failures)
@@ -376,7 +402,7 @@ def fit_clients(
     timeout: Optional[float],
 ) -> FitResultsAndFailures:
     """Refine parameters concurrently on all selected clients."""
-    log(INFO,"Start fit clients")
+    log(INFO, "Start fit clients")
     with concurrent.futures.ThreadPoolExecutor(max_workers=max_workers) as executor:
         submitted_fs = {
             executor.submit(fit_client, client_proxy, ins, timeout)

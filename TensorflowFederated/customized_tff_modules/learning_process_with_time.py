@@ -34,342 +34,357 @@ from tensorflow_federated.python.learning.templates import hparams_base
 
 
 class Error(Exception):
-  """Generic module-level error, allows caller to handle all exceptions raised.
-  """
+    """Generic module-level error, allows caller to handle all exceptions raised."""
 
 
 class LearningProcessPlacementError(Error):
-  """Raises when a learning process does not have expected placements."""
-  pass
+    """Raises when a learning process does not have expected placements."""
+
+    pass
 
 
 class LearningProcessSequenceTypeError(Error):
-  """Raises when a learning process does not have the expected sequence type."""
+    """Raises when a learning process does not have the expected sequence type."""
 
 
 class LearningProcessOutputError(Error):
-  """Raises when a learning process does not have the expected output type."""
+    """Raises when a learning process does not have the expected output type."""
 
 
 class GetModelWeightsTypeSignatureError(Error):
-  """Raises when the type signature of `get_model_weights` is not correct."""
+    """Raises when the type signature of `get_model_weights` is not correct."""
 
 
 class SetModelWeightsTypeSignatureError(Error):
-  """Raises when the type signature of `set_model_weights` is not correct."""
+    """Raises when the type signature of `set_model_weights` is not correct."""
 
 
 @attr.s(frozen=True, eq=True, order=False, slots=True)
 class LearningProcessOutput:
-  """A structure containing the output of a `LearningProcess.next` computation.
+    """A structure containing the output of a `LearningProcess.next` computation.
 
-  Attributes:
-    state: A structure that will be passed to invocation of
-      `LearningProcess.next`. Not intended for inspection externally, contains
-      implementation details of the process.
-    metrics: Metrics derived from the applying the process to a given state and
-      input. This output is intended for surfacing values to better understand
-      the progress of a learning process, and is not directly intended to be
-      used as input to `LearningProcess.next`. For example, this output may
-      include classical metrics surrounding the quality of a machine learning
-      model (eg. the average accuracy of a model across the participating
-      clients), or operational metrics concerning systems-oriented information
-      (eg. timing information and the amount of communication occurring between
-      clients and server).
-  """
-  state = attr.ib()
-  metrics = attr.ib()
-  times = attr.ib()
+    Attributes:
+      state: A structure that will be passed to invocation of
+        `LearningProcess.next`. Not intended for inspection externally, contains
+        implementation details of the process.
+      metrics: Metrics derived from the applying the process to a given state and
+        input. This output is intended for surfacing values to better understand
+        the progress of a learning process, and is not directly intended to be
+        used as input to `LearningProcess.next`. For example, this output may
+        include classical metrics surrounding the quality of a machine learning
+        model (eg. the average accuracy of a model across the participating
+        clients), or operational metrics concerning systems-oriented information
+        (eg. timing information and the amount of communication occurring between
+        clients and server).
+    """
 
+    state = attr.ib()
+    metrics = attr.ib()
+    times = attr.ib()
 
 
 class LearningProcess(iterative_process.IterativeProcess):
-  """A stateful process for learning tasks that produces metrics.
+    """A stateful process for learning tasks that produces metrics.
 
-  This class inherits the constraints documented by
-  `tff.templates.IterativeProcess`, including an `initialize` and `next`
-  attribute. The `LearningProcess` also contains additional attributes,
-  including `get_model_weights` and `get_hparams`. The former can be used to
-  get out structures suitable for evaluation purposes, while the latter can
-  be used to extract hyperparameters from the process. There are also
-  corresponding `set_model_weights` and `set_hparams` attributes that can set
-  these structures in a given state.
+    This class inherits the constraints documented by
+    `tff.templates.IterativeProcess`, including an `initialize` and `next`
+    attribute. The `LearningProcess` also contains additional attributes,
+    including `get_model_weights` and `get_hparams`. The former can be used to
+    get out structures suitable for evaluation purposes, while the latter can
+    be used to extract hyperparameters from the process. There are also
+    corresponding `set_model_weights` and `set_hparams` attributes that can set
+    these structures in a given state.
 
-  For example, given a LearningProcess `process` and client data `data`, we
-  could call the following to initialize, optionally load other model weights,
-  update the state three times, and extract the model weights of the state:
+    For example, given a LearningProcess `process` and client data `data`, we
+    could call the following to initialize, optionally load other model weights,
+    update the state three times, and extract the model weights of the state:
 
-  >>> state = process.initialize()
-  >>> # Optional: state = process.set_model_weights(state, other_weights)
-  >>> for _ in range(3):
-  >>>  state, metrics = process.next(state, data)
-  >>> model_weights = process.get_model_weights(state)
-  """
-
-  def __init__(self,
-               initialize_fn: computation_base.Computation,
-               next_fn: computation_base.Computation,
-               get_model_weights: computation_base.Computation,
-               set_model_weights: computation_base.Computation,
-               *,
-               get_hparams_fn: Optional[computation_base.Computation] = None,
-               set_hparams_fn: Optional[computation_base.Computation] = None):
-    """Creates a `tff.learning.templates.LearningProcess`.
-
-    The `initialize_fn`, `next_fn`, `get_model_weights`, and `set_model_weights`
-    must have the following type signatures:
-
-    ```
-      - initialize_fn: ( -> S@SERVER)
-      - next_fn: (<S@SERVER, {D*}@CLIENTS> -> <state=S@SERVER,
-      metrics=M@SERVER>)
-      - get_model_weights: (S -> W)
-      - set_model_weights: (<S, W> -> S)
-    ```
-    Here, `S` represents the state of the process, and {D*} represents a
-    sequence of data. `M` represents the metrics output by the process. Note
-    that while `initialize_fn`, and `next_fn` are federated computations,
-    `get_model_weights` and `set_model_weights` are unplaced.
-
-    If provided, the `get_hparams_fn` and `set_hparams_fn` must be non-federated
-    computations with the following type signatures:
-
-    ```
-      - get_hparams_fn: (S -> H)
-      - set_hparams_fn: (<S, H> -> S)
-    ```
-    Here, `S` must match the state `S` of `initialize_fn` and `next_fn`, and `H`
-    represents the hyperparameter type.
-
-    Args:
-      initialize_fn: A no-arg `tff.Computation` that creates the initial state
-        of the learning process.
-      next_fn: A `tff.Computation` that defines an iterated function. Given that
-        `initialize_fn` returns a type `S@SERVER`, the `next_fn` must return a
-        `LearningProcessOutput` where the `state` attribute is assignable from
-        values with type `S@SERVER`, and accepts two arguments with types
-        assignable from values with type `S@SERVER` and `{D*}@CLIENTS`.
-      get_model_weights: A `tff.Computation` that accepts an input `S` whose
-        type is assignable from the result of `init_fn`. This computation is
-        used to create a representation of the state that can be used for
-        downstream tasks without requiring access to the entire server state.
-        For example, `get_model_weights` could be used to extract model weights
-        suitable for computing evaluation metrics on held-out data.
-      set_model_weights: A `tff.Computation` that accepts two inputs `S` and `M`
-        where the type of `S` is assignable from values with the type returned
-        by `init_fn` and `M` is a representation of the model weights stored in
-        `S`. This updates the model weights representation within the state with
-        the incoming value and returns a new value of type `S`.
-      get_hparams_fn: An optional `tff.Computation` accepting the state `S` and
-        returning the hyperparameters `H`. If not provided, this defaults to a
-        computation that returns an empty ordered dictionary, regardless of the
-        contents of the state.
-      set_hparams_fn: An optional `tff.Computation` accepting the state `S` and
-        hyperparameters `H` (matching the output of `get_hparams_fn`) and
-        returning an updated state `S`. If not provided, this defaults to a
-        pass-through computation that returns the input state regardless of the
-        hparams passed in.
-
-    Raises:
-      TypeError: If `initialize_fn` and `next_fn` are not instances of
-        `tff.Computation`.
-      TemplateInitFnParamNotEmptyError: If `initialize_fn` has any input
-        arguments.
-      TemplateStateNotAssignableError: If the `state` returned by either
-        `initialize_fn` or `next_fn` is not assignable to the first input
-        argument of `next_fn`.
-      TemplateNextFnNumArgsError: If `next_fn` does not have at exactly two
-        input arguments.
-      LearningProcessPlacementError: If the placements of `initialize_fn` and
-        `next_fn` do not match the expected type placements.
-      LearningProcessOutputError: If `next_fn` does not return a
-        `LearningProcessOutput`.
-      LearningProcessSequenceTypeError: If the second argument to `next_fn` is
-        not a sequence type.
-      GetModelWeightsTypeSignatureError: If the input type of get_model_weights
-        does not match the process state type.
-      SetModelWeightsTypeSignatureError: If the type of the first input or the
-        type of the output of set_model_weights does not match the process state
-        type.
+    >>> state = process.initialize()
+    >>> # Optional: state = process.set_model_weights(state, other_weights)
+    >>> for _ in range(3):
+    >>>  state, metrics = process.next(state, data)
+    >>> model_weights = process.get_model_weights(state)
     """
-    super().__init__(initialize_fn, next_fn)
 
-    init_fn_result = initialize_fn.type_signature.result
-    if init_fn_result.placement != placements.SERVER:
-      raise LearningProcessPlacementError(
-          f'The result of `initialize_fn` must be placed at `SERVER` but found '
-          f'placement {init_fn_result.placement}.')
+    def __init__(
+        self,
+        initialize_fn: computation_base.Computation,
+        next_fn: computation_base.Computation,
+        get_model_weights: computation_base.Computation,
+        set_model_weights: computation_base.Computation,
+        *,
+        get_hparams_fn: Optional[computation_base.Computation] = None,
+        set_hparams_fn: Optional[computation_base.Computation] = None,
+    ):
+        """Creates a `tff.learning.templates.LearningProcess`.
 
-    next_result_type = next_fn.type_signature.result
-    if not (isinstance(next_result_type, computation_types.StructWithPythonType)
-            and next_result_type.python_container is LearningProcessOutput):
-      raise LearningProcessOutputError(
-          f'The `next_fn` of a `LearningProcess` must return a '
-          f'`LearningProcessOutput` object, but returns {next_result_type!r}')
-    # We perform a more strict type check on the inputs to `next_fn` than in the
-    # base class.
-    next_fn_param = next_fn.type_signature.parameter
-    if not next_fn_param.is_struct() or len(next_fn_param) != 2:
-      raise errors.TemplateNextFnNumArgsError(
-          f'The `next_fn` must have two input arguments, but found an input '
-          f'of type {next_fn_param}.')
-    if next_fn_param[1].placement != placements.CLIENTS:
-      raise LearningProcessPlacementError(
-          f'The second input argument of `next_fn` must be placed at `CLIENTS`,'
-          f' but found placement {next_fn_param[1].placement}.')
+        The `initialize_fn`, `next_fn`, `get_model_weights`, and `set_model_weights`
+        must have the following type signatures:
 
-    def is_allowed_client_data_type(type_spec: computation_types.Type) -> bool:
-      """Returns `True` if the type is a valid client dataset type."""
-      if type_spec.is_sequence():
-        return type_analysis.is_tensorflow_compatible_type(type_spec.element)
-      elif type_spec.is_struct():
-        return all(
-            is_allowed_client_data_type(element_type)
-            for element_type in type_spec.children())
-      else:
-        return False
+        ```
+          - initialize_fn: ( -> S@SERVER)
+          - next_fn: (<S@SERVER, {D*}@CLIENTS> -> <state=S@SERVER,
+          metrics=M@SERVER>)
+          - get_model_weights: (S -> W)
+          - set_model_weights: (<S, W> -> S)
+        ```
+        Here, `S` represents the state of the process, and {D*} represents a
+        sequence of data. `M` represents the metrics output by the process. Note
+        that while `initialize_fn`, and `next_fn` are federated computations,
+        `get_model_weights` and `set_model_weights` are unplaced.
 
-    if not is_allowed_client_data_type(next_fn_param[1].member):
-      raise LearningProcessSequenceTypeError(
-          f'The member type of the second input argument to `next_fn` must be a'
-          f' `tff.SequenceType` or a nested `tff.StructType` of sequence types '
-          f'but found {next_fn_param[1].member} instead.')
-    next_fn_result = next_fn.type_signature.result
-    if next_fn_result.metrics.placement != placements.SERVER:
-      raise LearningProcessPlacementError(
-          f'The result of `next_fn` must be placed at `SERVER` but found '
-          f'placement {next_fn_result.metrics.placement} for `metrics`.')
+        If provided, the `get_hparams_fn` and `set_hparams_fn` must be non-federated
+        computations with the following type signatures:
 
-    py_typecheck.check_type(get_model_weights, computation_base.Computation)
-    get_model_weights_type = get_model_weights.type_signature
-    get_model_weights_param = get_model_weights_type.parameter
-    next_fn_state_param = next_fn.type_signature.parameter[0].member
-    if not get_model_weights_param.is_equivalent_to(next_fn_state_param):
-      raise GetModelWeightsTypeSignatureError(
-          f'The input type of `get_model_weights` must be assignable from '
-          f'the member type of the output of `initialize_fn`, but found input '
-          f'type {get_model_weights_param}, which is not equivalent to '
-          f'{next_fn_state_param}.')
-    self._get_model_weights = get_model_weights
+        ```
+          - get_hparams_fn: (S -> H)
+          - set_hparams_fn: (<S, H> -> S)
+        ```
+        Here, `S` must match the state `S` of `initialize_fn` and `next_fn`, and `H`
+        represents the hyperparameter type.
 
-    py_typecheck.check_type(set_model_weights, computation_base.Computation)
-    set_model_weights_type = set_model_weights.type_signature
-    set_model_weights_state_param = set_model_weights_type.parameter[0]
-    if not set_model_weights_state_param.is_equivalent_to(next_fn_state_param):
-      raise SetModelWeightsTypeSignatureError(
-          f'The input type of `set_model_weights` must be assignable from '
-          f'the member type of the output of `initialize_fn`, but found input '
-          f'type {set_model_weights_state_param}, which is not equivalent to '
-          f'{next_fn_state_param}.')
-    set_model_weights_result = set_model_weights_type.result
-    if not next_fn_state_param.is_assignable_from(set_model_weights_result):
-      raise SetModelWeightsTypeSignatureError(
-          f'The output type of `set_model_weights` must be assignable to '
-          f'the first parameter of `next_fn`, but found input '
-          f'type {set_model_weights_result}, which is not assignable to; '
-          f'{next_fn_state_param}.')
-    self._set_model_weights = set_model_weights
+        Args:
+          initialize_fn: A no-arg `tff.Computation` that creates the initial state
+            of the learning process.
+          next_fn: A `tff.Computation` that defines an iterated function. Given that
+            `initialize_fn` returns a type `S@SERVER`, the `next_fn` must return a
+            `LearningProcessOutput` where the `state` attribute is assignable from
+            values with type `S@SERVER`, and accepts two arguments with types
+            assignable from values with type `S@SERVER` and `{D*}@CLIENTS`.
+          get_model_weights: A `tff.Computation` that accepts an input `S` whose
+            type is assignable from the result of `init_fn`. This computation is
+            used to create a representation of the state that can be used for
+            downstream tasks without requiring access to the entire server state.
+            For example, `get_model_weights` could be used to extract model weights
+            suitable for computing evaluation metrics on held-out data.
+          set_model_weights: A `tff.Computation` that accepts two inputs `S` and `M`
+            where the type of `S` is assignable from values with the type returned
+            by `init_fn` and `M` is a representation of the model weights stored in
+            `S`. This updates the model weights representation within the state with
+            the incoming value and returns a new value of type `S`.
+          get_hparams_fn: An optional `tff.Computation` accepting the state `S` and
+            returning the hyperparameters `H`. If not provided, this defaults to a
+            computation that returns an empty ordered dictionary, regardless of the
+            contents of the state.
+          set_hparams_fn: An optional `tff.Computation` accepting the state `S` and
+            hyperparameters `H` (matching the output of `get_hparams_fn`) and
+            returning an updated state `S`. If not provided, this defaults to a
+            pass-through computation that returns the input state regardless of the
+            hparams passed in.
 
-    state_type = initialize_fn.type_signature.result.member
-    if get_hparams_fn is not None:
-      hparams_base.type_check_get_hparams_fn(get_hparams_fn, state_type)
-    else:
-      get_hparams_fn = hparams_base.build_basic_hparams_getter(state_type)
+        Raises:
+          TypeError: If `initialize_fn` and `next_fn` are not instances of
+            `tff.Computation`.
+          TemplateInitFnParamNotEmptyError: If `initialize_fn` has any input
+            arguments.
+          TemplateStateNotAssignableError: If the `state` returned by either
+            `initialize_fn` or `next_fn` is not assignable to the first input
+            argument of `next_fn`.
+          TemplateNextFnNumArgsError: If `next_fn` does not have at exactly two
+            input arguments.
+          LearningProcessPlacementError: If the placements of `initialize_fn` and
+            `next_fn` do not match the expected type placements.
+          LearningProcessOutputError: If `next_fn` does not return a
+            `LearningProcessOutput`.
+          LearningProcessSequenceTypeError: If the second argument to `next_fn` is
+            not a sequence type.
+          GetModelWeightsTypeSignatureError: If the input type of get_model_weights
+            does not match the process state type.
+          SetModelWeightsTypeSignatureError: If the type of the first input or the
+            type of the output of set_model_weights does not match the process state
+            type.
+        """
+        super().__init__(initialize_fn, next_fn)
 
-    hparams_type = get_hparams_fn.type_signature.result
+        init_fn_result = initialize_fn.type_signature.result
+        if init_fn_result.placement != placements.SERVER:
+            raise LearningProcessPlacementError(
+                f"The result of `initialize_fn` must be placed at `SERVER` but found "
+                f"placement {init_fn_result.placement}."
+            )
 
-    if set_hparams_fn is not None:
-      hparams_base.type_check_set_hparams_fn(set_hparams_fn, state_type)
-    else:
-      set_hparams_fn = hparams_base.build_basic_hparams_setter(
-          state_type, hparams_type)
+        next_result_type = next_fn.type_signature.result
+        if not (
+            isinstance(next_result_type, computation_types.StructWithPythonType)
+            and next_result_type.python_container is LearningProcessOutput
+        ):
+            raise LearningProcessOutputError(
+                f"The `next_fn` of a `LearningProcess` must return a "
+                f"`LearningProcessOutput` object, but returns {next_result_type!r}"
+            )
+        # We perform a more strict type check on the inputs to `next_fn` than in the
+        # base class.
+        next_fn_param = next_fn.type_signature.parameter
+        if not next_fn_param.is_struct() or len(next_fn_param) != 2:
+            raise errors.TemplateNextFnNumArgsError(
+                f"The `next_fn` must have two input arguments, but found an input "
+                f"of type {next_fn_param}."
+            )
+        if next_fn_param[1].placement != placements.CLIENTS:
+            raise LearningProcessPlacementError(
+                f"The second input argument of `next_fn` must be placed at `CLIENTS`,"
+                f" but found placement {next_fn_param[1].placement}."
+            )
 
-    self._get_hparams_fn = get_hparams_fn
-    self._set_hparams_fn = set_hparams_fn
+        def is_allowed_client_data_type(type_spec: computation_types.Type) -> bool:
+            """Returns `True` if the type is a valid client dataset type."""
+            if type_spec.is_sequence():
+                return type_analysis.is_tensorflow_compatible_type(type_spec.element)
+            elif type_spec.is_struct():
+                return all(
+                    is_allowed_client_data_type(element_type)
+                    for element_type in type_spec.children()
+                )
+            else:
+                return False
 
-  @property
-  def initialize(self) -> computation_base.Computation:
-    """A `tff.Computation` that initializes the process.
+        if not is_allowed_client_data_type(next_fn_param[1].member):
+            raise LearningProcessSequenceTypeError(
+                f"The member type of the second input argument to `next_fn` must be a"
+                f" `tff.SequenceType` or a nested `tff.StructType` of sequence types "
+                f"but found {next_fn_param[1].member} instead."
+            )
+        next_fn_result = next_fn.type_signature.result
+        if next_fn_result.metrics.placement != placements.SERVER:
+            raise LearningProcessPlacementError(
+                f"The result of `next_fn` must be placed at `SERVER` but found "
+                f"placement {next_fn_result.metrics.placement} for `metrics`."
+            )
 
-    This computation must have no input arguments, and its output must be the
-    initial state of the learning process, placed at `SERVER`.
+        py_typecheck.check_type(get_model_weights, computation_base.Computation)
+        get_model_weights_type = get_model_weights.type_signature
+        get_model_weights_param = get_model_weights_type.parameter
+        next_fn_state_param = next_fn.type_signature.parameter[0].member
+        if not get_model_weights_param.is_equivalent_to(next_fn_state_param):
+            raise GetModelWeightsTypeSignatureError(
+                f"The input type of `get_model_weights` must be assignable from "
+                f"the member type of the output of `initialize_fn`, but found input "
+                f"type {get_model_weights_param}, which is not equivalent to "
+                f"{next_fn_state_param}."
+            )
+        self._get_model_weights = get_model_weights
 
-    Returns:
-      A `tff.Computation`.
-    """
-    return super().initialize
+        py_typecheck.check_type(set_model_weights, computation_base.Computation)
+        set_model_weights_type = set_model_weights.type_signature
+        set_model_weights_state_param = set_model_weights_type.parameter[0]
+        if not set_model_weights_state_param.is_equivalent_to(next_fn_state_param):
+            raise SetModelWeightsTypeSignatureError(
+                f"The input type of `set_model_weights` must be assignable from "
+                f"the member type of the output of `initialize_fn`, but found input "
+                f"type {set_model_weights_state_param}, which is not equivalent to "
+                f"{next_fn_state_param}."
+            )
+        set_model_weights_result = set_model_weights_type.result
+        if not next_fn_state_param.is_assignable_from(set_model_weights_result):
+            raise SetModelWeightsTypeSignatureError(
+                f"The output type of `set_model_weights` must be assignable to "
+                f"the first parameter of `next_fn`, but found input "
+                f"type {set_model_weights_result}, which is not assignable to; "
+                f"{next_fn_state_param}."
+            )
+        self._set_model_weights = set_model_weights
 
-  @property
-  def next(self) -> computation_base.Computation:
-    """A `tff.Computation` that runs one iteration of the process.
+        state_type = initialize_fn.type_signature.result.member
+        if get_hparams_fn is not None:
+            hparams_base.type_check_get_hparams_fn(get_hparams_fn, state_type)
+        else:
+            get_hparams_fn = hparams_base.build_basic_hparams_getter(state_type)
 
-    The first argument of this computation should always be the current state
-    (originally produced by the `initialize` attribute), the second argument
-    must be a `tff.SequenceType` placed at `CLIENTS`. The return type must be
-    a `LearningProcessOutput`, with each field placed at `SERVER`.
+        hparams_type = get_hparams_fn.type_signature.result
 
-    Returns:
-      A `tff.Computation`.
-    """
-    return super().next
+        if set_hparams_fn is not None:
+            hparams_base.type_check_set_hparams_fn(set_hparams_fn, state_type)
+        else:
+            set_hparams_fn = hparams_base.build_basic_hparams_setter(
+                state_type, hparams_type
+            )
 
-  @property
-  def get_model_weights(self) -> computation_base.Computation:
-    """A `tff.Computation` returning the model weights of a server state.
+        self._get_hparams_fn = get_hparams_fn
+        self._set_hparams_fn = set_hparams_fn
 
-    This computation accepts an unplaced state of the process (originally
-    produced by the `initialize` attribute), and returns an unplaced
-    representation of the model weights of the state. Note that this
-    representation need not take the form of a
-    `tff.learning.models.ModelWeights` object, and may depend on the specific
-    `LearningProcess` in question.
+    @property
+    def initialize(self) -> computation_base.Computation:
+        """A `tff.Computation` that initializes the process.
 
-    Returns:
-      A `tff.Computation`.
-    """
-    return self._get_model_weights
+        This computation must have no input arguments, and its output must be the
+        initial state of the learning process, placed at `SERVER`.
 
-  @property
-  def set_model_weights(self) -> computation_base.Computation:
-    """A `tff.Computation` that sets the model weights of a server state.
+        Returns:
+          A `tff.Computation`.
+        """
+        return super().initialize
 
-    This computation accepts two arguments: an unplaced state of the process
-    (originally produced by the `initialize` attribute) and a new structure of
-    tensors representing the model weights, and returns new unplaced state with
-    the updated model weights. Note that the model weights representation need
-    not take the form of a `tff.learning.models.ModelWeights` object, and may
-    depend on
-    the specific `LearningProcess` in question.
+    @property
+    def next(self) -> computation_base.Computation:
+        """A `tff.Computation` that runs one iteration of the process.
 
-    Returns:
-      A `tff.Computation`.
-    """
-    return self._set_model_weights
+        The first argument of this computation should always be the current state
+        (originally produced by the `initialize` attribute), the second argument
+        must be a `tff.SequenceType` placed at `CLIENTS`. The return type must be
+        a `LearningProcessOutput`, with each field placed at `SERVER`.
 
-  @property
-  def get_hparams(self) -> computation_base.Computation:
-    """A `tff.Computation` returning the hyperparameters of a server state.
+        Returns:
+          A `tff.Computation`.
+        """
+        return super().next
 
-    This computation accepts an unplaced state of the process (originally
-    produced by the `initialize` attribute), and returns an unplaced ordered
-    dictionary representing the hyperparameters of the state.
+    @property
+    def get_model_weights(self) -> computation_base.Computation:
+        """A `tff.Computation` returning the model weights of a server state.
 
-    Returns:
-      A `tff.Computation`.
-    """
-    return self._get_hparams_fn
+        This computation accepts an unplaced state of the process (originally
+        produced by the `initialize` attribute), and returns an unplaced
+        representation of the model weights of the state. Note that this
+        representation need not take the form of a
+        `tff.learning.models.ModelWeights` object, and may depend on the specific
+        `LearningProcess` in question.
 
-  @property
-  def set_hparams(self) -> computation_base.Computation:
-    """A `tff.Computation` that sets the hyperparamters of a server state.
+        Returns:
+          A `tff.Computation`.
+        """
+        return self._get_model_weights
 
-    This computation accepts two arguments: an unplaced state of the process
-    (originally produced by the `initialize` attribute) and an ordered
-    dictionary representing the hyperparameters (matching the output of
-    `get_hparams`), and returns a new unplaced state with updated
-    hyperparameters.
+    @property
+    def set_model_weights(self) -> computation_base.Computation:
+        """A `tff.Computation` that sets the model weights of a server state.
 
-    Returns:
-      A `tff.Computation`.
-    """
-    return self._set_hparams_fn
+        This computation accepts two arguments: an unplaced state of the process
+        (originally produced by the `initialize` attribute) and a new structure of
+        tensors representing the model weights, and returns new unplaced state with
+        the updated model weights. Note that the model weights representation need
+        not take the form of a `tff.learning.models.ModelWeights` object, and may
+        depend on
+        the specific `LearningProcess` in question.
+
+        Returns:
+          A `tff.Computation`.
+        """
+        return self._set_model_weights
+
+    @property
+    def get_hparams(self) -> computation_base.Computation:
+        """A `tff.Computation` returning the hyperparameters of a server state.
+
+        This computation accepts an unplaced state of the process (originally
+        produced by the `initialize` attribute), and returns an unplaced ordered
+        dictionary representing the hyperparameters of the state.
+
+        Returns:
+          A `tff.Computation`.
+        """
+        return self._get_hparams_fn
+
+    @property
+    def set_hparams(self) -> computation_base.Computation:
+        """A `tff.Computation` that sets the hyperparamters of a server state.
+
+        This computation accepts two arguments: an unplaced state of the process
+        (originally produced by the `initialize` attribute) and an ordered
+        dictionary representing the hyperparameters (matching the output of
+        `get_hparams`), and returns a new unplaced state with updated
+        hyperparameters.
+
+        Returns:
+          A `tff.Computation`.
+        """
+        return self._set_hparams_fn

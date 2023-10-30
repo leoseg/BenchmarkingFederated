@@ -1,0 +1,21 @@
+repos:
+-   repo: https://github.com/pre-commit/pre-commit-hooks
+    rev: v2.3.0
+    hooks:
+    -   id: check-yaml
+    -   id: end-of-file-fixer
+    -   id: trailing-whitespace
+    -   id: check-added-large-files
+-   repo: https://github.com/psf/black
+    rev: 22.10.0
+    hooks:
+    -   id: black
+#-   repo: https://github.com/pre-commit/mirrors-mypy
+#    rev: ''  # Use the sha / tag you want to point at
+#    hooks:
+#    -   id: mypy
+#- repo: https://github.com/econchick/interrogate
+#  rev: 1.5.0
+#  hooks:
+#      - id: interrogate
+#        args: [--fail-under=80, --verbose]

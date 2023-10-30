@@ -5,7 +5,7 @@ from config import configs
 from plotting import ENTITY, ROUNDS
 
 
-def get_loss_stats(groups:list,version:str,mode:str):
+def get_loss_stats(groups: list, version: str, mode: str):
     """
     Get the loss stats for the given groups and version
     :param groups: groups to get the stats for
@@ -24,10 +24,14 @@ def get_loss_stats(groups:list,version:str,mode:str):
     api = wandb.Api()
     project_metrics = {}
     for group in groups:
-        runs = api.runs(f"{ENTITY}/{project}",filters={"group": group})
+        runs = api.runs(f"{ENTITY}/{project}", filters={"group": group})
         losses = []
         for run in runs:
-            if run.config.get("version") == version or run.config.get("version") == "unbalanced_with_global_evaluation_1804" and run.name != "no_crossfold":
+            if (
+                run.config.get("version") == version
+                or run.config.get("version") == "unbalanced_with_global_evaluation_1804"
+                and run.name != "no_crossfold"
+            ):
                 history = run.history()
                 if mode == "unweighted":
                     loss = history.get("loss_global")
@@ -39,7 +43,7 @@ def get_loss_stats(groups:list,version:str,mode:str):
                     continue
                 else:
                     losses.append(loss.dropna().tolist())
-        means = np.mean(np.array(losses),axis=0).tolist()
+        means = np.mean(np.array(losses), axis=0).tolist()
         project_metrics[group] = means
     return project_metrics
 
@@ -51,7 +55,7 @@ def create_loss_df(metrics_dict):
     :return:
     """
     total_rows = []
-    for key,value in metrics_dict.items():
+    for key, value in metrics_dict.items():
         if key.startswith("usecase"):
             group = "central"
             framework = "Centralized"
@@ -60,13 +64,22 @@ def create_loss_df(metrics_dict):
             framework = key.split("_")[0].upper()
         rows = []
         for i in range(len(value)):
-            rows.append({"round":i+1,"loss":value[i],"group":group,"framework":framework})
+            rows.append(
+                {
+                    "round": i + 1,
+                    "loss": value[i],
+                    "group": group,
+                    "framework": framework,
+                }
+            )
         total_rows.extend(rows)
     df = pd.DataFrame(total_rows)
     return df
 
 
-def get_group_stats(project:str,groups:list,version:str,metric_names:list,mode:str):
+def get_group_stats(
+    project: str, groups: list, version: str, metric_names: list, mode: str
+):
     """
     Get the mean of the metrics for each group of a project
     :param project: name of the project
@@ -79,26 +92,32 @@ def get_group_stats(project:str,groups:list,version:str,metric_names:list,mode:s
     api = wandb.Api()
     project_metrics = {}
     for group in groups:
-        runs = api.runs(f"{ENTITY}/{project}",filters={"group": group})
+        runs = api.runs(f"{ENTITY}/{project}", filters={"group": group})
         metrics_dicts = []
         for run in runs:
-            if (run.config.get("version") == version or version is None) and run.state != "failed":
-                metrics_dicts.append(get_metrics_from_run(run, metric_names,group,mode))
-        metrics  = put_metrics_together(metrics_dicts)
+            if (
+                run.config.get("version") == version or version is None
+            ) and run.state != "failed":
+                metrics_dicts.append(
+                    get_metrics_from_run(run, metric_names, group, mode)
+                )
+        metrics = put_metrics_together(metrics_dicts)
         project_metrics[group] = metrics
     return project_metrics
 
 
-def group_scenarios(scenarios:list,group_factor):
+def group_scenarios(scenarios: list, group_factor):
     """
     Group a list of dataframes by a column and return a df with the means over that column
     """
     df = pd.concat(scenarios)
-    df = df.groupby([df.index,'framework', group_factor], as_index=False).agg({'metric': 'mean'})
+    df = df.groupby([df.index, "framework", group_factor], as_index=False).agg(
+        {"metric": "mean"}
+    )
     return df
 
 
-def get_stats_for_usecase(groups,version = None,mode="balanced",rounds=None):
+def get_stats_for_usecase(groups, version=None, mode="balanced", rounds=None):
     """
     Get the mean of the metrics for each group of all projecets for that usecase
     :param mode: mode of the project can be "unweighted" or "system" or "balanced"
@@ -112,27 +131,38 @@ def get_stats_for_usecase(groups,version = None,mode="balanced",rounds=None):
     metrics_prefix = "model"
     data_path = configs.get("data_path").split("/")[-1].split(".")[0]
     if rounds is None:
-        rounds  = ROUNDS
+        rounds = ROUNDS
     round_metrics = []
     if not version:
         version = configs.get("version")
     if mode == "system":
-        metrics_prefix ="system"
+        metrics_prefix = "system"
         version = "version_1005"
-        metrics_names = ["memory_client","memory_server","round_time","client_time","sent","received"]
+        metrics_names = [
+            "memory_client",
+            "memory_server",
+            "round_time",
+            "client_time",
+            "sent",
+            "received",
+        ]
     else:
         metrics_names = [element.name for element in configs.get("metrics")]
         metrics_names.append("loss")
     if mode == "unweighted":
         project_prefix = "unweightedusecase"
-        metrics_names.extend([name +"_global" for name in metrics_names])
+        metrics_names.extend([name + "_global" for name in metrics_names])
     for round in rounds:
         project = f"{project_prefix}_{str(usecase)}_benchmark_rounds_{round}_{data_path}_{metrics_prefix}_metrics"
-        round_metrics.append(get_group_stats(project,groups,version=version,metric_names=metrics_names,mode=mode))
+        round_metrics.append(
+            get_group_stats(
+                project, groups, version=version, metric_names=metrics_names, mode=mode
+            )
+        )
     return round_metrics
 
 
-def transform_scenario_metrics_to_df(metrics:dict,metric_name:str,round_num):
+def transform_scenario_metrics_to_df(metrics: dict, metric_name: str, round_num):
     """
     Transform the metrics for all roundconfiguration to a pandas dataframe for plotting
     :param metrics: metrics for all roundconfiguration
@@ -140,14 +170,22 @@ def transform_scenario_metrics_to_df(metrics:dict,metric_name:str,round_num):
     :round_num: number of rounds used for multiplying time metrics
     :return: df with the metrics for one roundconfiguration
     """
-    dfs= []
-    for groupname,metrics in metrics.items():
-            dfs.append(transform_to_df(metrics,metric_name,groupname.split("_")[0],groupname.split("_")[1],round_num))
+    dfs = []
+    for groupname, metrics in metrics.items():
+        dfs.append(
+            transform_to_df(
+                metrics,
+                metric_name,
+                groupname.split("_")[0],
+                groupname.split("_")[1],
+                round_num,
+            )
+        )
     df = pd.concat(dfs)
     return df
 
 
-def transform_to_df(metrics:dict,metric_name,framework,group,round_configuration):
+def transform_to_df(metrics: dict, metric_name, framework, group, round_configuration):
     """
     Transform the metrics for one roundconfiguration and one metric to a pandas dataframe for plotting
     :param metrics: metrics for one roundconfiguration
@@ -158,7 +196,7 @@ def transform_to_df(metrics:dict,metric_name,framework,group,round_configuration
     :return: df with the metrics for one roundconfiguration and one metric
     """
     rows = []
-    if framework in ["tff","flwr"]:
+    if framework in ["tff", "flwr"]:
         framework = framework.upper()
     if framework == "central":
         framework = "Centralized"
@@ -166,16 +204,18 @@ def transform_to_df(metrics:dict,metric_name,framework,group,round_configuration
         row = {
             "framework": framework,
             "group": group,
-            "round configuration": round_configuration
+            "round configuration": round_configuration,
         }
         metric_value = metrics[metric_name][i]
         row["metric"] = metric_value
         rows.append(row)
-    df = pd.DataFrame(data=rows, columns=["framework", "group", "metric", "round configuration"])
+    df = pd.DataFrame(
+        data=rows, columns=["framework", "group", "metric", "round configuration"]
+    )
     return df
 
 
-def create_dfs_for_fl_metric(rounds_metrics,metric_name:str):
+def create_dfs_for_fl_metric(rounds_metrics, metric_name: str):
     """
     Creates a dataframe for each roundconfiguration for one metric and appends them together
     :param rounds_metrics: metrics for each roundconfiguration
@@ -185,7 +225,9 @@ def create_dfs_for_fl_metric(rounds_metrics,metric_name:str):
     dfs = []
     for index, metric_for_number_of_rounds in enumerate(rounds_metrics):
         round_num = ROUNDS[index]
-        df = transform_scenario_metrics_to_df(metric_for_number_of_rounds, metric_name, round_num)
+        df = transform_scenario_metrics_to_df(
+            metric_for_number_of_rounds, metric_name, round_num
+        )
         dfs.append(df)
     df = pd.concat(dfs)
     return df
@@ -202,7 +244,7 @@ def recalculate_round_times_for_number_of_rounds(df):
     return df
 
 
-def get_central_metrics(mode:str,metric_names:list):
+def get_central_metrics(mode: str, metric_names: list):
     """
     Get the metrics for the central model
     :param mode: metric mode of the project can be "system" or "model"
@@ -213,17 +255,21 @@ def get_central_metrics(mode:str,metric_names:list):
     group = f"usecase_{usecase}"
     if mode == "system":
         project = "benchmark-central_system_metrics"
-        metric_names = ["training_time","memory_central"]
+        metric_names = ["training_time", "memory_central"]
         version = None
     else:
         project = "central_model_metrics"
         version = "essential_seeds_42"
     api = wandb.Api()
-    runs = api.runs(f"{ENTITY}/{project}",filters={"group": group})
+    runs = api.runs(f"{ENTITY}/{project}", filters={"group": group})
     metrics_dicts = []
     for run in runs:
-        if run.name != "no_crossfold" and run.config.get("version") == version and run.state != "failed":
-            metrics_dicts.append(get_metrics_from_run(run,metric_names,group,mode))
+        if (
+            run.name != "no_crossfold"
+            and run.config.get("version") == version
+            and run.state != "failed"
+        ):
+            metrics_dicts.append(get_metrics_from_run(run, metric_names, group, mode))
     metrics = put_metrics_together(metrics_dicts)
     return metrics
 
@@ -238,11 +284,11 @@ def get_system_metrics(history, metric_names, group):
     """
     metrics = {}
     for metric in set(metric_names).intersection(history.keys()):
-        if metric in ["memory_client","memory_server","memory_central"]:
+        if metric in ["memory_client", "memory_server", "memory_central"]:
             # if the metric is a memory metric, get the sum, mean and max of the metric
             memory_metrics = get_memory_metrics(group, history, metric)
             metrics.update(memory_metrics)
-        elif metric in ["round_time","client_time","training_time"]:
+        elif metric in ["round_time", "client_time", "training_time"]:
             # if the metric is a time metric, get the mean of the metric
             time = history.get(metric)
             if time is not None:
@@ -252,20 +298,25 @@ def get_system_metrics(history, metric_names, group):
                     # if the metric is client_time, get the first_round_time
                     metrics["first_round_time"] = time.iloc[0]
                 if metric == "client_time" or metric == "round_time":
-                    metrics["total_"+metric] = time.sum()
-        elif metric in ["sent","received"]:
+                    metrics["total_" + metric] = time.sum()
+        elif metric in ["sent", "received"]:
             metric_value = float(history.get(metric)[0])
             if metric_value is not None:
                 number_of_clients = int(group.split("_")[-1])
-                metrics[metric] =  metric_value * number_of_clients
+                metrics[metric] = metric_value * number_of_clients
     if "client_time" in metrics.keys() and "round_time" in metrics.keys():
         # if both client_time and round_time are in the metric_names, get the time_diff
         metrics["time_diff"] = metrics["round_time"] - metrics["client_time"]
         metrics["time_diff_percentage"] = metrics["time_diff"] / metrics["client_time"]
-    if "total_memory_client" in metrics.keys() and "total_memory_server" in metrics.keys():
+    if (
+        "total_memory_client" in metrics.keys()
+        and "total_memory_server" in metrics.keys()
+    ):
         # if both memory_client and memory_server are in metric_names calculate the sum
         # of both metrics summed up
-        metrics["total_memory_fl"] = metrics["total_memory_client"] + metrics["total_memory_server"]
+        metrics["total_memory_fl"] = (
+            metrics["total_memory_client"] + metrics["total_memory_server"]
+        )
     return metrics
 
 
@@ -293,7 +344,7 @@ def get_memory_metrics(group, history, metric):
     return memory_metrics
 
 
-def get_metrics_from_run(run:wandb.run,metric_names:list,group,mode:str):
+def get_metrics_from_run(run: wandb.run, metric_names: list, group, mode: str):
     """
     Get the metrics from a run
     :param run: run to get the metrics from
@@ -307,7 +358,7 @@ def get_metrics_from_run(run:wandb.run,metric_names:list,group,mode:str):
     metrics = {}
     if mode == "system":
         history = run.history()
-        return get_system_metrics(history,metric_names,group)
+        return get_system_metrics(history, metric_names, group)
     for metric in metric_names:
         if metric not in run.summary.keys():
             # If the run summary does not contain the metric, get it from the history
@@ -321,7 +372,7 @@ def get_metrics_from_run(run:wandb.run,metric_names:list,group,mode:str):
     return metrics
 
 
-def put_metrics_together(metrics_dicts:list):
+def put_metrics_together(metrics_dicts: list):
     """
     Put the metrics of all runs into one dictionary
     :param metrics_dicts: list of dictionaries with the metrics for each run
@@ -330,6 +381,12 @@ def put_metrics_together(metrics_dicts:list):
     unique_keys = set()
     for metrics_dict in metrics_dicts:
         unique_keys.update(metrics_dict.keys())
-    metrics = {key: [metrics_dict.get(key) for metrics_dict in metrics_dicts if metrics_dict.get(key) is not None]
-               for key in unique_keys}
+    metrics = {
+        key: [
+            metrics_dict.get(key)
+            for metrics_dict in metrics_dicts
+            if metrics_dict.get(key) is not None
+        ]
+        for key in unique_keys
+    }
     return metrics

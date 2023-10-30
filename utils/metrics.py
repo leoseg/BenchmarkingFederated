@@ -1,4 +1,3 @@
-from keras.metrics import AUC
 import tensorflow as tf
 import numpy as np
 from keras import activations
@@ -10,7 +9,6 @@ from keras.utils.tf_utils import is_tensor_or_variable
 
 # isort: off
 from tensorflow.python.util.tf_export import keras_export
-
 
 
 @keras_export("keras.metrics.AUC")
@@ -184,8 +182,7 @@ class AUC(base_metric.Metric):
             # (0, 1).
             self.num_thresholds = num_thresholds
             thresholds = [
-                (i + 1) * 1.0 / (num_thresholds - 1)
-                for i in range(num_thresholds - 2)
+                (i + 1) * 1.0 / (num_thresholds - 1) for i in range(num_thresholds - 2)
             ]
             self._thresholds_distributed_evenly = True
 
@@ -251,9 +248,7 @@ class AUC(base_metric.Metric):
                     f"Full shape received for `y_true`: {shape}"
                 )
             self._num_labels = shape[1]
-            variable_shape = tf.TensorShape(
-                [self.num_thresholds, self._num_labels]
-            )
+            variable_shape = tf.TensorShape([self.num_thresholds, self._num_labels])
         else:
             variable_shape = tf.TensorShape([self.num_thresholds])
 
@@ -390,15 +385,10 @@ class AUC(base_metric.Metric):
         Returns:
           pr_auc: an approximation of the area under the P-R curve.
         """
-        dtp = (
-            self.true_positives[: self.num_thresholds - 1]
-            - self.true_positives[1:]
-        )
+        dtp = self.true_positives[: self.num_thresholds - 1] - self.true_positives[1:]
         p = tf.math.add(self.true_positives, self.false_positives)
         dp = p[: self.num_thresholds - 1] - p[1:]
-        prec_slope = tf.math.divide_no_nan(
-            dtp, tf.maximum(dp, 0), name="prec_slope"
-        )
+        prec_slope = tf.math.divide_no_nan(dtp, tf.maximum(dp, 0), name="prec_slope")
         intercept = self.true_positives[1:] - tf.multiply(prec_slope, p[1:])
 
         safe_p_ratio = tf.where(
@@ -427,9 +417,7 @@ class AUC(base_metric.Metric):
             else:
                 # Weighted average of the label AUCs.
                 return tf.math.divide_no_nan(
-                    tf.reduce_sum(
-                        tf.multiply(by_label_auc, self.label_weights)
-                    ),
+                    tf.reduce_sum(tf.multiply(by_label_auc, self.label_weights)),
                     tf.reduce_sum(self.label_weights),
                     name=self.name,
                 )
@@ -439,8 +427,7 @@ class AUC(base_metric.Metric):
     def result(self):
         if (
             self.curve == metrics_utils.AUCCurve.PR
-            and self.summation_method
-            == metrics_utils.AUCSummationMethod.INTERPOLATION
+            and self.summation_method == metrics_utils.AUCSummationMethod.INTERPOLATION
         ):
             # This use case is different and is handled separately.
             return self.interpolate_pr_auc()
@@ -466,10 +453,7 @@ class AUC(base_metric.Metric):
             y = precision
 
         # Find the rectangle heights based on `summation_method`.
-        if (
-            self.summation_method
-            == metrics_utils.AUCSummationMethod.INTERPOLATION
-        ):
+        if self.summation_method == metrics_utils.AUCSummationMethod.INTERPOLATION:
             # Note: the case ('PR', 'interpolation') has been handled above.
             heights = (y[: self.num_thresholds - 1] + y[1:]) / 2.0
         elif self.summation_method == metrics_utils.AUCSummationMethod.MINORING:
@@ -480,9 +464,7 @@ class AUC(base_metric.Metric):
 
         # Sum up the areas of all the rectangles.
         if self.multi_label:
-            riemann_terms = tf.multiply(
-                x[: self.num_thresholds - 1] - x[1:], heights
-            )
+            riemann_terms = tf.multiply(x[: self.num_thresholds - 1] - x[1:], heights)
             by_label_auc = tf.reduce_sum(
                 riemann_terms, name=self.name + "_by_label", axis=0
             )
@@ -493,9 +475,7 @@ class AUC(base_metric.Metric):
             else:
                 # Weighted average of the label AUCs.
                 return tf.math.divide_no_nan(
-                    tf.reduce_sum(
-                        tf.multiply(by_label_auc, self.label_weights)
-                    ),
+                    tf.reduce_sum(tf.multiply(by_label_auc, self.label_weights)),
                     tf.reduce_sum(self.label_weights),
                     name=self.name,
                 )

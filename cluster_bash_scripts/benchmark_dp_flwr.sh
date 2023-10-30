@@ -44,4 +44,3 @@ do
     bash flwr_balanced_benchmark.sh $DATA_PATH 3 $num_rounds $WANDB_API_KEY $NUM_REPEATS $SYSTEM_ONLY $noise
   done
 done
-

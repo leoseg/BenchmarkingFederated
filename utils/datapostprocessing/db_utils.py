@@ -1,6 +1,8 @@
 import yaml
 from pymongo import MongoClient
+
 SECRETS_FILE = "../../utils/secrets.yaml"
+
 
 class MongoDBHandler:
     """A class to handle MongoDB operations."""
@@ -44,7 +46,7 @@ class MongoDBHandler:
             secrets = yaml.safe_load(file)
             return secrets["mongodb_adress"]
 
-    def get_data_by_name(self, name, calc_total_memory=False) ->list:
+    def get_data_by_name(self, name, calc_total_memory=False) -> list:
         """
         Get data from a document by its name.
 
@@ -57,7 +59,15 @@ class MongoDBHandler:
         if calc_total_memory:
             for count, round in enumerate(document["data"]):
                 for key, value in round.items():
-                    if "total_memory_server" in value.keys() and "total_memory_client" in value.keys():
-                        document["data"][count][key]["total_memory"] = [(x + y) for x,y in zip(value["total_memory_server"] ,value["total_memory_client"])]
+                    if (
+                        "total_memory_server" in value.keys()
+                        and "total_memory_client" in value.keys()
+                    ):
+                        document["data"][count][key]["total_memory"] = [
+                            (x + y)
+                            for x, y in zip(
+                                value["total_memory_server"],
+                                value["total_memory_client"],
+                            )
+                        ]
         return document["data"] if document else None
-

@@ -42,4 +42,3 @@ do
     bash tff_unbalanced_benchmark.sh $DATA_PATH $num_clients $rounds $WANDB_API_KEY $NUM_REPEATS $unweight_step
   done
 done
-

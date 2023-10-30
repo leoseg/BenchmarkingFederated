@@ -4,7 +4,7 @@ New run with config num_rounds:2,num_clients:1,epochs:100,batch:512,nrows:None
 Initializationtime is 0.5005779266357422
 ROUND 1:
 
-Selecting data time is 4.00543212890625e-05 
+Selecting data time is 4.00543212890625e-05
 Time for client update with keras optimizer time ís
 9.5367431640625e-07
 Round time is 25.312520027160645
@@ -23,7 +23,7 @@ Metrics=OrderedDict([('binary_accuracy', 0.946005), ('auc', 0.97436404), ('preci
  Time between create_metrics_begin and create_new_state_end is 0.000286102294921875
  Time between create_metrics_end and create_metrics_begin is 0.00039196014404296875ROUND 2:
 
-Selecting data time is 1.0967254638671875e-05 
+Selecting data time is 1.0967254638671875e-05
 Time for client update with keras optimizer time ís
 3.0994415283203125e-06
 Round time is 24.423096895217896
@@ -48,7 +48,7 @@ New run with config num_rounds:2,num_clients:1,epochs:10,batch:512,nrows:None
 Initializationtime is 0.5027780532836914
 ROUND 1:
 
-Selecting data time is 2.9087066650390625e-05 
+Selecting data time is 2.9087066650390625e-05
 Time for client update with keras optimizer time ís
 2.86102294921875e-06
 Round time is 25.979620933532715
@@ -67,7 +67,7 @@ Metrics=OrderedDict([('binary_accuracy', 0.71025), ('auc', 0.78058726), ('precis
  Time between create_metrics_begin and create_new_state_end is 0.00025391578674316406
  Time between create_metrics_end and create_metrics_begin is 0.0002570152282714844ROUND 2:
 
-Selecting data time is 3.0040740966796875e-05 
+Selecting data time is 3.0040740966796875e-05
 Time for client update with keras optimizer time ís
 5.9604644775390625e-06
 Round time is 3.3336241245269775
@@ -92,7 +92,7 @@ New run with config num_rounds:2,num_clients:1,epochs:1,batch:512,nrows:None
 Initializationtime is 0.5040791034698486
 ROUND 1:
 
-Selecting data time is 1.5974044799804688e-05 
+Selecting data time is 1.5974044799804688e-05
 Time for client update with keras optimizer time ís
 2.1457672119140625e-06
 Round time is 24.81087303161621
@@ -111,7 +111,7 @@ Metrics=OrderedDict([('binary_accuracy', 0.5285), ('auc', 0.5193712), ('precisio
  Time between create_metrics_begin and create_new_state_end is 0.0003399848937988281
  Time between create_metrics_end and create_metrics_begin is 0.0003199577331542969ROUND 2:
 
-Selecting data time is 2.5987625122070312e-05 
+Selecting data time is 2.5987625122070312e-05
 Time for client update with keras optimizer time ís
 2.1457672119140625e-06
 Round time is 1.5202829837799072
@@ -136,7 +136,7 @@ New run with config num_rounds:4,num_clients:1,epochs:1,batch:256,nrows:None
 Initializationtime is 0.5570080280303955
 ROUND 1:
 
-Selecting data time is 1.811981201171875e-05 
+Selecting data time is 1.811981201171875e-05
 Time for client update with keras optimizer time ís
 2.86102294921875e-06
 Round time is 25.3750958442688
@@ -155,7 +155,7 @@ Metrics=OrderedDict([('binary_accuracy', 0.5735), ('auc', 0.49965742), ('precisi
  Time between create_metrics_begin and create_new_state_end is 0.00033092498779296875
  Time between create_metrics_end and create_metrics_begin is 0.0014920234680175781ROUND 2:
 
-Selecting data time is 1.811981201171875e-05 
+Selecting data time is 1.811981201171875e-05
 Time for client update with keras optimizer time ís
 2.86102294921875e-06
 Round time is 1.4976789951324463
@@ -174,7 +174,7 @@ Metrics=OrderedDict([('binary_accuracy', 0.6145), ('auc', 0.60143334), ('precisi
  Time between create_metrics_begin and create_new_state_end is 0.0004830360412597656
  Time between create_metrics_end and create_metrics_begin is 0.0006070137023925781ROUND 3:
 
-Selecting data time is 2.288818359375e-05 
+Selecting data time is 2.288818359375e-05
 Time for client update with keras optimizer time ís
 2.1457672119140625e-06
 Round time is 1.669123888015747
@@ -193,7 +193,7 @@ Metrics=OrderedDict([('binary_accuracy', 0.6995), ('auc', 0.73395205), ('precisi
  Time between create_metrics_begin and create_new_state_end is 0.0008699893951416016
  Time between create_metrics_end and create_metrics_begin is 0.0011110305786132812ROUND 4:
 
-Selecting data time is 2.288818359375e-05 
+Selecting data time is 2.288818359375e-05
 Time for client update with keras optimizer time ís
 2.86102294921875e-06
 Round time is 1.4643068313598633
@@ -218,7 +218,7 @@ New run with config num_rounds:4,num_clients:1,epochs:1,batch:128,nrows:None
 Initializationtime is 0.5031740665435791
 ROUND 1:
 
-Selecting data time is 3.886222839355469e-05 
+Selecting data time is 3.886222839355469e-05
 Time for client update with keras optimizer time ís
 2.1457672119140625e-06
 Round time is 25.253446102142334
@@ -237,7 +237,7 @@ Metrics=OrderedDict([('binary_accuracy', 0.617), ('auc', 0.7135441), ('precision
  Time between create_metrics_begin and create_new_state_end is 0.0020608901977539062
  Time between create_metrics_end and create_metrics_begin is 0.0003361701965332031ROUND 2:
 
-Selecting data time is 2.5033950805664062e-05 
+Selecting data time is 2.5033950805664062e-05
 Time for client update with keras optimizer time ís
 2.86102294921875e-06
 Round time is 1.7267329692840576
@@ -256,7 +256,7 @@ Metrics=OrderedDict([('binary_accuracy', 0.7125), ('auc', 0.7769901), ('precisio
  Time between create_metrics_begin and create_new_state_end is 0.0019040107727050781
  Time between create_metrics_end and create_metrics_begin is 0.0005419254302978516ROUND 3:
 
-Selecting data time is 3.4809112548828125e-05 
+Selecting data time is 3.4809112548828125e-05
 Time for client update with keras optimizer time ís
 3.0994415283203125e-06
 Round time is 1.969451904296875
@@ -275,7 +275,7 @@ Metrics=OrderedDict([('binary_accuracy', 0.8475), ('auc', 0.910604), ('precision
  Time between create_metrics_begin and create_new_state_end is 0.00015401840209960938
  Time between create_metrics_end and create_metrics_begin is 0.00041604042053222656ROUND 4:
 
-Selecting data time is 1.4066696166992188e-05 
+Selecting data time is 1.4066696166992188e-05
 Time for client update with keras optimizer time ís
 3.0994415283203125e-06
 Round time is 1.6812000274658203
@@ -300,7 +300,7 @@ New run with config num_rounds:4,num_clients:1,epochs:10,batch:512,nrows:None
 Initializationtime is 0.5044949054718018
 ROUND 1:
 
-Selecting data time is 1.5020370483398438e-05 
+Selecting data time is 1.5020370483398438e-05
 Time for client update with keras optimizer time ís
 1.9073486328125e-06
 Time for client train with keras optimizer time ís
@@ -399,7 +399,7 @@ Metrics=OrderedDict([('binary_accuracy', 0.69035), ('auc', 0.7674432), ('precisi
  Time between create_metrics_begin and create_new_state_end is 0.00037598609924316406
  Time between create_metrics_end and create_metrics_begin is 0.0005171298980712891ROUND 2:
 
-Selecting data time is 3.0994415283203125e-05 
+Selecting data time is 3.0994415283203125e-05
 Time for client update with keras optimizer time ís
 5.0067901611328125e-06
 Time for client train with keras optimizer time ís
@@ -498,7 +498,7 @@ Metrics=OrderedDict([('binary_accuracy', 0.9615), ('auc', 0.9900573), ('precisio
  Time between create_metrics_begin and create_new_state_end is 0.0015361309051513672
  Time between create_metrics_end and create_metrics_begin is 0.0003559589385986328ROUND 3:
 
-Selecting data time is 1.811981201171875e-05 
+Selecting data time is 1.811981201171875e-05
 Time for client update with keras optimizer time ís
 3.0994415283203125e-06
 Time for client train with keras optimizer time ís
@@ -597,7 +597,7 @@ Metrics=OrderedDict([('binary_accuracy', 0.9968), ('auc', 0.999299), ('precision
  Time between create_metrics_begin and create_new_state_end is 0.0024170875549316406
  Time between create_metrics_end and create_metrics_begin is 0.0006508827209472656ROUND 4:
 
-Selecting data time is 2.5033950805664062e-05 
+Selecting data time is 2.5033950805664062e-05
 Time for client update with keras optimizer time ís
 5.0067901611328125e-06
 Time for client train with keras optimizer time ís
@@ -702,7 +702,7 @@ New run with config num_rounds:4,num_clients:1,epochs:10,batch:512,nrows:None
 Initializationtime is 0.508267879486084
 ROUND 1:
 
-Selecting data time is 3.1948089599609375e-05 
+Selecting data time is 3.1948089599609375e-05
 Time for client update with keras optimizer time ís
 4.482269287109375e-05
 Round time is 26.89812707901001
@@ -721,7 +721,7 @@ Metrics=OrderedDict([('binary_accuracy', 0.71755), ('auc', 0.7599152), ('precisi
  Time between create_metrics_begin and create_new_state_end is 0.00138092041015625
  Time between create_metrics_end and create_metrics_begin is 0.0007870197296142578ROUND 2:
 
-Selecting data time is 3.504753112792969e-05 
+Selecting data time is 3.504753112792969e-05
 Time for client update with keras optimizer time ís
 6.9856643676757812e-05
 Round time is 3.304982900619507
@@ -740,7 +740,7 @@ Metrics=OrderedDict([('binary_accuracy', 0.9508), ('auc', 0.973698), ('precision
  Time between create_metrics_begin and create_new_state_end is 0.0009429454803466797
  Time between create_metrics_end and create_metrics_begin is 0.00562596321105957ROUND 3:
 
-Selecting data time is 2.47955322265625e-05 
+Selecting data time is 2.47955322265625e-05
 Time for client update with keras optimizer time ís
 7.7962875366210938e-05
 Round time is 3.6624820232391357
@@ -759,7 +759,7 @@ Metrics=OrderedDict([('binary_accuracy', 0.99), ('auc', 0.9961374), ('precision'
  Time between create_metrics_begin and create_new_state_end is 0.0025599002838134766
  Time between create_metrics_end and create_metrics_begin is 0.0037169456481933594ROUND 4:
 
-Selecting data time is 3.0994415283203125e-05 
+Selecting data time is 3.0994415283203125e-05
 Time for client update with keras optimizer time ís
 7.6055526733398438e-05
 Round time is 3.5416629314422607
@@ -784,7 +784,7 @@ New run with config num_rounds:4,num_clients:1,epochs:10,batch:512,nrows:None
 Initializationtime is 0.49005913734436035
 ROUND 1:
 
-Selecting data time is 3.790855407714844e-05 
+Selecting data time is 3.790855407714844e-05
 Time for client train with keras optimizer time ís
 0.00012183189392089844
 Time for client update with keras optimizer time ís
@@ -805,7 +805,7 @@ Metrics=OrderedDict([('binary_accuracy', 0.7415), ('auc', 0.7940205), ('precisio
  Time between create_metrics_begin and create_new_state_end is 0.005141019821166992
  Time between create_metrics_end and create_metrics_begin is 0.0003108978271484375ROUND 2:
 
-Selecting data time is 5.1021575927734375e-05 
+Selecting data time is 5.1021575927734375e-05
 Time for client train with keras optimizer time ís
 0.0001087188720703125
 Time for client update with keras optimizer time ís
@@ -826,7 +826,7 @@ Metrics=OrderedDict([('binary_accuracy', 0.96795), ('auc', 0.99070424), ('precis
  Time between create_metrics_begin and create_new_state_end is 0.0013580322265625
  Time between create_metrics_end and create_metrics_begin is 0.0005269050598144531ROUND 3:
 
-Selecting data time is 2.6226043701171875e-05 
+Selecting data time is 2.6226043701171875e-05
 Time for client train with keras optimizer time ís
 0.00010466575622558594
 Time for client update with keras optimizer time ís
@@ -847,7 +847,7 @@ Metrics=OrderedDict([('binary_accuracy', 0.99565), ('auc', 0.9987885), ('precisi
  Time between create_metrics_begin and create_new_state_end is 0.005609035491943359
  Time between create_metrics_end and create_metrics_begin is 0.0017490386962890625ROUND 4:
 
-Selecting data time is 2.5033950805664062e-05 
+Selecting data time is 2.5033950805664062e-05
 Time for client train with keras optimizer time ís
 8.9168548583984375e-05
 Time for client update with keras optimizer time ís
@@ -874,7 +874,7 @@ New run with config num_rounds:4,num_clients:1,epochs:50,batch:512,nrows:None
 Initializationtime is 0.505195140838623
 ROUND 1:
 
-Selecting data time is 6.29425048828125e-05 
+Selecting data time is 6.29425048828125e-05
 Time for client train with keras optimizer time ís
 0.00052094459533691406
 Time for client update with keras optimizer time ís
@@ -895,7 +895,7 @@ Metrics=OrderedDict([('binary_accuracy', 0.93195), ('auc', 0.97495013), ('precis
  Time between create_metrics_begin and create_new_state_end is 0.0003819465637207031
  Time between create_metrics_end and create_metrics_begin is 0.00018286705017089844ROUND 2:
 
-Selecting data time is 3.0040740966796875e-05 
+Selecting data time is 3.0040740966796875e-05
 Time for client train with keras optimizer time ís
 0.00053644180297851562
 Time for client update with keras optimizer time ís
@@ -916,7 +916,7 @@ Metrics=OrderedDict([('binary_accuracy', 0.99903), ('auc', 0.9998844), ('precisi
  Time between create_metrics_begin and create_new_state_end is 0.0018069744110107422
  Time between create_metrics_end and create_metrics_begin is 0.0022771358489990234ROUND 3:
 
-Selecting data time is 2.5987625122070312e-05 
+Selecting data time is 2.5987625122070312e-05
 Time for client train with keras optimizer time ís
 0.00060200691223144531
 Time for client update with keras optimizer time ís
@@ -937,7 +937,7 @@ Metrics=OrderedDict([('binary_accuracy', 0.99982), ('auc', 0.999988), ('precisio
  Time between create_metrics_begin and create_new_state_end is 0.0014810562133789062
  Time between create_metrics_end and create_metrics_begin is 0.0003559589385986328ROUND 4:
 
-Selecting data time is 1.5974044799804688e-05 
+Selecting data time is 1.5974044799804688e-05
 Time for client train with keras optimizer time ís
 0.00043654441833496094
 Time for client update with keras optimizer time ís
@@ -964,7 +964,7 @@ New run with config num_rounds:4,num_clients:1,epochs:50,batch:512,nrows:None
 Initializationtime is 0.49916815757751465
 ROUND 1:
 
-Selecting data time is 1.2874603271484375e-05 
+Selecting data time is 1.2874603271484375e-05
 Time for client train with keras optimizer time ís
 0.00059676170349121094
 Round time is 37.472012996673584
@@ -983,7 +983,7 @@ Metrics=OrderedDict([('binary_accuracy', 0.92952), ('auc', 0.97665405), ('precis
  Time between create_metrics_begin and create_new_state_end is 0.001110076904296875
  Time between create_metrics_end and create_metrics_begin is 0.009573936462402344ROUND 2:
 
-Selecting data time is 2.5033950805664062e-05 
+Selecting data time is 2.5033950805664062e-05
 Time for client train with keras optimizer time ís
 0.0005950927734375
 Round time is 12.867591142654419
@@ -1002,7 +1002,7 @@ Metrics=OrderedDict([('binary_accuracy', 0.99904), ('auc', 0.99986714), ('precis
  Time between create_metrics_begin and create_new_state_end is 0.0005409717559814453
  Time between create_metrics_end and create_metrics_begin is 0.0014729499816894531ROUND 3:
 
-Selecting data time is 3.600120544433594e-05 
+Selecting data time is 3.600120544433594e-05
 Time for client train with keras optimizer time ís
 0.00058078765869140625
 Round time is 11.898592948913574
@@ -1021,7 +1021,7 @@ Metrics=OrderedDict([('binary_accuracy', 0.99985), ('auc', 0.9999877), ('precisi
  Time between create_metrics_begin and create_new_state_end is 0.003621816635131836
  Time between create_metrics_end and create_metrics_begin is 0.0015420913696289062ROUND 4:
 
-Selecting data time is 3.2901763916015625e-05 
+Selecting data time is 3.2901763916015625e-05
 Time for client train with keras optimizer time ís
 0.00052905082702636719
 Round time is 12.118247985839844
@@ -1046,7 +1046,7 @@ New run with config num_rounds:4,num_clients:1,epochs:50,batch:512,nrows:None
 Initializationtime is 0.4994809627532959
 ROUND 1:
 
-Selecting data time is 3.695487976074219e-05 
+Selecting data time is 3.695487976074219e-05
 Time for client train with keras optimizer time ís
 0.0005550384521484375
 Time for client update with keras optimizer time ís
@@ -1067,7 +1067,7 @@ Metrics=OrderedDict([('binary_accuracy', 0.94701), ('auc', 0.98393637), ('precis
  Time between create_metrics_begin and create_new_state_end is 0.008366823196411133
  Time between create_metrics_end and create_metrics_begin is 0.006777048110961914ROUND 2:
 
-Selecting data time is 1.5974044799804688e-05 
+Selecting data time is 1.5974044799804688e-05
 Time for client train with keras optimizer time ís
 0.0005359649658203125
 Time for client update with keras optimizer time ís
@@ -1088,7 +1088,7 @@ Metrics=OrderedDict([('binary_accuracy', 0.99932), ('auc', 0.9999623), ('precisi
  Time between create_metrics_begin and create_new_state_end is 0.0008280277252197266
  Time between create_metrics_end and create_metrics_begin is 0.0008349418640136719ROUND 3:
 
-Selecting data time is 2.5987625122070312e-05 
+Selecting data time is 2.5987625122070312e-05
 Time for client train with keras optimizer time ís
 0.00055956840515136719
 Time for client update with keras optimizer time ís
@@ -1109,7 +1109,7 @@ Metrics=OrderedDict([('binary_accuracy', 0.99938), ('auc', 0.99997383), ('precis
  Time between create_metrics_begin and create_new_state_end is 0.0013129711151123047
  Time between create_metrics_end and create_metrics_begin is 0.00031304359436035156ROUND 4:
 
-Selecting data time is 1.5020370483398438e-05 
+Selecting data time is 1.5020370483398438e-05
 Time for client train with keras optimizer time ís
 0.00057649612426757812
 Time for client update with keras optimizer time ís
@@ -1136,7 +1136,7 @@ New run with config num_rounds:4,num_clients:2,epochs:50,batch:512,nrows:None
 Initializationtime is 0.5027720928192139
 ROUND 1:
 
-Selecting data time is 3.0994415283203125e-05 
+Selecting data time is 3.0994415283203125e-05
 Time for client train with keras optimizer time ís
 Time for client train with keras optimizer time ís
 0.0010082721710205078
@@ -1161,7 +1161,7 @@ Metrics=OrderedDict([('binary_accuracy', 0.911755), ('auc', 0.9654399), ('precis
  Time between create_metrics_begin and create_new_state_end is 0.00017595291137695312
  Time between create_metrics_end and create_metrics_begin is 0.0002570152282714844ROUND 2:
 
-Selecting data time is 3.790855407714844e-05 
+Selecting data time is 3.790855407714844e-05
 Time for client train with keras optimizer time ís
 Time for client train with keras optimizer time ís
 0.0011193752288818359
@@ -1186,7 +1186,7 @@ Metrics=OrderedDict([('binary_accuracy', 0.99759), ('auc', 0.9994988), ('precisi
  Time between create_metrics_begin and create_new_state_end is 0.0017459392547607422
  Time between create_metrics_end and create_metrics_begin is 0.0008499622344970703ROUND 3:
 
-Selecting data time is 1.8835067749023438e-05 
+Selecting data time is 1.8835067749023438e-05
 Time for client train with keras optimizer time ís
 Time for client train with keras optimizer time ís
 0.0010459423065185547
@@ -1211,7 +1211,7 @@ Metrics=OrderedDict([('binary_accuracy', 0.99985), ('auc', 0.99999976), ('precis
  Time between create_metrics_begin and create_new_state_end is 0.0011000633239746094
  Time between create_metrics_end and create_metrics_begin is 0.00018405914306640625ROUND 4:
 
-Selecting data time is 2.6941299438476562e-05 
+Selecting data time is 2.6941299438476562e-05
 Time for client train with keras optimizer time ís
 Time for client train with keras optimizer time ís
 0.0010459423065185547
@@ -1242,7 +1242,7 @@ New run with config num_rounds:4,num_clients:2,epochs:50,batch:512,nrows:None
 Initializationtime is 0.5064890384674072
 ROUND 1:
 
-Selecting data time is 1.3113021850585938e-05 
+Selecting data time is 1.3113021850585938e-05
 Time for client train with keras optimizer time ís
 Time for client train with keras optimizer time ís
 0.00092458724975585938
@@ -1267,7 +1267,7 @@ Metrics=OrderedDict([('binary_accuracy', 0.92356), ('auc', 0.9731139), ('precisi
  Time between create_metrics_begin and create_new_state_end is 0.00026798248291015625
  Time between create_metrics_end and create_metrics_begin is 0.0011119842529296875ROUND 2:
 
-Selecting data time is 4.291534423828125e-05 
+Selecting data time is 4.291534423828125e-05
 Time for client train with keras optimizer time ís
 Time for client train with keras optimizer time ís
 0.001102447509765625
@@ -1292,7 +1292,7 @@ Metrics=OrderedDict([('binary_accuracy', 0.998455), ('auc', 0.99980634), ('preci
  Time between create_metrics_begin and create_new_state_end is 0.0006361007690429688
  Time between create_metrics_end and create_metrics_begin is 0.00041294097900390625ROUND 3:
 
-Selecting data time is 6.580352783203125e-05 
+Selecting data time is 6.580352783203125e-05
 Time for client train with keras optimizer time ís
 Time for client train with keras optimizer time ís
 0.0010504722595214844
@@ -1317,7 +1317,7 @@ Metrics=OrderedDict([('binary_accuracy', 0.99985), ('auc', 0.9999996), ('precisi
  Time between create_metrics_begin and create_new_state_end is 0.0016090869903564453
  Time between create_metrics_end and create_metrics_begin is 0.0011379718780517578ROUND 4:
 
-Selecting data time is 2.193450927734375e-05 
+Selecting data time is 2.193450927734375e-05
 Time for client train with keras optimizer time ís
 Time for client train with keras optimizer time ís
 0.0010282993316650391
@@ -1347,7 +1347,7 @@ Metrics=OrderedDict([('binary_accuracy', 0.999995), ('auc', 1.0), ('precision', 
 New run with config num_rounds:4,num_clients:3,epochs:50,batch:512,nrows:None
 Initializationtime is 0.5018129348754883
 ROUND 1:
-Selecting data time is 4.00543212890625e-05 
+Selecting data time is 4.00543212890625e-05
 Time for client train with keras optimizer time ís
 Time for client train with keras optimizer time ís
 Time for client train with keras optimizer time ís
@@ -1375,7 +1375,7 @@ Metrics=OrderedDict([('binary_accuracy', 0.91822), ('auc', 0.9620775), ('precisi
  Time between create_new_state_end and create_new_state_begin is 0.002310037612915039
  Time between create_metrics_begin and create_new_state_end is 0.003996133804321289
  Time between create_metrics_end and create_metrics_begin is 0.0005099773406982422ROUND 2:
-Selecting data time is 3.886222839355469e-05 
+Selecting data time is 3.886222839355469e-05
 Time for client train with keras optimizer time ís
 Time for client train with keras optimizer time ís
 Time for client train with keras optimizer time ís
@@ -1403,7 +1403,7 @@ Metrics=OrderedDict([('binary_accuracy', 0.99737334), ('auc', 0.9996828), ('prec
  Time between create_new_state_end and create_new_state_begin is 0.0008211135864257812
  Time between create_metrics_begin and create_new_state_end is 0.0034830570220947266
  Time between create_metrics_end and create_metrics_begin is 0.001500844955444336ROUND 3:
-Selecting data time is 3.3855438232421875e-05 
+Selecting data time is 3.3855438232421875e-05
 Time for client train with keras optimizer time ís
 Time for client train with keras optimizer time ís
 Time for client train with keras optimizer time ís
@@ -1431,7 +1431,7 @@ Metrics=OrderedDict([('binary_accuracy', 0.99972), ('auc', 0.99999064), ('precis
  Time between create_new_state_end and create_new_state_begin is 0.0007140636444091797
  Time between create_metrics_begin and create_new_state_end is 0.00030803680419921875
  Time between create_metrics_end and create_metrics_begin is 0.0004680156707763672ROUND 4:
-Selecting data time is 2.5033950805664062e-05 
+Selecting data time is 2.5033950805664062e-05
 Time for client train with keras optimizer time ís
 Time for client train with keras optimizer time ís
 Time for client train with keras optimizer time ís
@@ -1465,7 +1465,7 @@ Metrics=OrderedDict([('binary_accuracy', 0.99998), ('auc', 1.0), ('precision', 0
 New run with config num_rounds:4,num_clients:1,epochs:50,batch:512,nrows:None
 Initializationtime is 0.48931097984313965
 ROUND 1:
-Selecting data time is 2.193450927734375e-05 
+Selecting data time is 2.193450927734375e-05
 Time for client train with keras optimizer time ís
 0.00052332878112792969
 Time for client update with keras optimizer time ís
@@ -1485,7 +1485,7 @@ Metrics=OrderedDict([('binary_accuracy', 0.94975), ('auc', 0.9825434), ('precisi
  Time between create_new_state_end and create_new_state_begin is 0.0001919269561767578
  Time between create_metrics_begin and create_new_state_end is 0.0001819133758544922
  Time between create_metrics_end and create_metrics_begin is 0.00017905235290527344ROUND 2:
-Selecting data time is 3.2901763916015625e-05 
+Selecting data time is 3.2901763916015625e-05
 Time for client train with keras optimizer time ís
 0.00051617622375488281
 Time for client update with keras optimizer time ís
@@ -1505,7 +1505,7 @@ Metrics=OrderedDict([('binary_accuracy', 0.99911), ('auc', 0.9999066), ('precisi
  Time between create_new_state_end and create_new_state_begin is 0.00041794776916503906
  Time between create_metrics_begin and create_new_state_end is 0.0020589828491210938
  Time between create_metrics_end and create_metrics_begin is 0.0004940032958984375ROUND 3:
-Selecting data time is 4.220008850097656e-05 
+Selecting data time is 4.220008850097656e-05
 Time for client train with keras optimizer time ís
 0.0006008148193359375
 Time for client update with keras optimizer time ís
@@ -1525,7 +1525,7 @@ Metrics=OrderedDict([('binary_accuracy', 0.99989), ('auc', 1.0), ('precision', 0
  Time between create_new_state_end and create_new_state_begin is 0.0004801750183105469
  Time between create_metrics_begin and create_new_state_end is 0.001809835433959961
  Time between create_metrics_end and create_metrics_begin is 0.0011849403381347656ROUND 4:
-Selecting data time is 3.2901763916015625e-05 
+Selecting data time is 3.2901763916015625e-05
 Time for client train with keras optimizer time ís
 0.00061058998107910156
 Time for client update with keras optimizer time ís
@@ -1551,13 +1551,13 @@ Metrics=OrderedDict([('binary_accuracy', 0.99995), ('auc', 0.9999999), ('precisi
 New run with config num_rounds:4,num_clients:1,epochs:50,batch:512,nrows:None
 Initializationtime is 0.5221920013427734
 ROUND 1:
-Selecting data time is 2.5987625122070312e-05 
+Selecting data time is 2.5987625122070312e-05
 -------------------------------------------
 
 New run with config num_rounds:4,num_clients:1,epochs:50,batch:512,nrows:None
 Initializationtime is 0.5116569995880127
 ROUND 1:
-Selecting data time is 2.002716064453125e-05 
+Selecting data time is 2.002716064453125e-05
 Time for client train with keras optimizer time ís
 0.00056195259094238281
 Time for client update with keras optimizer time ís
@@ -1577,7 +1577,7 @@ Metrics=OrderedDict([('binary_accuracy', 0.90527), ('auc', 0.96419185), ('precis
  Time between create_new_state_end and create_new_state_begin is 0.00027489662170410156
  Time between create_metrics_begin and create_new_state_end is 0.00020313262939453125
  Time between create_metrics_end and create_metrics_begin is 0.00018596649169921875ROUND 2:
-Selecting data time is 2.7179718017578125e-05 
+Selecting data time is 2.7179718017578125e-05
 Time for client train with keras optimizer time ís
 0.00057506561279296875
 Time for client update with keras optimizer time ís
@@ -1597,7 +1597,7 @@ Metrics=OrderedDict([('binary_accuracy', 0.99772), ('auc', 0.99912363), ('precis
  Time between create_new_state_end and create_new_state_begin is 0.0006809234619140625
  Time between create_metrics_begin and create_new_state_end is 0.0009589195251464844
  Time between create_metrics_end and create_metrics_begin is 0.00016999244689941406ROUND 3:
-Selecting data time is 2.8848648071289062e-05 
+Selecting data time is 2.8848648071289062e-05
 Time for client train with keras optimizer time ís
 0.00060009956359863281
 Time for client update with keras optimizer time ís
@@ -1617,7 +1617,7 @@ Metrics=OrderedDict([('binary_accuracy', 0.99918), ('auc', 0.999542), ('precisio
  Time between create_new_state_end and create_new_state_begin is 0.0005519390106201172
  Time between create_metrics_begin and create_new_state_end is 0.0007960796356201172
  Time between create_metrics_end and create_metrics_begin is 0.0006690025329589844ROUND 4:
-Selecting data time is 3.886222839355469e-05 
+Selecting data time is 3.886222839355469e-05
 Time for client train with keras optimizer time ís
 0.00054287910461425781
 Time for client update with keras optimizer time ís

@@ -3,7 +3,8 @@ from sklearn.model_selection import StratifiedKFold
 from TensorflowFederated.data_loading import DataBackend
 from data_utils import create_unbalanced_splits
 import pandas as pd
-data_path ="../DataGenExpression/Alldata.csv"
+
+data_path = "../DataGenExpression/Alldata.csv"
 # df = pd.read_csv("class_num.csv")
 # fig = df.plot(kind="bar", stacked=True)
 # plt.xlabel = "Clients"
@@ -11,7 +12,7 @@ data_path ="../DataGenExpression/Alldata.csv"
 # plt.title = "Examples per class and per client"
 # plt.show()
 # plt.savefig("test.png")
-create_unbalanced_splits(data_path,"Condition",unweight_step=0)
+create_unbalanced_splits(data_path, "Condition", unweight_step=0)
 # X,y = create_X_y(df)
 # print(len(y))
 # for i in range(3,11):
@@ -25,4 +26,3 @@ create_unbalanced_splits(data_path,"Condition",unweight_step=0)
 #     backend = GenDataBackend(partition_rows[0],kfold_num=1,data_path=data_path,local_epochs=100,random_state=1)
 #     data = backend.materialize()
 #     print(sum([len(list) for list in partition_rows]))
-

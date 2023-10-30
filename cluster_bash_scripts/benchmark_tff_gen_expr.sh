@@ -34,4 +34,3 @@ do
     bash tff_balanced_benchmark.sh $DATA_PATH $client_num $rounds $WANDB_API_KEY $NUM_REPEATS $SYSTEM_ONLY
   done
 done
-
