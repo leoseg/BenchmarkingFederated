@@ -22,24 +22,26 @@ pip install -e utils
 pip3 install -r requirements.txt
 cd TensorflowFederated || exit
 clients_config=(3)
-if [ "$USECASE" -eq "4" ]
-then
-    noises=(2.5 3.5 4.5 5.5 6.0)
-elif [ "$USECASE" -eq "3" ]
-then
-    noises=(1.5 2.0 2.5 3.0 3.5)
-elif [ "$USECASE" -eq "2" ]
-then
-    noises=(1.5 2.5 3.5 4.0 5.0)
-else
-    noises=(2.0 3.0 4.0 5.0 6.0)
-fi
+rounds_config=(1 2 5 10)
+#if [ "$USECASE" -eq "4" ]
+#then
+#    noises=(2.5 3.5 4.5 5.5 6.0)
+#elif [ "$USECASE" -eq "3" ]
+#then
+#    noises=(1.5 2.0 2.5 3.0 3.5)
+#elif [ "$USECASE" -eq "2" ]
+#then
+#    noises=(1.5 2.5 3.5 4.0 5.0)
+#else
+#    noises=(2.0 3.0 4.0 5.0 6.0)
+#fi
+noises=(0.5 1.0 2.5 3.5 5.0)
 # Loops trough round and number of clients configuration
-for clients in "${clients_config[@]}";
+for num_rounds in "${rounds_config[@]}";
 do
   for noise in "${noises[@]}";
   do
-    bash tff_dp.sh $DATA_PATH $noise $clients $WANDB_API_KEY $NUM_REPEATS $SYSTEM_ONLY
+    bash tff_dp.sh $DATA_PATH $noise 5 $WANDB_API_KEY $NUM_REPEATS $SYSTEM_ONLY $num_rounds
   done
 done
 

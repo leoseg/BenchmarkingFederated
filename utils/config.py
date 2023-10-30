@@ -7,7 +7,7 @@ from keras.losses import BinaryCrossentropy,SparseCategoricalCrossentropy
 tff_time_logging_directory = "timelogs/tff_logs_time.txt"
 flw_time_logging_directory = "timelogs/flw_logs_time.txt"
 SEED = 42
-version = "version_1005"
+version = "dp_testrun"
 n_splits = 5
 DATA_PATH = ""
 if os.environ["USECASE"] == "test":
@@ -72,7 +72,7 @@ elif os.environ["USECASE"] == str(4):
         num_examples_10=554,
         delta=0.0005,
         dp_epochs  =100,
-        noises= [1.5,2.5, 3.5 , 4.5 , 5.5 ]
+        noises= [0.5,1.0,2.5, 3.5 ,5.0 ]
     )
 elif os.environ["USECASE"] == str(3):
     configs = dict(
@@ -105,7 +105,7 @@ elif os.environ["USECASE"] == str(3):
         data_directory="../Dataset2/",
         num_examples_10=554,
         delta=0.0005,
-        noises = [1.5 , 2.0, 2.5, 3.0, 3.5]
+        noises= [0.5,1.0,2.5, 3.5 ,5.0 ]
     )
 elif os.environ["USECASE"] == str(2):
     configs = dict(
@@ -136,7 +136,7 @@ elif os.environ["USECASE"] == str(2):
         data_directory="../DataGenExpression/",
         num_examples_10=961,
         delta=0.0005,
-        noises = [1.5, 2.5, 3.5, 4.0, 5.0]
+        noises=[0.5, 1.0, 2.5, 3.5, 5.0]
     )
 else:
     configs = dict(
@@ -171,5 +171,5 @@ else:
         data_directory="../DataGenExpression/",
         num_examples_10 = 961,
         delta = 0.0005,
-        noises = [2.0, 3.0, 4.0, 5.0, 6.0]
+        noises= [0.5,1.0,2.5, 3.5 ,5.0 ]
     )
