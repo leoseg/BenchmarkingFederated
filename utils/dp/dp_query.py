@@ -1,4 +1,4 @@
-"""Implements DPQuery interface for distributed discrete Gaussian mechanism."""
+"""File is derived from tf privacy module Distributed Gaussian Query"""
 
 import collections
 import tensorflow_federated as tff
@@ -235,10 +235,12 @@ class LocalGaussianSumQuery(dp_query.SumAggregationDPQuery):
         return tf.nest.map_structure(add_noise, record)
 
     def preprocess_record(self, params, record):
-        """Check record norm and add noise to the record."""
+        """Norms record and add noise to the record."""
         record_as_list = tf.nest.flatten(record)
 
+        record_as_list, _ = tf.clip_by_global_norm(record_as_list, params.l2_norm_bound)
         record_as_float_list = [tf.cast(x, tf.float32) for x in record_as_list]
+
         dependencies = [
             tf.compat.v1.assert_less_equal(
                 tf.linalg.global_norm(record_as_float_list),

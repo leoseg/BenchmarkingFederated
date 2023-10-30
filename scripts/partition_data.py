@@ -18,6 +18,9 @@ os.environ["TF_CPP_MIN_LOG_LEVEL"] = "3"
 
 
 def main():
+    """
+    Main function for data partitioning
+    """
     parser = argparse.ArgumentParser(
         prog="partition_data.py",
         formatter_class=argparse.RawDescriptionHelpFormatter,

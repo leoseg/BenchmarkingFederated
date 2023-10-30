@@ -10,7 +10,7 @@ if configs.get("usecase") == 2:
     ROUNDS = [1, 2, 4, 8]
 
 
-def transform_central_metric_to_df(central_data, metric_name):
+def transform_central_metric_to_df(central_data: pd.DataFrame, metric_name: str):
     """
     Transform central metric to dataframe
     :param central_data: central data to transform

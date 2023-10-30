@@ -30,6 +30,9 @@ X_train, X_test, y_train, y_test = load_gen_data_as_train_test_split(data_path)
 
 # get utils
 def train():
+    """
+    Train function for wandb sweep
+    """
     wandb.init(
         project=f"sweep_usecase_{configs['usecase']}", config=configs, job_type="train"
     )

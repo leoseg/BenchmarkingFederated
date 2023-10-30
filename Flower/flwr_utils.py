@@ -1,11 +1,11 @@
-from typing import Tuple, Optional, Dict
+from typing import Tuple, Optional, Dict, List
 
 from flwr.common import NDArrays, Scalar
 
 from evaluation_utils import evaluate_model, load_test_data_for_evaluation
 
 
-def evaluate_metrics_aggregation_fn(results, weighting=False):
+def evaluate_metrics_aggregation_fn(results: List[Tuple], weighting=False):
     """
     Aggregates metrics of all clients by averaging their metrics
     :param results: list of tuples in form num examples and metrics

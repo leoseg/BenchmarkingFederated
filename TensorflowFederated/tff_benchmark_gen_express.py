@@ -73,6 +73,9 @@ dataset_type = tff.types.SequenceType(element_type)
 
 # Model function to use for FL
 def model_fn():
+    """
+    Creates keras model and wraps it in tff learning model
+    """
     model = get_model(
         input_dim=configs.get("input_dim"),
         num_nodes=configs.get("num_nodes"),

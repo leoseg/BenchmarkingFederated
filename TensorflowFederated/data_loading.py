@@ -11,6 +11,9 @@ class DataBackend(tff.framework.DataBackend):
     """
 
     def __init__(self, train_dataset, test_dataset, local_epochs):
+        """
+        Init function for DataBackend
+        """
         self.train_dataset = train_dataset
         self.test_dataset = test_dataset
         print(
@@ -20,6 +23,9 @@ class DataBackend(tff.framework.DataBackend):
         self.local_epochs = local_epochs
 
     async def materialize(self, data, type_spec):
+        """
+        Materializes the data on client
+        """
         tf.print(
             f"Materializing data for client {data.uri}"
             f"Train dataset has size {self.train_dataset.cardinality()}",

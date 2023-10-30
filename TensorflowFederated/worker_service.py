@@ -27,6 +27,9 @@ flags.DEFINE_bool("unweighted", False, "flag for unweighted federated averaging"
 
 
 def main(argv) -> None:
+    """
+    Main loop for worker service
+    """
     port = FLAGS.port
     num_rounds = FLAGS.num_rounds
     epochs = int(configs.get("epochs") / num_rounds)
@@ -55,6 +58,9 @@ def main(argv) -> None:
     )
     # Sets executor for local calculations
     def ex_fn(device: tf.config.LogicalDevice) -> tff.framework.DataExecutor:
+        """
+        Creates executor for local calculations
+        """
         return tff.framework.DataExecutor(
             tff.framework.EagerTFExecutor(device),
             data_backend=DataBackend(

@@ -1,5 +1,5 @@
 from math import ceil
-from typing import Optional, Tuple, Dict
+from typing import Optional, Tuple, Dict, Callable
 
 import flwr as fl
 from flwr.common import NDArrays, Scalar
@@ -11,6 +11,7 @@ from config import configs
 from Flower.customized_flw_modules.custom_server import Server
 from evaluation_utils import load_test_data_for_evaluation
 from models import get_model
+import tensorflow as tf
 
 parser = argparse.ArgumentParser(
     prog="custom_server.py",
@@ -44,7 +45,7 @@ parser.add_argument("--noise", type=float, help="dp_noise", default=0.0)
 args = parser.parse_args()
 
 
-def fit_config(server_round: int):
+def fit_config(server_round: int) -> Dict[str, Scalar]:
     """Return training configuration dict for each round. Sets local epochs of each client"""
     config = {
         "local_epochs": ceil(configs.get("epochs") / args.num_rounds),
@@ -66,7 +67,11 @@ model.compile(
 )
 
 
-def get_evaluate_fn(model):
+def get_evaluate_fn(
+    model: tf.keras.Model,
+) -> Callable[
+    [int, NDArrays, Dict[str, Scalar]], Optional[Tuple[float, Dict[str, Scalar]]]
+]:
     """Return an evaluation function for server-side evaluation."""
 
     # Load data and model here to avoid the overhead of doing it in `evaluate` itself
@@ -77,6 +82,9 @@ def get_evaluate_fn(model):
     def evaluate(
         server_round: int, parameters: NDArrays, config: Dict[str, Scalar]
     ) -> Optional[Tuple[float, Dict[str, Scalar]]]:
+        """
+        Evaluates the model globally
+        """
         new_parameters = parameters
         model.set_weights(new_parameters)
         metrics = model.evaluate(X_test, y_test, verbose=0, return_dict=True)

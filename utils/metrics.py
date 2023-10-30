@@ -1,3 +1,4 @@
+""" Metrics is derived from keras metric to use in FL setting for multi class AUC"""
 import tensorflow as tf
 import numpy as np
 from keras import activations
@@ -143,7 +144,9 @@ class AUC(base_metric.Metric):
         label_weights=None,
         from_logits=False,
     ):
-        # Validate configurations.
+        """
+        Initializes `AUC` metric
+        """
         if isinstance(curve, metrics_utils.AUCCurve) and curve not in list(
             metrics_utils.AUCCurve
         ):
@@ -425,6 +428,9 @@ class AUC(base_metric.Metric):
             return tf.reduce_sum(pr_auc_increment, name="interpolate_pr_auc")
 
     def result(self):
+        """
+        Returns metric result
+        """
         if (
             self.curve == metrics_utils.AUCCurve.PR
             and self.summation_method == metrics_utils.AUCSummationMethod.INTERPOLATION

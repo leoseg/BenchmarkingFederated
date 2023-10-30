@@ -67,6 +67,9 @@ dataset_type = tff.types.SequenceType(element_type)
 
 # Model function to use for FL
 def model_fn():
+    """
+    Creates keras model and wraps it in a tff learning model
+    """
     model = get_model(
         input_dim=configs.get("input_dim"),
         num_nodes=configs.get("num_nodes"),
@@ -108,10 +111,10 @@ aggregator = tff.learning.robust_aggregator(
 query = GaussianSumQuery(0.1, 100000000.0)
 
 aggregator = tff.aggregators.DifferentiallyPrivateFactory(
-    LocalGaussianSumQuery(10.0, args.noise), aggregator
+    LocalGaussianSumQuery(configs.get("global_norm"), args.noise), aggregator
 )
 # optimizer = tfp.DPKerasAdamOptimizer(l2_norm_clip=1.0,noise_multiplier=noise,num_microbatches=1)
-optimizer = Adam(global_clipnorm=configs.get("global_norm"))
+optimizer = Adam()
 # momentum = 0.9
 momentum = 0.0
 print(aggregator)

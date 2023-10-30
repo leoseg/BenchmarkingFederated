@@ -1,6 +1,9 @@
 import argparse
 import os
+from typing import Dict, Any, List
+
 import flwr as fl
+import numpy as np
 from keras.optimizers import Adam
 from utils.models import get_model
 from utils.data_utils import (
@@ -94,19 +97,28 @@ model = get_model(
 optimizer = Adam()
 global_clipnorm = None
 if args.noise:
-    dp_query = LocalGaussianSumQuery(1.0, args.noise * 1.0)
+    dp_query = LocalGaussianSumQuery(configs.get("global_norm"), args.noise * 1.0)
     params = dp_query.derive_sample_params(dp_query.initial_global_state())
     global_clipnorm = configs.get("global_norm")
-    optimizer = Adam(global_clipnorm=global_clipnorm)
 model.compile(optimizer, configs.get("loss"), metrics=configs.get("metrics"))
 
 
 # Define Flower client
 class Client(fl.client.NumPyClient):
-    def get_parameters(self, config):
+    """
+    Flower client class
+    """
+
+    def get_parameters(self, config: Dict[str, Any]):
+        """
+        Return model parameters
+        """
         return model.get_weights()
 
-    def fit(self, parameters, config):
+    def fit(self, parameters: List, config: Dict[str, Any]):
+        """
+        Train model using local dataset
+        """
         tf.print(
             f"Materializing data for client {args.client_index}"
             f"Train dataset has size {train_ds.cardinality()}",
@@ -138,7 +150,10 @@ class Client(fl.client.NumPyClient):
         print(model.get_weights())
         return model.get_weights(), len(list(train_ds)), {"train_loss": train_loss}
 
-    def evaluate(self, parameters, config):
+    def evaluate(self, parameters: np.array, config: Dict[str, Any]):
+        """
+        Evaluate model on local dataset
+        """
         model.set_weights(parameters)
         metrics = model.evaluate(test_ds.batch(32), return_dict=True)
         loss = metrics.pop("loss")

@@ -14,29 +14,6 @@ DIV_EPSILON = 1e-22
 GAMMA = 1e-10
 
 
-def create_compression_sum_query(
-    l2_norm_bound, ddp_query, client_template=None, conditional=True, beta=BETA
-):
-    """
-    This function creates a compression sum query which quantizes the input data and then uses the given
-    distributed differential privacy query to add noise to the quantized data.
-    """
-    scale = 1.0 / (GAMMA + DIV_EPSILON)
-    quantization_params = compression_query.QuantizationParams(
-        stochastic=True,
-        conditional=conditional,
-        l2_norm_bound=l2_norm_bound,
-        beta=beta,
-        quantize_scale=scale,
-    )
-    quantized_ddp_query = compression_query.CompressionSumQuery(
-        quantization_params=quantization_params,
-        inner_query=ddp_query,
-        record_template=client_template,
-    )
-    return quantized_ddp_query
-
-
 def calculate_delta(num_examples: int) -> float:
     """
     This function calculates an adequate delta for differential privacy in machine learning.
@@ -107,22 +84,34 @@ def calculate_epsilon_for_usecases(noise_multiplier):
 
 
 class GlobalNorm(keras.callbacks.Callback):
+    """
+    Callback to calculate the global norm of the weights of the model
+    """
 
     median_global_norm = 0
 
     batch_global_norms = []
 
     def on_train_begin(self, logs=None):
+        """
+        Initialize the callback
+        """
         self.batch_global_norms = []
         self.median_global_norm = 0
 
     def on_train_batch_end(self, batch, logs=None):
+        """
+        Calculate the global norm of the weights of the model
+        """
         weights = self.model.get_weights()
         flatten_weights = tf.nest.flatten(weights)
         global_norm = tf.linalg.global_norm(flatten_weights)
         self.batch_global_norms.append(global_norm)
 
     def on_train_end(self, logs=None):
+        """
+        Calculate the median of the global norms
+        """
         self.median_global_norm = np.median(np.asarray(self.batch_global_norms))
 
 
