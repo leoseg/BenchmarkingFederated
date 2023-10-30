@@ -1,8 +1,6 @@
-import pandas as pd
-
-from table_utils import transform_df_to_latex, create_summarize_dataframe_from_metrics, transform_central_metric_to_df, \
+from datapostprocessing.table_utils import create_summarize_dataframe_from_metrics, transform_central_metric_to_df, \
     transform_df_to_landscape_table, get_usecase_name, get_metrics_for_mode, get_mode_name, convert_val
-from db_utils import MongoDBHandler
+from datapostprocessing.db_utils import MongoDBHandler
 
 headers = ["Nr. Clients","1 Rounds TFF", " 1 Rounds Flwr","3 Rounds TFF", "3 Rounds Flwr","5 Rounds TFF", "5 Rounds Flwr","10 Rounds TFF", "10 Rounds Flwr", "Rounds Summary TFF", "Rounds Summary Flwr"]
 mongodb = MongoDBHandler()

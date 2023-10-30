@@ -1,8 +1,7 @@
-from utils.plotting import plot_swarmplots, plot_heatmap, \
-    create_loss_line_plot, calc_scale, create_time_diff
-from data_uploading_utils import create_loss_df, group_scenarios, transform_to_df, create_dfs_for_fl_metric
+from datapostprocessing.plotting import plot_swarmplots
+from datapostprocessing.data_uploading_utils import transform_to_df, create_dfs_for_fl_metric
 from config import configs
-from utils.db_utils import MongoDBHandler
+from datapostprocessing.db_utils import MongoDBHandler
 import pandas as pd
 """
 Plotting script for which plots all heatmaps and barplots for one usecase
