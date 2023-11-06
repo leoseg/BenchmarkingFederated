@@ -75,8 +75,8 @@ if [ $SYSTEM_ONLY != "2" ]; then
     project_name="usecase_${USECASE}_benchmark_rounds_${NUM_ROUNDS}_${DATA_NAME}_system_metrics"
     group_name="flwr_${NUM_CLIENTS}"
     if [ -n "$NOISE" ]; then
-      project_name="dp{$project_name}"
-      group_name="flwr_{$NOISE}"
+      project_name="dp${project_name}"
+      group_name="flwr_${NUM_CLIENTS}_${NOISE}"
     fi
     run_name="run_${repeat}"
     # Read files logged from psutil to wandb

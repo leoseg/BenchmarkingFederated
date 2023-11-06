@@ -3,7 +3,7 @@ import concurrent.futures
 import pickle
 
 import time
-from dp.dp_query import GaussianSumQuery, LocalGaussianSumQuery
+from dp.dp_query import LocalGaussianSumQuery
 import grpc
 import tensorflow as tf
 import tensorflow_federated as tff
@@ -108,7 +108,6 @@ aggregator = tff.learning.robust_aggregator(
 # #     1.0,
 # #     tfp.DistributedDiscreteGaussianSumQuery(0.5,args.noise),
 # # model_fn().trainable_variables)
-query = GaussianSumQuery(0.1, 100000000.0)
 
 aggregator = tff.aggregators.DifferentiallyPrivateFactory(
     LocalGaussianSumQuery(configs.get("global_norm"), args.noise), aggregator

@@ -167,7 +167,9 @@ class Server:
                 wandb.log(
                     {"round_time": tf.get_static_value(end - begin)}, step=current_round
                 )
-                # wandb.log(get_time_logs(flw_time_logging_directory, True),step=current_round)
+                wandb.log(
+                    get_time_logs(flw_time_logging_directory, True), step=current_round
+                )
             # Evaluate model using strategy implementation
             if not self.system_metrics and self.unweighted >= 0.0:
                 res_cen = self.strategy.evaluate(

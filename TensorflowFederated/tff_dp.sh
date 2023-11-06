@@ -68,8 +68,8 @@ if [ $SYSTEM_ONLY != "2" ]; then
     project_name="dpusecase_${USECASE}_benchmark_clients_${DATA_NAME}_system_metrics"
     run_name="run_${repeat}"
     # Read files logged from psutil to wandb
-    python ../scripts/mem_data_to_wandb.py --logs_path $worker_time_logs --project_name $project_name --run_name $run_name --group_name "${NUM_CLIENTS}_${NOISE}"  --memory_type "client"
-    python ../scripts/mem_data_to_wandb.py --logs_path $train_time_logs --project_name $project_name  --run_name $run_name --group_name "${NUM_CLIENTS}_${NOISE}"   --memory_type "server"
+    python ../scripts/mem_data_to_wandb.py --logs_path $worker_time_logs --project_name $project_name --run_name $run_name --group_name "tff_${NUM_CLIENTS}_${NOISE}"  --memory_type "client"
+    python ../scripts/mem_data_to_wandb.py --logs_path $train_time_logs --project_name $project_name  --run_name $run_name --group_name "tff_${NUM_CLIENTS}_${NOISE}"   --memory_type "server"
     echo "Repeat system metrics ${repeat} num clients 10 num rounds ${NUM_ROUNDS} and data ${DATA_NAME} complete"
     echo "<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<"
   done
