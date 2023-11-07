@@ -22,7 +22,7 @@ pip install -e utils
 pip3 install -r requirements.txt
 cd Flower || exit
 clients_config=(3)
-rounds_config=(1 2 5 10)
+rounds_config=(1 5)
 #if [ "$USECASE" -eq "4" ]
 #then
 #    noises=(2.5 3.5 4.5 5.5 6.0)
@@ -35,12 +35,12 @@ rounds_config=(1 2 5 10)
 #else
 #    noises=(2.0 3.0 4.0 5.0 6.0)
 #fi
-noises=(0.5 1.0 2.5 3.5 5.0)
+noises=(0.01 0.05 0.1 0.15 0.2 0.25 0.3 0.35 0.4 0.5)
 # Loops trough round and number of clients configuration
 for num_rounds in "${rounds_config[@]}";
 do
   for noise in "${noises[@]}";
   do
-    bash flwr_balanced_benchmark.sh $DATA_PATH 3 $num_rounds $WANDB_API_KEY $NUM_REPEATS $SYSTEM_ONLY $noise
+    bash flwr_balanced_benchmark.sh $DATA_PATH 5 $num_rounds $WANDB_API_KEY $NUM_REPEATS $SYSTEM_ONLY $noise
   done
 done
