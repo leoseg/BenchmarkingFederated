@@ -245,34 +245,13 @@ class LocalGaussianSumQuery(dp_query.SumAggregationDPQuery):
 
     def preprocess_record(self, params, record):
         """Norms record and add noise to the record."""
-        record_as_list = tf.nest.flatten(record)
-
-        record_as_list, _ = tf.clip_by_global_norm(record_as_list, params.l2_norm_bound)
-
-        def round(x, decimals=0):
-            """
-            Rounds x to decimals
-            """
-            multiplier = tf.constant(10**decimals, dtype=x.dtype)
-            return tf.floor(x * multiplier) / multiplier
-
-        record_as_float_list = [
-            round(tf.cast(x, tf.float32), 2) for x in record_as_list
-        ]
-        dependencies = [
-            tf.compat.v1.assert_less_equal(
-                tf.linalg.global_norm(record_as_float_list),
-                params.l2_norm_bound,
-                message=f"Global L2 norm exceeds {params.l2_norm_bound}.",
-            )
-        ]
-        with tf.control_dependencies(dependencies):
-            result = tf.cond(
-                tf.equal(params.local_stddev, 0),
-                lambda: record,
-                lambda: self._add_local_noise(record, params.local_stddev),
-            )
-            return result
+        record, _ = tf.clip_by_global_norm(record, params.l2_norm_bound)
+        result = tf.cond(
+            tf.equal(params.local_stddev, 0),
+            lambda: record,
+            lambda: self._add_local_noise(record, params.local_stddev),
+        )
+        return result
 
     def get_noised_result(self, sample_state, global_state):
         """
