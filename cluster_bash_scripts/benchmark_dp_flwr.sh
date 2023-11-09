@@ -27,18 +27,7 @@ if [ "$USECASE" -eq "1" ]
 then
     rounds_config=(5)
 fi
-#if [ "$USECASE" -eq "4" ]
-#then
-#    noises=(2.5 3.5 4.5 5.5 6.0)
-#elif [ "$USECASE" -eq "3" ]
-#then
-#    noises=(1.5 2.0 2.5 3.0 3.5)
-#elif [ "$USECASE" -eq "2" ]
-#then
-#    noises=(1.5 2.5 3.5 4.0 5.0)
-#else
-#    noises=(2.0 3.0 4.0 5.0 6.0)
-#fi
+rounds_config=(1 5)
 noises=(0.01 0.05 0.1 0.15 0.2 0.25 0.3 0.35 0.4 0.5)
 # Loops trough round and number of clients configuration
 for num_rounds in "${rounds_config[@]}";
