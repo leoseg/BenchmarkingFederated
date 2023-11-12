@@ -116,7 +116,7 @@ elif os.environ["USECASE"] == str(4):
         num_examples_10=554,
         delta=0.0005,
         dp_epochs=100,
-        noises=[0.5, 1.0, 2.5, 3.5, 5.0],
+        noises=noises,
     )
 elif os.environ["USECASE"] == str(3):
     configs = dict(
@@ -176,7 +176,7 @@ elif os.environ["USECASE"] == str(3):
         data_directory="../Dataset2/",
         num_examples_10=554,
         delta=0.0005,
-        noises=[0.5, 1.0, 2.5, 3.5, 5.0],
+        noises=noises,
     )
 elif os.environ["USECASE"] == str(2):
     configs = dict(
@@ -238,7 +238,7 @@ elif os.environ["USECASE"] == str(2):
         data_directory="../DataGenExpression/",
         num_examples_10=961,
         delta=0.0005,
-        noises=[0.5, 1.0, 2.5, 3.5, 5.0],
+        noises=noises,
     )
 else:
     configs = dict(
@@ -304,5 +304,5 @@ else:
         data_directory="../DataGenExpression/",
         num_examples_10=961,
         delta=0.0005,
-        noises=[0.5, 1.0, 2.5, 3.5, 5.0],
+        noises=noises,
     )
