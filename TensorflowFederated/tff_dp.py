@@ -143,12 +143,12 @@ DELAY_SECONDS = 5  # Delay between each retry attempt
 
 while True:
     try:
-        wandb.init(settings=wandb.Settings(_service_wait=300))
         wandb.init(
             project=project_name,
             group=group,
             name=f"run_{args.run_repeat}",
             config=configs,
+            settings=wandb.Settings(_service_wait=300),
         )
         print("Wandb initialized successfully")
         break

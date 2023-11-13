@@ -136,12 +136,12 @@ class Server:
         if not self.network_metrics:
             while True:
                 try:
-                    wandb.init(settings=wandb.Settings(_service_wait=300))
                     wandb.init(
                         project=project_name,
                         group=group,
                         name=f"run_{self.run_repeat}",
                         config=configs,
+                        settings=wandb.Settings(_service_wait=300),
                     )
                     print("Wandb initialized successfully")
                     break
