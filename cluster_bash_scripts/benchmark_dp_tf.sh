@@ -35,7 +35,7 @@ rounds_config=(1 2 5 10)
 #else
 #    noises=(2.0 3.0 4.0 5.0 6.0)
 #fi
-noises=(0.5 1.0 2.5 3.5 5.0)
+noises=(0.01 0.03 0.05 0.07 0.085  0.1)
 # Loops trough round and number of clients configuration
 for num_rounds in "${rounds_config[@]}";
 do

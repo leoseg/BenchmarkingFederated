@@ -24,7 +24,7 @@ pip install -e utils
 pip3 install -r requirements.txt
 cd Flower || exit
 rounds_config=(1 2 5 10)
-noises=(0.01 0.02 0.03 0.04 0.05)
+noises=(0.01 0.03 0.05 0.07 0.085  0.1)
 # Loops trough round and number of clients configuration
 for num_rounds in "${rounds_config[@]}";
 do

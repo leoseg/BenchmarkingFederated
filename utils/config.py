@@ -17,7 +17,7 @@ flw_time_logging_directory = "timelogs/flw_logs_time.txt"
 SEED = 42
 version = "dp_noises"
 n_splits = 5
-noises = [0.01, 0.02, 0.03, 0.04, 0.05]
+noises = [0.01, 0.03, 0.05, 0.07, 0.085, 0.1]
 DATA_PATH = ""
 if os.environ["USECASE"] == "test":
     configs = dict(
