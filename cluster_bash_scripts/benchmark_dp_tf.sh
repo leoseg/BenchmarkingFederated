@@ -21,8 +21,8 @@ pip3 install --upgrade pip
 pip install -e utils
 pip3 install -r requirements.txt
 cd TensorflowFederated || exit
-clients_config=(3)
-rounds_config=(5)
+#clients_config=(5)
+rounds_config=(10)
 #if [ "$USECASE" -eq "4" ]
 #then
 #    noises=(2.5 3.5 4.5 5.5 6.0)
