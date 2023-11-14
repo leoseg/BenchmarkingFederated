@@ -76,11 +76,7 @@ for mode in ["system"]:
         df = create_dfs_for_fl_metric(
             rounds_metrics=scenario_metrics, metric_name=metric
         )
-        if (
-            mode != "unweighted"
-            and metric != "time_diff"
-            and metric != "time_diff_relation"
-        ):
+        if mode in ["system", "balanced"]:
             central = mongodb.get_data_by_name(
                 f"central_metrics_{configs.get('usecase')}_{mode}"
             )
@@ -116,6 +112,8 @@ for mode in ["system"]:
         # plot_heatmap(df,"FLWR",standard_deviation=True,unweighted=unweighted,scale=scale,metric_name=metric_name,data_path=plot_path)
         if mode == "unweighted":
             configuration_name = "Percentage of chosen class"
+        elif mode == "dp":
+            configuration_name = "Noisemultiplier"
         else:
             configuration_name = "Number of clients"
         for plot_type in ["bar"]:

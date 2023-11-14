@@ -16,6 +16,20 @@ tff_time_logging_directory = "timelogs/tff_logs_time.txt"
 flw_time_logging_directory = "timelogs/flw_logs_time.txt"
 SEED = 42
 version = "dp_noises"
+dp_groups = [
+    "flwr_5_0.1",
+    "flwr_5_0.085",
+    "flwr_5_0.07",
+    "flwr_5_0.05",
+    "flwr_5_0.03",
+    "flwr_5_0.01",
+    "tff_5_0.1",
+    "tff_5_0.085",
+    "tff_5_0.07",
+    "tff_5_0.05",
+    "tff_5_0.03",
+    "tff_5_0.01",
+]
 n_splits = 5
 noises = [0.01, 0.03, 0.05, 0.07, 0.085, 0.1]
 DATA_PATH = ""
@@ -98,6 +112,7 @@ elif os.environ["USECASE"] == str(4):
             "flwr_14.0",
             "flwr_16.0",
         ],
+        dp_groups=dp_groups,
         num_nodes=512,
         dropout_rate=0.15,
         l1_v=0.0,
@@ -154,6 +169,7 @@ elif os.environ["USECASE"] == str(3):
             "flwr_14.0",
             "flwr_16.0",
         ],
+        dp_groups=dp_groups,
         loss=SparseCategoricalCrossentropy(),
         dp_loss=SparseCategoricalCrossentropy(reduction=tf.keras.losses.Reduction.NONE),
         metrics=[
@@ -212,6 +228,7 @@ elif os.environ["USECASE"] == str(2):
             "flwr_9.0",
             "flwr_10.0",
         ],
+        dp_groups=dp_groups,
         optimizer=SGD(),
         global_norm=298.85,
         loss=BinaryCrossentropy(),
@@ -287,6 +304,7 @@ else:
             "flwr_9.0",
             "flwr_10.0",
         ],
+        dp_groups=dp_groups,
         num_nodes=512,
         dropout_rate=0.15,
         l1_v=0.0,

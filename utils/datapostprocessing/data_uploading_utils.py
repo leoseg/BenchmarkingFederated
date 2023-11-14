@@ -152,6 +152,8 @@ def get_stats_for_usecase(groups, version=None, mode="balanced", rounds=None):
     if mode == "unweighted":
         project_prefix = "unweightedusecase"
         metrics_names.extend([name + "_global" for name in metrics_names])
+    if mode == "dp":
+        project_prefix = "dpusecase"
     for round in rounds:
         project = f"{project_prefix}_{str(usecase)}_benchmark_rounds_{round}_{data_path}_{metrics_prefix}_metrics"
         round_metrics.append(
@@ -177,7 +179,7 @@ def transform_scenario_metrics_to_df(metrics: dict, metric_name: str, round_num)
                 metrics,
                 metric_name,
                 groupname.split("_")[0],
-                groupname.split("_")[1],
+                groupname.split("_")[-1],
                 round_num,
             )
         )
