@@ -41,6 +41,6 @@ class DataBackend(tff.framework.DataBackend):
                 self.train_dataset, epochs=self.local_epochs, seed=int(data.uri[0])
             )
             tf.print(
-                f"preprocessed dataset entry {0} from client {data.uri[-1]} is {list(preprocessed_ds.as_numpy_iterator())[0]}"
+                f"preprocessed dataset entry {0} from client {data.uri} is {list(preprocessed_ds.as_numpy_iterator())[0]}"
             )
             return preprocessed_ds
