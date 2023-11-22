@@ -22,7 +22,11 @@ pip install -e utils
 pip3 install -r requirements.txt
 cd TensorflowFederated || exit
 #clients_config=(5)
-rounds_config=(4 8)
+if [ $3 =  "1" ] ||  [ $3 = "3" ] || [ $3 = "4" ]; then
+   rounds_config=(1 2 5 10)
+elif [  $3 = "2" ]; then
+   rounds_config=(1 2 4 8)
+fi
 #if [ "$USECASE" -eq "4" ]
 #then
 #    noises=(2.5 3.5 4.5 5.5 6.0)
