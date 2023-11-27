@@ -23,6 +23,11 @@ pip3 install --upgrade pip
 pip install -e utils
 pip3 install -r requirements.txt
 cd Flower || exit
+if [ $3 =  "1" ] ||  [ $3 = "3" ] || [ $3 = "4" ]; then
+   rounds_config=(1 2 5 10)
+elif [  $3 = "2" ]; then
+   rounds_config=(4 8)
+fi
 rounds_config=(1 2 5 10)
 noises=(0.01 0.03 0.05 0.07 0.085  0.1)
 # Loops trough round and number of clients configuration
