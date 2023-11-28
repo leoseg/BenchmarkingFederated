@@ -20,28 +20,6 @@ from datapostprocessing.table_utils import get_metrics_for_mode
 """
 Plotting script for which plots all heatmaps and barplots for one usecase
 """
-plot_dict = defaultdict()
-plots_refs = defaultdict
-position_dict = {1: (0, 0), 2: (1, 0), 3: (1, 1), 4: (0, 1)}
-modes = ["system", "balanced", "unweighted", "dp"]
-for mode in modes:
-    metric_names = [
-        metric_tuple[0] for metric_tuple in get_metric_names_for_plotting(mode)
-    ]
-    for metric_name in metric_names:
-        fig_rounds, ax_rounds = plt.subplots(2, 2, figsize=(10, 10))
-        fig_groups, ax_groups = plt.subplots(2, 2, figsize=(10, 10))
-        plots_refs[mode][metric_name]["rounds"] = ax_rounds, fig_rounds
-        plots_refs[mode][metric_name]["groups"] = ax_groups, fig_groups
-        for usecase in [1, 2, 3, 4]:
-            plot_dict[mode][metric_name][usecase]["rounds"] = ax_rounds[
-                position_dict[usecase]
-            ]
-            plot_dict[mode][metric_name][usecase]["groups"] = ax_groups[
-                position_dict[usecase]
-            ]
-
-
 for usecase in [1, 2, 3, 4]:
     os.environ["USECASE"] = str(usecase)
     from config import configs
@@ -71,7 +49,6 @@ for usecase in [1, 2, 3, 4]:
                     scale=None,
                     data2=df2,
                     configuration_name="Number of clients",
-                    axs_object=plot_dict[mode],
                 )
                 continue
             scenario_metrics = mongodb.get_data_by_name(
@@ -116,8 +93,6 @@ for usecase in [1, 2, 3, 4]:
                     scale = [0.0, 1.05]
                 else:
                     scale = None
-                print(f"Object id for {usecase} {metric} rounds")
-                print(id(plot_dict[metric][usecase]["rounds"]))
                 plot_swarmplots(
                     df,
                     metric_name,
@@ -125,28 +100,4 @@ for usecase in [1, 2, 3, 4]:
                     data_path=plot_path,
                     plot_type=plot_type,
                     scale=scale,
-                    axs_object=plot_dict[mode][metric][usecase],
                 )
-
-
-for mode in modes:
-    for metric_name in plots_refs[mode].keys():
-        for summarize_mode in ["rounds", "groups"]:
-            print(f"object id for {metric_name} {summarize_mode} ")
-            print(id(plots_refs[mode][metric_name][summarize_mode][0][0][0]))
-            axs, fig = plots_refs[mode][metric_name][summarize_mode]
-            axs[0, 0].set_title("a")
-            axs[0, 1].set_title("b")
-            axs[1, 0].set_title("c")
-            axs[1, 1].set_title("d")
-            if metric_name == "sent":
-                legend_patches = create_legend_patches_with_sent_received()
-            elif mode in ["system", "balanced"]:
-                legend_patches = create_legend_patches(True)
-            else:
-                legend_patches = create_legend_patches()
-            fig.legend(handles=legend_patches, loc="lower center")
-            plt.tight_layout()
-            plt.savefig(
-                f"../../BenchmarkData/plots/plot_{metric_name}_{summarize_mode}.png"
-            )

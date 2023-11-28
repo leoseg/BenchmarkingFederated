@@ -356,7 +356,7 @@ def plot_swarmplots(
         axs_object=axs_object["groups"],
     )
 
-    if metric_name == "Network traffic (MB)":
+    if metric_name == "Network traffic (MB)" and axs_object is None:
         for group in df["group"].unique():
 
             if group == "central":
