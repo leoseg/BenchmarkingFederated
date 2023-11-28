@@ -1,5 +1,7 @@
 import pandas as pd
 import seaborn as sns
+from matplotlib.ticker import FuncFormatter
+
 from config import configs
 import matplotlib.pyplot as plt
 import os
@@ -176,12 +178,20 @@ def seaborn_plot(
     ax.set_ylabel(metric_name, fontsize=fontsize)
     if metric_name == "AUC":
         ax.axhline(0.5, color="red", linestyle="--")
+    if "Memory" in metric_name:
+
+        def custom_formatter(x, pos):
+            return f"{int(x)}"
+
+        # Set the custom formatter for the y-axis
+        ax.yaxis.set_major_formatter(FuncFormatter(custom_formatter))
+
     if scale is not None:
         ax.set_ylim(scale[0], scale[1])
     # set x axis title to group name
     ax.set_xlabel(configuration_name, fontsize=fontsize)
     if configuration_name == "Imbalance (%)":
-        if configs.get("usecase") == 1 or configs.get("usecase") == 2:
+        if os.environ["USECASE"] == 1 or os.environ["USECASE"] == 2:
             start_value = 50
         else:
             start_value = 20
