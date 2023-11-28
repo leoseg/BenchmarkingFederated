@@ -2,7 +2,7 @@ import numpy as np
 import pandas as pd
 import wandb
 from config import configs
-from plotting import ENTITY, ROUNDS
+from utils.datapostprocessing.plotting import ENTITY, ROUNDS
 
 
 def get_loss_stats(groups: list, version: str, mode: str):
