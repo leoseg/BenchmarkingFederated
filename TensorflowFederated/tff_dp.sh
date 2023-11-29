@@ -8,7 +8,7 @@ NUM_CLIENTS=$3
 WANDB_API_KEY=$4
 REPEATS=$5
 SYSTEM_ONLY=$6
-NUM_ROUNDS=1
+NUM_ROUNDS=$7
 DATA_NAME=$(basename "$DATA_PATH" .csv)
 echo "Starting tff experiment with num clients ${NUM_CLIENTS} num rounds ${NUM_ROUNDS} and data ${DATA_NAME} and ${REPEATS} repeats"
 # Creates partitions and saves the row indices of each partition to file so it can be read from clients
@@ -19,7 +19,7 @@ if [ $SYSTEM_ONLY != "1" ]; then
   for (( repeat = 0; repeat < $REPEATS; repeat++ ))
   do
     echo "Start repeat model metrics ${repeat} num clients ${NUM_CLIENTS} num rounds ${NUM_ROUNDS} and data ${DATA_NAME}"
-    for ((i=1;i<=10;i++))
+    for ((i=1;i<=NUM_CLIENTS;i++))
     do
       port=$((8000 + $i))
       echo "Creating worker ${i} with port ${port}"
@@ -68,8 +68,8 @@ if [ $SYSTEM_ONLY != "2" ]; then
     project_name="dpusecase_${USECASE}_benchmark_clients_${DATA_NAME}_system_metrics"
     run_name="run_${repeat}"
     # Read files logged from psutil to wandb
-    python ../scripts/mem_data_to_wandb.py --logs_path $worker_time_logs --project_name $project_name --run_name $run_name --group_name "${NUM_CLIENTS}_${NOISE}"  --memory_type "client"
-    python ../scripts/mem_data_to_wandb.py --logs_path $train_time_logs --project_name $project_name  --run_name $run_name --group_name "${NUM_CLIENTS}_${NOISE}"   --memory_type "server"
+    python ../scripts/mem_data_to_wandb.py --logs_path $worker_time_logs --project_name $project_name --run_name $run_name --group_name "tff_${NUM_CLIENTS}_${NOISE}"  --memory_type "client"
+    python ../scripts/mem_data_to_wandb.py --logs_path $train_time_logs --project_name $project_name  --run_name $run_name --group_name "tff_${NUM_CLIENTS}_${NOISE}"   --memory_type "server"
     echo "Repeat system metrics ${repeat} num clients 10 num rounds ${NUM_ROUNDS} and data ${DATA_NAME} complete"
     echo "<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<"
   done

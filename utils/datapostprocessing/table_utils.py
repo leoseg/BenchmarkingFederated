@@ -4,21 +4,31 @@ from typing import Optional
 import pandas as pd
 import numpy as np
 from config import configs
-ROUNDS = [1,3,5,10]
-if configs.get("usecase") == 2:
-    ROUNDS = [1,2,4,8]
 
-def transform_central_metric_to_df(central_data,metric_name):
+ROUNDS = [1, 3, 5, 10]
+if configs.get("usecase") == 2:
+    ROUNDS = [1, 2, 4, 8]
+
+
+def transform_central_metric_to_df(central_data: pd.DataFrame, metric_name: str):
     """
     Transform central metric to dataframe
     :param central_data: central data to transform
     :param metric_name: metric to transform
     :return: dataframe
     """
-    row = [{"value": f"{np.mean(central_data[metric_name]):.4f} \u00B1 {np.std(central_data[metric_name]):.4f}"}]
+    row = [
+        {
+            "value": f"{np.mean(central_data[metric_name]):.4f} \u00B1 {np.std(central_data[metric_name]):.4f}"
+        }
+    ]
     df = pd.DataFrame(row)
     return df
-def create_summarize_dataframe_from_metrics(data: list,metric_name, rounds,groups = None,mode="both"):
+
+
+def create_summarize_dataframe_from_metrics(
+    data: list, metric_name, rounds, groups=None, mode="both"
+):
     """
     Create a summarizing dataframe from a list of metrics
     :param data: data to summarize
@@ -40,17 +50,17 @@ def create_summarize_dataframe_from_metrics(data: list,metric_name, rounds,group
     df = pd.DataFrame(columns=new_columns)
     for group in groups:
         if group.startswith("tff"):
-            row_data = create_data_row(data, group, metric_name, rounds,mode)
+            row_data = create_data_row(data, group, metric_name, rounds, mode)
             df = df.append(row_data, ignore_index=True)
 
     # Compute summary columns
-    df = compute_summary_columns(df,mode)
-    summary_row = create_summary_row(df,mode)
+    df = compute_summary_columns(df, mode)
+    summary_row = create_summary_row(df, mode)
     df = df.append(summary_row, ignore_index=True)
     return df
 
 
-def create_data_row(data, group, metric_name, rounds,mode):
+def create_data_row(data, group, metric_name, rounds, mode):
     """
     Create a data row for a dataframe
     :param data: data to create row for
@@ -68,13 +78,24 @@ def create_data_row(data, group, metric_name, rounds,mode):
             tff_metrics = round_data[group]
             flwr_group = group.replace("tff", "flwr")
             flwr_metrics = round_data[flwr_group]
-            row_data.update({
-                f"round {rounds[i]} tff": create_column_string(np.mean(tff_metrics[metric_name]),np.std(tff_metrics[metric_name]),mode=mode),
-                f"round {rounds[i]} flwr": create_column_string(np.mean(flwr_metrics[metric_name]),np.std(flwr_metrics[metric_name]),mode=mode),
-            })
+            row_data.update(
+                {
+                    f"round {rounds[i]} tff": create_column_string(
+                        np.mean(tff_metrics[metric_name]),
+                        np.std(tff_metrics[metric_name]),
+                        mode=mode,
+                    ),
+                    f"round {rounds[i]} flwr": create_column_string(
+                        np.mean(flwr_metrics[metric_name]),
+                        np.std(flwr_metrics[metric_name]),
+                        mode=mode,
+                    ),
+                }
+            )
     return row_data
 
-def create_column_string(mean,std,mode="both"):
+
+def create_column_string(mean, std, mode="both"):
     """
     Create a column string
     :param mean: mean
@@ -87,7 +108,9 @@ def create_column_string(mean,std,mode="both"):
     elif mode == "std":
         return f"{std:.4f}"
     return f"{mean:.4f} \u00B1 {std:.4f}"
-def create_summary_row(df,mode):
+
+
+def create_summary_row(df, mode):
     """
     Create a summary row for a dataframe
     :param df: df to create summary row for
@@ -98,20 +121,22 @@ def create_summary_row(df,mode):
     for col in df.columns:
         if col.startswith("round") or col.startswith("group summary"):
             if mode == "both":
-                values = df[col].apply(lambda x: np.array(list(map(float, x.split(" \u00B1 ")))))
+                values = df[col].apply(
+                    lambda x: np.array(list(map(float, x.split(" \u00B1 "))))
+                )
                 mean = np.mean(values.apply(lambda x: x[0]))
                 std = np.sqrt(np.sum(values.apply(lambda x: x[1] ** 2)))
-            elif mode =="mean":
+            elif mode == "mean":
                 mean = np.mean(df[col].apply(lambda x: float(x)))
                 std = 0.0
             elif mode == "std":
                 std = np.std(df[col].apply(lambda x: float(x)))
                 mean = 0.0
-            summary_row[col] = create_column_string(mean,std,mode=mode)
+            summary_row[col] = create_column_string(mean, std, mode=mode)
     return summary_row
 
 
-def compute_summary_columns(df,mode):
+def compute_summary_columns(df, mode):
     """
     Compute summary columns for a dataframe
     :param df: df to compute summary columns for
@@ -160,14 +185,16 @@ def compute_summary_columns(df,mode):
             tff_mean = 0
             flwr_std = np.sqrt(np.sum(np.array(flwr_stds) ** 2))
             tff_std = np.sqrt(np.sum(np.array(tff_stds) ** 2))
-        df.at[
-            index, "group summary tff"] = create_column_string(tff_mean,tff_std,mode=mode)
-        df.at[
-            index, "group summary flwr"] = create_column_string(flwr_mean,flwr_std,mode=mode)
+        df.at[index, "group summary tff"] = create_column_string(
+            tff_mean, tff_std, mode=mode
+        )
+        df.at[index, "group summary flwr"] = create_column_string(
+            flwr_mean, flwr_std, mode=mode
+        )
     return df
 
 
-def transform_df_to_latex(df,headers,rows_to_include,central_df=None):
+def transform_df_to_latex(df, headers, rows_to_include, central_df=None):
     """
     Transforms a latex data table to a dataframe with given headers and writes
     it to a text file namd table.txt in the same directory
@@ -176,19 +203,25 @@ def transform_df_to_latex(df,headers,rows_to_include,central_df=None):
     :return:
     """
     df1 = df[["group"] + rows_to_include]
-    df2 = df[["group"] + ["group summary tff"]+["group summary flwr"]]
+    df2 = df[["group"] + ["group summary tff"] + ["group summary flwr"]]
     latex_str1 = df1.to_latex(index=False, header=headers, escape=False)
-    latex_str2 = df2.to_latex(index=False, header=["Number of Clients","Group summary TFF","Group summary Flwr"], escape=False)
+    latex_str2 = df2.to_latex(
+        index=False,
+        header=["Number of Clients", "Group summary TFF", "Group summary Flwr"],
+        escape=False,
+    )
     latex_str3 = ""
 
     if central_df is not None:
-        latex_str3 = central_df.to_latex(index=False, header=["Central model value"], escape=False)
-    complete_latex_str= latex_str1 + "\n" + latex_str2 + "\n"+  latex_str3
+        latex_str3 = central_df.to_latex(
+            index=False, header=["Central model value"], escape=False
+        )
+    complete_latex_str = latex_str1 + "\n" + latex_str2 + "\n" + latex_str3
     with open("table.txt", "w") as f:
         f.write(complete_latex_str)
 
 
-def transform_df_to_landscape_table(df,headers,caption, central_df=None):
+def transform_df_to_landscape_table(df, headers, caption, central_df=None):
     """
     Transforms a latex data table to a dataframe with given headers and writes jt to file
     :param df: df to transform
@@ -196,14 +229,24 @@ def transform_df_to_landscape_table(df,headers,caption, central_df=None):
     :return:
     """
     df_string = df.to_latex(index=False, header=headers, escape=False)
-    central_df_string =""
+    central_df_string = ""
     if central_df is not None:
-        central_df_string = central_df.to_latex(index=False, header=["Central model value"], escape=False)
-    return "\\begin{table}\n \caption{"+caption+ "}\n \\begin{tiny}\n " + df_string + central_df_string+"\n\end{tiny}\n\end{table}\n"
+        central_df_string = central_df.to_latex(
+            index=False, header=["Central model value"], escape=False
+        )
+    return (
+        "\\begin{table}\n \caption{"
+        + caption
+        + "}\n \\begin{tiny}\n "
+        + df_string
+        + central_df_string
+        + "\n\end{tiny}\n\end{table}\n"
+    )
     # with open("landscape_table.txt", "w") as f:
     #     f.write(df_string)
 
-def get_usecase_name(usecase:int):
+
+def get_usecase_name(usecase: int):
     """
     Returns the name of the usecase
     :param usecase: usecase number
@@ -219,7 +262,8 @@ def get_usecase_name(usecase:int):
         case 4:
             return "BrainCellDL"
 
-def get_mode_name(mode:str):
+
+def get_mode_name(mode: str):
     """
     Returns the name of the mode
     :param mode: mode
@@ -233,7 +277,9 @@ def get_mode_name(mode:str):
             return "Benchmark model performance for class imbalance"
         case "system":
             return "Benchmark computational resources"
-def get_metrics_for_mode(mode,usecase):
+
+
+def get_metrics_for_mode(mode, usecase):
     """
     Returns the metrics for a given mode
     :param mode: mode to return metrics for
@@ -241,7 +287,7 @@ def get_metrics_for_mode(mode,usecase):
     """
     match mode:
         case "balanced":
-            if usecase == 1 or  usecase == 2:
+            if usecase == 1 or usecase == 2:
                 metric1 = "binary_accuracy"
             else:
                 metric1 = "sparse_categorical_accuracy"
@@ -264,10 +310,9 @@ def get_metrics_for_mode(mode,usecase):
                 ("total_round_time", "Training time in seconds of all rounds"),
                 ("total_per_client_memory_client", "Memory per client in MB"),
                 ("total_client_time", "Training time in seconds per client"),
-                ("sent","Mb sent from client"),
-                ("received","Mb received by client"),]
-
-
+                ("sent", "Mb sent from client"),
+                ("received", "Mb received by client"),
+            ]
 
 
 def convert_val(val):
@@ -276,10 +321,10 @@ def convert_val(val):
     :param val: value to convert
     :return: string with correct number of significant digits
     """
-    parts = val.split(' ± ')
+    parts = val.split(" ± ")
 
     # Convert each part to float, round to nearest integer, convert back to string
     parts = [str(int(round(float(part)))) for part in parts]
 
     # Concatenate the parts back together
-    return ' ± '.join(parts)
+    return " ± ".join(parts)

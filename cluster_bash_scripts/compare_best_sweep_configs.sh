@@ -21,4 +21,3 @@ export USECASE=1
 cd CentralizedApproach || exit
 python train_model_wandb_gen_expr.py --num_nodes 512 --dropout_rate 0.15 --l1_v 0.005
 python train_model_wandb_gen_expr.py --num_nodes 1024 --dropout_rate 0.3 --l1_v 0.005
-

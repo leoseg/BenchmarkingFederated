@@ -66,7 +66,6 @@ def get_seq_nn_model(
             256,
             activation="relu",
             kernel_initializer=tf.keras.initializers.GlorotUniform(seed=1),
-            kernel_regularizer=l1_l2(l1=0.0, l2=0.0),
             input_dim=input_dim,
         )
     )
@@ -78,7 +77,7 @@ def get_seq_nn_model(
             num_nodes,
             activation="relu",
             kernel_initializer=tf.keras.initializers.GlorotUniform(seed=1),
-            kernel_regularizer=l1_l2(l1=l1_v, l2=l2_v),
+            input_dim=input_dim,
         )
     )
     model.add(Dropout(dropout_rate, seed=1))
@@ -88,7 +87,7 @@ def get_seq_nn_model(
             int(num_nodes / 2),
             activation="relu",
             kernel_initializer=tf.keras.initializers.GlorotUniform(seed=1),
-            kernel_regularizer=l1_l2(l1=l1_v, l2=l2_v),
+            input_dim=input_dim,
         )
     )
     model.add(Dropout(dropout_rate, seed=1))
@@ -98,7 +97,7 @@ def get_seq_nn_model(
             int(num_nodes / 2),
             activation="relu",
             kernel_initializer=tf.keras.initializers.GlorotUniform(seed=1),
-            kernel_regularizer=l1_l2(l1=l1_v, l2=l2_v),
+            input_dim=input_dim,
         )
     )
     model.add(Dropout(dropout_rate, seed=1))
@@ -108,7 +107,7 @@ def get_seq_nn_model(
             int(num_nodes / 4),
             activation="relu",
             kernel_initializer=tf.keras.initializers.GlorotUniform(seed=1),
-            kernel_regularizer=l1_l2(l1=l1_v, l2=l2_v),
+            input_dim=input_dim,
         )
     )
     model.add(Dropout(dropout_rate, seed=1))
@@ -118,7 +117,7 @@ def get_seq_nn_model(
             int(num_nodes / 4),
             activation="relu",
             kernel_initializer=tf.keras.initializers.GlorotUniform(seed=1),
-            kernel_regularizer=l1_l2(l1=l1_v, l2=l2_v),
+            input_dim=input_dim,
         )
     )
     model.add(Dropout(dropout_rate, seed=1))
@@ -128,7 +127,7 @@ def get_seq_nn_model(
             int(num_nodes / 8),
             activation="relu",
             kernel_initializer=tf.keras.initializers.GlorotUniform(seed=1),
-            kernel_regularizer=l1_l2(l1=l1_v, l2=l2_v),
+            input_dim=input_dim,
         )
     )
     model.add(Dropout(dropout_rate, seed=1))
@@ -138,7 +137,7 @@ def get_seq_nn_model(
             int(num_nodes / 8),
             activation="relu",
             kernel_initializer=tf.keras.initializers.GlorotUniform(seed=1),
-            kernel_regularizer=l1_l2(l1=l1_v, l2=l2_v),
+            input_dim=input_dim,
         )
     )
     model.add(Dropout(dropout_rate, seed=1))
@@ -148,7 +147,7 @@ def get_seq_nn_model(
             int(num_nodes / 16),
             activation="relu",
             kernel_initializer=tf.keras.initializers.GlorotUniform(seed=1),
-            kernel_regularizer=l1_l2(l1=l1_v, l2=l2_v),
+            input_dim=input_dim,
         )
     )
     model.add(Dropout(dropout_rate, seed=1))
@@ -174,7 +173,6 @@ def get_log_reg_keras(l2_v):
             units=configs["number_of_classes"],
             kernel_initializer=tf.keras.initializers.GlorotUniform(seed=1),
             activation=configs["activation"],
-            kernel_regularizer=l2(l2_v),
         )
     )
     return model
