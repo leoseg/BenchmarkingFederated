@@ -2,14 +2,14 @@ import pandas as pd
 import seaborn as sns
 from matplotlib.ticker import FuncFormatter
 
-from config import configs
+from config import configs, get_config
 import matplotlib.pyplot as plt
 import os
 import matplotlib.patches as mpatches
 
 
 ENTITY = "Scads"
-if configs.get("usecase") == 2:
+if get_config().get("usecase") == 2:
     ROUNDS = [1, 2, 4, 8]
 else:
     ROUNDS = [1, 2, 5, 10]
@@ -342,31 +342,8 @@ def plot_swarmplots(
     print(id(axs_object["rounds"]))
     print(" id for axs object groups")
     print(id(axs_object["groups"]))
-    seaborn_plot(
-        "round configuration",
-        metric_name,
-        df,
-        f"Round configs over all groups",
-        plot_type=plot_type,
-        data_path=data_path,
-        scale=scale,
-        data2=data2,
-        axs_object=axs_object["rounds"],
-    )
-    seaborn_plot(
-        "group",
-        metric_name,
-        df,
-        f"Group configs over all round configs",
-        configuration_name=configuration_name,
-        plot_type=plot_type,
-        data_path=data_path,
-        scale=scale,
-        data2=data2,
-        axs_object=axs_object["groups"],
-    )
-
-    if metric_name == "Network traffic (MB)" and axs_object is None:
+    if metric_name == "Network traffic (MB)":
+        df = df[df["group"] == "10"]
         for group in df["group"].unique():
 
             if group == "central":
@@ -388,7 +365,32 @@ def plot_swarmplots(
                 data_path=data_path,
                 scale=scale,
                 data2=group_data2,
+                axs_object=axs_object["rounds"],
             )
+    else:
+        seaborn_plot(
+            "round configuration",
+            metric_name,
+            df,
+            f"Round configs over all groups",
+            plot_type=plot_type,
+            data_path=data_path,
+            scale=scale,
+            data2=data2,
+            axs_object=axs_object["rounds"],
+        )
+        seaborn_plot(
+            "group",
+            metric_name,
+            df,
+            f"Group configs over all round configs",
+            configuration_name=configuration_name,
+            plot_type=plot_type,
+            data_path=data_path,
+            scale=scale,
+            data2=data2,
+            axs_object=axs_object["groups"],
+        )
 
 
 def create_time_diff(df1, df2, relation=False):
@@ -466,4 +468,4 @@ def plot_figure_with_subfigures(axs, fig, mode, metric_name, summarize_mode):
         handles=legend_patches, bbox_to_anchor=(0.5, 0.05), loc="lower center", ncol=3
     )  # ,bbox_to_anchor=(0.5, -0.2), ncol=3)
     fig.tight_layout(rect=[0, 0.1, 1, 1])
-    fig.savefig(f"../../BenchmarkData/plots/{mode}_{metric_name}_{summarize_mode}.png")
+    fig.savefig(f"../../BenchmarkData/plots/{mode}_{metric_name}_{summarize_mode}.pdf")

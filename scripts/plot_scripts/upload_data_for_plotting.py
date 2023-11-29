@@ -3,16 +3,17 @@ from datapostprocessing.data_uploading_utils import (
     get_stats_for_usecase,
     get_central_metrics,
 )
-from config import configs
-from datapostprocessing.db_utils import MongoDBHandler
 
+from datapostprocessing.db_utils import MongoDBHandler
+from config import configs
 
 mongodb = MongoDBHandler()
-if configs.get("usecase") == 1:
+usecase = configs.get("usecase")
+if usecase == 1:
     version = "unbalanced_with_global_evaluation"
 
 else:
-    version = "dp_noises"
+    version = "unbalanced_with_global_evaluation_1804"
 
 for mode in ["dp"]:
     central_loss = {}
@@ -24,10 +25,11 @@ for mode in ["dp"]:
             version = "unbalanced_with_global_evaluation_1804"
     elif mode == "dp":
         groups = configs.get("dp_groups")
+        version = "dp_noises"
         central = None
     elif mode == "loss":
         central_loss = get_loss_stats(
-            groups=[f"usecase_{configs.get('usecase')}"],
+            groups=[f"usecase_{usecase}"],
             mode="central",
             version="loss_tracking_central",
         )
@@ -49,9 +51,9 @@ for mode in ["dp"]:
     )
     mongodb.update_benchmark_data(
         data=scenario_metrics,
-        name=f"scenario_metrics_{configs.get('usecase')}_{mode}",
+        name=f"scenario_metrics_{usecase}_{mode}",
     )
     if mode in ["balanced", "system"]:
         mongodb.update_benchmark_data(
-            data=central, name=f"central_metrics_{configs.get('usecase')}_{mode}"
+            data=central, name=f"central_metrics_{usecase}_{mode}"
         )

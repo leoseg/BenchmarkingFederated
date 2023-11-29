@@ -1,7 +1,7 @@
 import numpy as np
 import pandas as pd
 import wandb
-from config import configs
+from config import configs, get_config
 from utils.datapostprocessing.plotting import ENTITY, ROUNDS
 
 
@@ -117,16 +117,23 @@ def group_scenarios(scenarios: list, group_factor):
     return df
 
 
-def get_stats_for_usecase(groups, version=None, mode="balanced", rounds=None):
+def get_stats_for_usecase(
+    groups, usecase=None, version=None, mode="balanced", rounds=None
+):
     """
     Get the mean of the metrics for each group of all projecets for that usecase
     :param mode: mode of the project can be "unweighted" or "system" or "balanced"
     :param groups: groups to get the mean of the metrics for
+    :param usecase: usecase to get the metrics for
     :param version: version of the runs
     :param rounds: rounds to get the metrics for
     :return: list of dictionaries with the mean of the metrics for each group for each round
     """
-    usecase = configs.get("usecase")
+    if not usecase:
+        configs = get_config()
+        usecase = configs.get("usecase")
+    else:
+        configs = get_config(usecase)
     project_prefix = "usecase"
     metrics_prefix = "model"
     data_path = configs.get("data_path").split("/")[-1].split(".")[0]
@@ -217,7 +224,7 @@ def transform_to_df(metrics: dict, metric_name, framework, group, round_configur
     return df
 
 
-def create_dfs_for_fl_metric(rounds_metrics, metric_name: str):
+def create_dfs_for_fl_metric(rounds_metrics, metric_name: str, rounds=None):
     """
     Creates a dataframe for each roundconfiguration for one metric and appends them together
     :param rounds_metrics: metrics for each roundconfiguration
@@ -225,8 +232,10 @@ def create_dfs_for_fl_metric(rounds_metrics, metric_name: str):
     :return: df with all values for one metric
     """
     dfs = []
+    if rounds is None:
+        rounds = ROUNDS
     for index, metric_for_number_of_rounds in enumerate(rounds_metrics):
-        round_num = ROUNDS[index]
+        round_num = rounds[index]
         df = transform_scenario_metrics_to_df(
             metric_for_number_of_rounds, metric_name, round_num
         )
@@ -246,14 +255,16 @@ def recalculate_round_times_for_number_of_rounds(df):
     return df
 
 
-def get_central_metrics(mode: str, metric_names: list):
+def get_central_metrics(mode: str, metric_names: list, usecase=None):
     """
     Get the metrics for the central model
     :param mode: metric mode of the project can be "system" or "model"
     :param metric_names: names of the metrics to get
+    :param usecase: usecase to get the metrics for
     :return: dictionary with the metrics for the central model
     """
-    usecase = configs.get("usecase")
+    if not usecase:
+        usecase = configs.get("usecase")
     group = f"usecase_{usecase}"
     if mode == "system":
         project = "benchmark-central_system_metrics"
