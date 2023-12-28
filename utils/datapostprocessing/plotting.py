@@ -92,6 +92,7 @@ def seaborn_plot(
     :return:
     """
     sns.set(font_scale=1.7)
+    sns.set_style("whitegrid")
     # plt.subplots_adjust(bottom=0.24, left=0.17)
     hue = "framework"
     dodge = True
@@ -121,6 +122,7 @@ def seaborn_plot(
                 data2["metric"] = (data2["metric"] + data["metric"]).tolist()
                 sns_palette2 = sns.color_palette("Dark2")
                 palette2 = {"TFF": sns_palette2[1], "FLWR": sns_palette2[2]}
+                sns.set_style("whitegrid")
                 ax = sns.barplot(
                     x=x,
                     y="metric",
@@ -191,7 +193,7 @@ def seaborn_plot(
     # set x axis title to group name
     ax.set_xlabel(configuration_name, fontsize=fontsize)
     if configuration_name == "Imbalance (%)":
-        if os.environ["USECASE"] == 1 or os.environ["USECASE"] == 2:
+        if os.environ["USECASE"] == str(1) or os.environ["USECASE"] == str(2):
             start_value = 50
         else:
             start_value = 20
@@ -314,34 +316,9 @@ def plot_swarmplots(
     :param data_path: path to the data
     :metric_name: name of metric to plot
     """
-    # if metric_name == "AUC":
-    #     for index, round_num in enumerate(ROUNDS):
-    #         if round_num in [1, 10]:
-    #             round_df = df[df["round configuration"] == "central"]
-    #             round_df = pd.concat(
-    #                 [round_df, df[df["round configuration"] == round_num]],
-    #                 ignore_index=True,
-    #             )
-    #             if data2 is not None:
-    #                 round_data2 = data2[data2["round configuration"] == round_num]
-    #             else:
-    #                 round_data2 = None
-    #             seaborn_plot(
-    #                 "group",
-    #                 metric_name,
-    #                 round_df,
-    #                 f"Round configuration {round_num}",
-    #                 configuration_name=configuration_name,
-    #                 plot_type=plot_type,
-    #                 data_path=data_path,
-    #                 scale=scale,
-    #                 data2=round_data2,
-    #             )
-    #             plt.show()
-    print(" id for axs object rounds")
-    print(id(axs_object["rounds"]))
-    print(" id for axs object groups")
-    print(id(axs_object["groups"]))
+    # print(id(axs_object["rounds"]))
+    # print(" id for axs object groups")
+    # print(id(axs_object["groups"]))
     if metric_name == "Network traffic (MB)":
         df = df[df["group"] == "10"]
         for group in df["group"].unique():
@@ -393,6 +370,45 @@ def plot_swarmplots(
         )
 
 
+def plot_round(
+    df,
+    metric_name: str,
+    configuration_name: str,
+    data_path: str,
+    plot_type: str,
+    round_to_plot: int,
+    scale=None,
+    data2=None,
+    axs_object=None,
+):
+    """
+    Plots all groups summarized for the given round
+    """
+    for index, round_num in enumerate(ROUNDS):
+        if round_num == round_to_plot:
+            round_df = df[df["round configuration"] == "central"]
+            round_df = pd.concat(
+                [round_df, df[df["round configuration"] == round_num]],
+                ignore_index=True,
+            )
+            if data2 is not None:
+                round_data2 = data2[data2["round configuration"] == round_num]
+            else:
+                round_data2 = None
+            seaborn_plot(
+                "group",
+                metric_name,
+                round_df,
+                f"Round configuration {round_num}",
+                configuration_name=configuration_name,
+                plot_type=plot_type,
+                data_path=data_path,
+                scale=scale,
+                data2=round_data2,
+                axs_object=axs_object[round_to_plot],
+            )
+
+
 def create_time_diff(df1, df2, relation=False):
     """
     Creates a df with the time difference between df1 and df2
@@ -438,6 +454,16 @@ def get_metric_names_for_plotting(mode) -> list:
             metric2_name = "AUC"
             # metrics_tuples.append((metric1, metric1_name))
             metrics_tuples.append((metric2, metric2_name))
+        case "1vs10":
+            # if configs.get("usecase") == 1 or configs.get("usecase") == 2:
+            #     metric1 = "binary_accuracy"
+            # else:
+            #     metric1 = "sparse_categorical_accuracy"
+            metric2 = "auc"
+            # metric1_name = "Accuracy"
+            metric2_name = "AUC"
+            # metrics_tuples.append((metric1, metric1_name))
+            metrics_tuples.append((metric2, metric2_name))
         case "system":
             metrics_tuples.append(("sent", "Network traffic (MB)"))
             metrics_tuples.append(("total_memory", "Memory (GB)"))
@@ -460,7 +486,7 @@ def plot_figure_with_subfigures(axs, fig, mode, metric_name, summarize_mode):
     axs[1, 1].set_title("d)")
     if metric_name == "sent":
         legend_patches = create_legend_patches_with_sent_received()
-    elif mode in ["system", "balanced"]:
+    elif mode in ["system", "balanced", "1vs10"]:
         legend_patches = create_legend_patches(True)
     else:
         legend_patches = create_legend_patches()
