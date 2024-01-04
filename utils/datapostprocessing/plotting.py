@@ -470,6 +470,8 @@ def get_metric_names_for_plotting(mode) -> list:
             metrics_tuples.append(("total_round_time", "Training time (s)"))
             metrics_tuples.append(("total_per_client_memory_client", "Memory(GB)"))
             metrics_tuples.append(("total_client_time", "Training time (s)"))
+            metrics_tuples.append(("max_per_client_memory_client", "Max Memory (GB)"))
+            metrics_tuples.append(("mean_per_client_memory_client", "Mean Memory (GB)"))
         case "dp":
             configuration_name = "Noise multiplier"
             metrics_tuples.append(("auc", "AUC"))

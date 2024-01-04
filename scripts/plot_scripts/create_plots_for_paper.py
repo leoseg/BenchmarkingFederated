@@ -17,7 +17,7 @@ from datapostprocessing.plotting import (
     plot_round,
 )
 
-modes = ["1vs10"]
+modes = ["system"]
 
 data = {}
 mongodb = MongoDBHandler()
@@ -137,7 +137,10 @@ for mode in modes:
                     central_metric = "training_time"
                 elif metric in ["total_memory", "total_per_client_memory_client"]:
                     central_metric = "total_memory_central"
-
+                elif metric == "max_per_client_memory_client":
+                    central_metric = "max_per_client_memory_central"
+                elif metric == "mean_per_client_memory_client":
+                    central_metric = "mean_per_client_memory_central"
                 else:
                     central_metric = metric
                 central_df = transform_to_df(
@@ -148,7 +151,12 @@ for mode in modes:
                     round_configuration="central",
                 )
                 df = pd.concat([central_df, df])
-                if metric in ["total_memory", "total_per_client_memory_client"]:
+                if metric in [
+                    "total_memory",
+                    "total_per_client_memory_client",
+                    "max_per_client_memory_client",
+                    "mean_per_client_memory_client",
+                ]:
                     df["metric"] = df["metric"] / 1000
             if metric_name == "AUC":
                 scale = [0.0, 1.05]
