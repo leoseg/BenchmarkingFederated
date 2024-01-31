@@ -41,7 +41,61 @@ var/
 #  Usually these files are written by a python script from a template
 #  before PyInstaller builds the exe, so as to inject date/other infos into it.
 *.manifest
-*.spec
+*.specFL_paper
+￼Review
+￼Share
+￼Submit
+to IEEE
+￼History
+￼Layout
+￼Chat
+￼New File
+￼New Folder
+￼Upload
+￼Rename
+￼Delete
+￼￼bak
+ ￼6-appendix.tex
+ ￼main_IEEE.tex
+ ￼main_springer.tex
+￼￼data
+￼￼plots
+￼￼plots_angepasst
+￼￼plotsPDF
+ ￼1vs10_auc_groups.pdf￼Menu
+ ￼balanced_auc_groups.pdf
+ ￼balanced_auc_rounds.pdf
+ ￼dp_auc_groups.pdf
+ ￼dp_auc_rounds.pdf
+ ￼system_sent_rounds.pdf
+ ￼system_total_client_time_groups.pdf
+ ￼system_total_client_time_rounds.pdf
+ ￼system_total_memory_groups.pdf
+ ￼system_total_memory_rounds.pdf
+ ￼system_total_per_client_memory_client_groups.pdf
+ ￼system_total_per_client_memory_client_rounds.pdf
+ ￼system_total_round_time_groups.pdf
+ ￼system_total_round_time_rounds.pdf
+ ￼unweighted_auc_global_groups.pdf
+ ￼unweighted_auc_global_rounds.pdf
+ ￼0-abstract.tex
+ ￼1-intro.tex
+ ￼2-related.tex
+ ￼3-methodology.tex
+ ￼4-experiments.tex
+ ￼5-conclusion.tex
+ ￼IEEEtran.cls
+ ￼main.bib
+ ￼main.tex
+ ￼splncs04.bst
+￼
+File outline
+  Download
+pictures/
+partitions_list
+*.conf
+*.pb
+*.v2
 
 # Installer logs
 pip-log.txt
