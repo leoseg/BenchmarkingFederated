@@ -1,5 +1,5 @@
-# MasterthesisBenchmarkFL
-Benchmarking of Flower and Tensorflow Federated for gene expression data analysis.
+# Federated Learning on Transcriptomic Data:
+Model Quality and Performance Trade-offs
 
 ## Datasets used
 ### First Usecase: Blood Cell Classification
