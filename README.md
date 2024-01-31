@@ -1,5 +1,4 @@
-# Federated Learning on Transcriptomic Data:
-Model Quality and Performance Trade-offs
+# Federated Learning on Transcriptomic Data: # Model Quality and Performance Trade-offs
 
 ## Datasets used
 ### First Usecase: Blood Cell Classification
